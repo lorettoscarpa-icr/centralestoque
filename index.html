@@ -12,17 +12,32 @@
 <style>
   :root{--verde:#4a5c2a;--verde-claro:#5d7235;--verde-escuro:#36441f;--ouro:#c9a950;--ouro-claro:#e0c876;--areia:#f4f1e8;--carvao:#1c1c1a;--linha:rgba(201,169,80,.22)}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Barlow',sans-serif;background:radial-gradient(circle at 12% 8%, rgba(201,169,80,.06), transparent 45%),radial-gradient(circle at 88% 92%, rgba(201,169,80,.05), transparent 40%),var(--verde-escuro);color:var(--areia);min-height:100vh;padding:28px 20px 80px}
-  .wrap{max-width:1240px;margin:0 auto}
-  header{display:flex;align-items:center;gap:18px;border-bottom:1px solid var(--linha);padding-bottom:20px;margin-bottom:22px}
-  .crest{width:54px;height:54px;flex-shrink:0;border:1.5px solid var(--ouro);border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);color:var(--ouro)}
-  .crest svg,.crest img{width:34px;height:34px;max-width:34px;max-height:34px}
-  header h1{font-family:'Playfair Display',serif;font-weight:700;font-size:26px;letter-spacing:.5px;line-height:1}
-  header .sub{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--ouro);margin-top:5px;font-weight:600}
-  .tabs{margin-left:auto;display:flex;gap:6px}
-  .tab{background:transparent;border:1px solid var(--linha);color:var(--areia);padding:9px 18px;border-radius:8px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:13px;letter-spacing:.5px;transition:.2s}
-  .tab.active{background:var(--ouro);color:var(--verde-escuro);border-color:var(--ouro)}
-  .tab:not(.active):hover{background:rgba(201,169,80,.1)}
+  body{font-family:'Barlow',sans-serif;background:radial-gradient(circle at 12% 8%, rgba(201,169,80,.06), transparent 45%),radial-gradient(circle at 88% 92%, rgba(201,169,80,.05), transparent 40%),var(--verde-escuro);color:var(--areia);min-height:100vh;padding:0;margin:0}
+  .app-shell{display:flex;min-height:100vh}
+  .sidebar{width:248px;flex-shrink:0;background:#2b3518;border-right:1px solid var(--linha);display:flex;flex-direction:column;padding:22px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:50}
+  .side-brand{display:flex;align-items:center;gap:12px;padding:0 6px 18px;border-bottom:1px solid var(--linha);margin-bottom:14px}
+  .crest{width:46px;height:46px;flex-shrink:0;border:1.5px solid var(--ouro);border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);color:var(--ouro)}
+  .crest svg,.crest img{width:30px;height:30px;max-width:30px;max-height:30px}
+  .side-title{font-family:'Playfair Display',serif;font-weight:700;font-size:16px;line-height:1.05}
+  .side-sub{font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ouro);margin-top:4px;font-weight:600}
+  .side-nav{display:flex;flex-direction:column;gap:4px}
+  .side-item{display:flex;align-items:center;gap:12px;background:transparent;border:none;color:var(--areia);padding:12px 14px;border-radius:10px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:14.5px;text-align:left;width:100%;transition:.18s}
+  .side-item .si-ic{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+  .side-item:hover{background:rgba(201,169,80,.1)}
+  .side-item.active{background:var(--ouro);color:var(--verde-escuro)}
+  .content{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;gap:14px;padding:15px 24px;border-bottom:1px solid var(--linha);position:sticky;top:0;background:rgba(54,68,31,.94);backdrop-filter:blur(6px);z-index:40}
+  .topbar-title{font-family:'Playfair Display',serif;font-weight:600;font-size:20px}
+  .hamb{display:none;background:transparent;border:1px solid var(--linha);color:var(--ouro);width:40px;height:40px;border-radius:9px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+  .content-inner{padding:24px;max-width:1240px;width:100%}
+  .sidebar-bg{display:none}
+  @media(max-width:860px){
+    .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .25s;box-shadow:0 0 40px rgba(0,0,0,.5)}
+    .app-shell.menu-open .sidebar{transform:none}
+    .hamb{display:inline-flex}
+    .app-shell.menu-open .sidebar-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:45;display:block}
+    .content-inner{padding:16px}
+  }
   .grid{display:grid;grid-template-columns:1fr 360px;gap:30px;align-items:start}
   @media(max-width:960px){.grid{grid-template-columns:1fr}}
   .search-bar{position:sticky;top:0;z-index:20;padding:8px 0 12px;background:linear-gradient(var(--verde-escuro) 72%,transparent)}
@@ -100,7 +115,7 @@
   .et-info{flex:1;min-width:0}
   .et-nome{font-weight:var(--etNomeW,700);line-height:1.05;font-size:calc(var(--lh)*.125);letter-spacing:-.2px;word-break:break-word}
   .et-cor{font-weight:var(--etCorW,400);font-size:calc(var(--lh)*.10);margin-top:calc(var(--lh)*.05)}
-  .et-num{color:#000;background:#fff;border:calc(var(--lh)*.014) solid #000;border-radius:calc(var(--lh)*.025);flex-shrink:0;font-weight:var(--etNumW,800);line-height:.85;font-size:calc(var(--lh)*var(--etNum,.30));padding:calc(var(--lh)*.03) calc(var(--lh)*.05);min-width:calc(var(--lh)*.34);text-align:center;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .et-num{color:#fff;background:#000;border-radius:calc(var(--lh)*.02);flex-shrink:0;font-weight:var(--etNumW,800);line-height:.85;font-size:calc(var(--lh)*var(--etNum,.30));padding:calc(var(--lh)*.035) calc(var(--lh)*.06);min-width:calc(var(--lh)*.34);text-align:center;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .et-num.sm{font-size:calc(var(--lh)*.15)}
   .et-bottom{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:6px}
   .et-barcode{flex:1;min-width:0;text-align:var(--etBcAlign,left)}
@@ -354,15 +369,24 @@
 <style id="pageRule"></style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="crest" id="crestHolder"></div>
-    <div><h1>Central do Estoque</h1><div class="sub">Loretto Scarpa</div></div>
-    <div class="tabs">
-      <button class="tab active" data-tab="etiquetas">Etiquetas</button>
-      <button class="tab" data-tab="modelos">Modelos</button>
+<div class="app-shell" id="appShell">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-brand">
+      <div class="crest" id="crestHolder"></div>
+      <div><div class="side-title">Central do Estoque</div><div class="side-sub">Loretto Scarpa</div></div>
     </div>
-  </header>
+    <nav class="side-nav">
+      <button class="side-item active" data-tab="etiquetas" data-title="Etiquetas"><span class="si-ic">&#127991;</span> Etiquetas</button>
+      <button class="side-item" data-tab="entrada" data-title="Entrada de mercadoria"><span class="si-ic">&#128229;</span> Entrada</button>
+      <button class="side-item" data-tab="reposicao" data-title="Reposicao"><span class="si-ic">&#128260;</span> Reposicao</button>
+      <button class="side-item" data-tab="financeiro" data-title="Financeiro"><span class="si-ic">&#128176;</span> Financeiro</button>
+      <button class="side-item" data-tab="modelos" data-title="Modelos"><span class="si-ic">&#128097;</span> Modelos</button>
+    </nav>
+  </aside>
+  <div class="sidebar-bg" id="sidebarBg"></div>
+  <main class="content">
+    <header class="topbar"><button class="hamb" id="hamb" aria-label="Menu">&#9776;</button><div class="topbar-title" id="topbarTitle">Etiquetas</div></header>
+    <div class="content-inner">
 
   <div id="tab-etiquetas">
     <div class="grid">
@@ -399,6 +423,118 @@
         <div class="mini-prev"><div class="lbl">Previa</div><div class="prev-holder"><div class="etiqueta" id="preview"></div></div></div>
       </div>
     </div>
+  </div>
+
+  <div id="tab-entrada" class="hide">
+    <div class="twocol">
+      <div class="panel">
+        <h2>Entrada de mercadoria</h2>
+        <p class="hint">Cole o que chegou (uma linha por item) ou importe a planilha. Dois formatos aceitos:<br>&bull; Por codigo: <b>CODIGO</b> ou <b>CODIGO QTD</b> &nbsp;(ex.: LFRKTGTPT37 3)<br>&bull; Por descricao: <b>Modelo; Cor; Numeracao; Qtd</b> &nbsp;(ex.: Loafer Katar Gravata; Mouro; 40; 2)</p>
+        <textarea id="entradaTxt" style="min-height:230px" placeholder="LFRKTGTMR40 2&#10;Bota Chelsea; Preto; 41; 3&#10;..."></textarea>
+        <label style="margin-top:14px">Total de pares da nota (opcional, confere divergencia)</label>
+        <input type="text" id="entradaTotal" placeholder="ex.: 132">
+        <div class="config-row" style="margin-top:14px">
+          <button class="btn btn-ouro" id="entradaProcessar" style="flex:1">Conferir</button>
+          <button class="btn btn-ghost" id="entradaXlsxBtn" style="flex:1">Importar .xlsx</button>
+          <input type="file" id="entradaXlsx" accept=".xlsx,.xls" class="hide">
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Conferencia</h2>
+        <div id="entradaPreview"><div class="empty">Cole a lista e clique em Conferir.</div></div>
+        <button class="btn btn-ouro hide" id="entradaAdd" style="width:100%;margin-top:16px">Adicionar a fila</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-reposicao" class="hide">
+    <div class="repo-bar">
+      <button class="btn btn-ghost" id="repoAddOpen">+ Modelo</button>
+      <button class="btn btn-ghost" id="repoBulkOpen">Meta em lote</button>
+      <button class="btn btn-ghost" id="repoHistOpen">Historico</button>
+      <button class="btn btn-ghost" id="repoClearEst">Limpar estoque</button>
+      <button class="btn btn-ouro" id="repoGerar">Gerar pedidos</button>
+    </div>
+    <div class="repo-tg" style="margin:12px 0">A pedir: <b id="repoTotal">0 pares</b></div>
+    <div id="repoList"></div>
+    <div id="repoResult"></div>
+
+    <div id="addModal" class="modal-bg hide">
+      <div class="modal">
+        <h3>Adicionar modelo a reposicao</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <input type="text" id="repoForn" list="fornList" placeholder="Fornecedor">
+          <input type="text" id="repoModelo" list="repoModelosDL" placeholder="Modelo (digite para buscar)">
+          <select id="repoCor"><option value="">Todas as cores</option></select>
+        </div>
+        <div class="modal-acts" style="margin-top:16px">
+          <button class="btn btn-ghost" id="addCancel">Cancelar</button>
+          <button class="btn btn-ouro" id="addConfirm">Adicionar</button>
+        </div>
+        <datalist id="repoModelosDL"></datalist>
+        <datalist id="fornList"><option value="Manutt"></option><option value="Tchwm Shoes"></option><option value="Urbana Man"></option><option value="Tarragona"></option><option value="Murilo Mendes"></option></datalist>
+      </div>
+    </div>
+
+    <div id="cfgModal" class="modal-bg hide">
+      <div class="modal modal-lg">
+        <h3 id="cfgTitle">Configurar</h3>
+        <div id="cfgBody"></div>
+        <div class="modal-acts" style="margin-top:16px">
+          <button class="btn btn-ouro" id="cfgClose">Concluir</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="bulkModal" class="modal-bg hide">
+      <div class="modal modal-lg">
+        <h3>Meta em lote</h3>
+        <p class="hint">Defina uma grade-meta e aplique de uma vez a todos os modelos do fornecedor escolhido. So as numeracoes que o modelo tiver serao preenchidas. Voce pode ajustar depois modelo a modelo.</p>
+        <div class="cfg-lbl">Aplicar em</div>
+        <select id="bulkScope" style="width:100%;margin-bottom:14px"></select>
+        <div class="cfg-lbl">Grade-meta (pares por numeracao)</div>
+        <div id="bulkGrade" class="repo-grade"></div>
+        <div class="modal-acts" style="margin-top:16px">
+          <button class="btn btn-ghost" id="bulkCancel">Cancelar</button>
+          <button class="btn btn-ouro" id="bulkApply">Aplicar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="recebModal" class="modal-bg hide">
+      <div class="modal modal-lg">
+        <h3 id="recebTitle">Conferir chegada</h3>
+        <p class="hint">Confira o que chegou de cada item (ja vem preenchido com o que foi pedido; edite se veio diferente). Ao confirmar, as etiquetas do que chegou vao direto para a fila de impressao.</p>
+        <div id="recebAlerta" class="receb-alerta ok"></div>
+        <div id="recebBody"></div>
+        <div class="modal-acts" style="margin-top:16px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="recebCancel">Cancelar</button>
+          <button class="btn btn-ghost" id="recebBaixa">So dar baixa</button>
+          <button class="btn btn-ouro" id="recebConfirm">Confirmar e gerar etiquetas</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="histModal" class="modal-bg hide">
+      <div class="modal modal-lg">
+        <h3>Historico de pedidos</h3>
+        <p class="hint">Pedidos marcados como enviados ficam "a caminho" e descontam do que falta pedir. Quando a mercadoria chegar, marque como recebido para dar baixa.</p>
+        <div id="histList"></div>
+        <div class="modal-acts" style="margin-top:16px">
+          <button class="btn btn-ouro" id="histClose">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-financeiro" class="hide">
+    <div id="finResumo" class="fin-resumo"></div>
+    <div class="repo-modes" id="finFiltros">
+      <button class="rmode on" data-fin="apagar">A pagar</button>
+      <button class="rmode" data-fin="pago">Pagos</button>
+      <button class="rmode" data-fin="todos">Todos</button>
+    </div>
+    <div id="finList"></div>
   </div>
 
   <div id="tab-modelos" class="hide">
@@ -480,6 +616,8 @@
       </div>
     </div>
   </div>
+    </div>
+  </main>
 </div>
 
 <div id="print-area"><div class="print-grid" id="printGrid"></div></div>
@@ -766,7 +904,7 @@ $('entradaAdd')&&$('entradaAdd').addEventListener('click',()=>{
   entradaRec.forEach(e=>{last=addItem(e.modId,e.ci,e.tam,e.qtd);tot+=e.qtd;});
   if(last)montaEtiqueta($('preview'),last,'bc-preview');
   renderFila();renderLista();toast(tot+' etiqueta(s) adicionadas a fila');
-  document.querySelector('.tab[data-tab=etiquetas]').click();
+  document.querySelector('.side-item[data-tab=etiquetas]').click();
   entradaRec=[];entradaErr=[];$('entradaTxt').value='';renderEntradaPreview();
 });
 $('entradaXlsxBtn')&&$('entradaXlsxBtn').addEventListener('click',()=>$('entradaXlsx').click());
@@ -1051,7 +1189,7 @@ window.editarModelo=(id)=>{
   $('mNumIni').value=ini||37;$('mNumFim').value=fim||44;
   coresTmp=m.cores.map(c=>({nome:c.nome,sigla:c.sigla||'',hex:c.hex||'#333333',skus:c.skus?{...c.skus}:undefined,off:!!c.off}));
   renderCoresEditor(coresTmp);$('cancelarEdicaoBtn').classList.remove('hide');
-  document.querySelector('.tab[data-tab=modelos]').click();window.scrollTo({top:0,behavior:'smooth'});
+  document.querySelector('.side-item[data-tab=modelos]').click();window.scrollTo({top:0,behavior:'smooth'});
 };
 window.excluirModelo=(id)=>{const m=catalogo.find(x=>x.id===id);if(confirm('Excluir "'+m.nome+'" de vez? (Para apenas tirar da tela, use o olho para ocultar.)')){catalogo=catalogo.filter(x=>x.id!==id);favoritos.delete(id);marcarUser();salvarCatalogo();salvarFav();renderGerenciar();renderLista();if(editandoId===id)limparForm();}};
 
@@ -1061,7 +1199,19 @@ $('importFile').addEventListener('change',ev=>{const f=ev.target.files[0];if(!f)
 $('uploadBtn').addEventListener('click',()=>$('logoFile').click());
 $('logoFile').addEventListener('change',ev=>{const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{logoData=r.result;localStorage.setItem('loretto_leao',logoData);renderLogo();toast('Simbolo salvo');};r.readAsDataURL(f);});
 function renderLogo(){const h=logoData?`<img src="${logoData}">`:LEAO_SVG;$('logoPrev').innerHTML=h;$('crestHolder').innerHTML=h;}
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');const tab=t.dataset.tab;$('tab-etiquetas').classList.toggle('hide',tab!=='etiquetas');$('tab-modelos').classList.toggle('hide',tab!=='modelos');}));
+function fecharMenu(){const sh=$('appShell');if(sh)sh.classList.remove('menu-open');}
+document.querySelectorAll('.side-item').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.side-item').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  const tab=t.dataset.tab;
+  ['etiquetas','entrada','reposicao','financeiro','modelos'].forEach(n=>{const el=$('tab-'+n);if(el)el.classList.toggle('hide',tab!==n);});
+  const tt=$('topbarTitle');if(tt)tt.textContent=t.dataset.title||t.textContent.trim();
+  if(tab==='reposicao'){buildRepoDatalist();renderRepoList();}
+  if(tab==='financeiro')renderFinanceiro();
+  fecharMenu();const c=document.querySelector('.content');if(c)c.scrollTop=0;
+}));
+if($('hamb'))$('hamb').addEventListener('click',()=>{const sh=$('appShell');if(sh)sh.classList.toggle('menu-open');});
+if($('sidebarBg'))$('sidebarBg').addEventListener('click',fecharMenu);
 function salvaTamanho(){localStorage.setItem('loretto_tamanho',$('tamanho').value);localStorage.setItem('loretto_custom',($('customW').value||'')+','+($('customH').value||''));}
 function toggleCustom(){$('customWrap').classList.toggle('hide',$('tamanho').value!=='custom');}
 $('tamanho').addEventListener('change',()=>{toggleCustom();aplicaTamanho();salvaTamanho();if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');});
@@ -1196,7 +1346,7 @@ window.registrarEnviado=(fk)=>{
 
 // ---- recebimento -> etiquetas ----
 function acharModeloCor(modNome,corNome){const mi=catalogo.findIndex(x=>normKey(x.nome)===normKey(modNome));if(mi<0)return null;const m=catalogo[mi];const ci=m.cores.findIndex(c=>normKey(c.nome)===normKey(corNome));if(ci<0)return null;return {modId:m.id,ci};}
-function trocarAba(tab){const b=document.querySelector('.tab[data-tab="'+tab+'"]');if(b)b.click();}
+function trocarAba(tab){const b=document.querySelector('.side-item[data-tab="'+tab+'"]');if(b)b.click();}
 let recebId=null;
 window.abrirReceb=(id)=>{const p=repoHist.find(x=>x.id===id);if(!p)return;recebId=id;$('recebTitle').textContent='Conferir chegada \u2014 '+p.fornNome;
   let html='';
@@ -1309,7 +1459,7 @@ function renderFinanceiro(){if(!$('finList'))return;
 }
 document.querySelectorAll('#finFiltros .rmode').forEach(b=>b.addEventListener('click',()=>{finFiltro=b.dataset.fin;document.querySelectorAll('#finFiltros .rmode').forEach(x=>x.classList.toggle('on',x===b));renderFinanceiro();}));
 
-aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();iniciarSync();
+aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();buildRepoDatalist();renderRepoList();renderFinanceiro();iniciarSync();
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
 </script>
 </body>
