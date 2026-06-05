@@ -365,6 +365,92 @@
     body.modo-pedido #repo-print{display:block;position:absolute;top:0;left:0;width:100%}
     body.modo-pedido .rp-item{page-break-inside:avoid;break-inside:avoid}
   }
+  /* ===== Reposicao refeita ===== */
+  .rep-subnav{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .rep-tab{background:transparent;border:1px solid var(--linha);color:var(--areia);padding:10px 18px;border-radius:9px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:13.5px;transition:.2s}
+  .rep-tab.active{background:var(--ouro);color:var(--verde-escuro);border-color:var(--ouro)}
+  .rep-tab:not(.active):hover{background:rgba(201,169,80,.1)}
+  .rep-card{border:1px solid var(--linha);border-radius:14px;padding:22px;margin-bottom:16px;background:rgba(0,0,0,.1)}
+  .rep-card-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+  .rep-card-h h3{font-family:'Playfair Display',serif;font-weight:600;font-size:18px}
+  .rep-hint{font-size:13px;color:rgba(244,241,232,.65);line-height:1.5;margin:6px 0 14px}
+  .rep-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .rep-busca{max-width:240px}
+  .rep-filtros{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .rep-ck{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;cursor:pointer;margin:0;text-transform:none;letter-spacing:0;color:var(--areia)}
+  .rep-ck input{width:16px;height:16px;accent-color:var(--ouro)}
+  .btn-sm{padding:7px 14px;font-size:12.5px}
+  .rep-info{margin-top:14px}
+  .rep-info-ok{border-left:3px solid var(--ouro);background:rgba(201,169,80,.08);padding:12px 16px;border-radius:0 8px 8px 0;font-size:13.5px;line-height:1.6}
+  .rep-info-vazio{font-size:13px;color:rgba(244,241,232,.5)}
+  .rep-est-lista{margin-top:6px;max-height:340px;overflow:auto}
+  .rep-est-row{display:flex;justify-content:space-between;padding:8px 4px;border-top:1px solid rgba(255,255,255,.05);font-size:14px}
+  .rep-est-row b{font-family:'DM Mono',monospace;color:var(--ouro-claro)}
+  /* modelos */
+  .rep-mod-lista{margin-top:8px}
+  .rep-mod{border:1px solid rgba(255,255,255,.07);border-radius:10px;margin-bottom:8px;overflow:hidden;transition:.15s}
+  .rep-mod.on{border-color:var(--linha);background:rgba(201,169,80,.04)}
+  .rep-mod-top{display:flex;align-items:center;gap:12px;padding:12px 14px}
+  .rep-mod-nome{flex:1;cursor:pointer;font-weight:600;font-size:14.5px}
+  .rep-mod-meta{display:block;font-size:11.5px;color:rgba(244,241,232,.5);font-weight:400;margin-top:2px}
+  .rep-exp{background:transparent;border:none;color:var(--ouro);cursor:pointer;font-size:11px;padding:4px 8px}
+  /* switch */
+  .rep-switch{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0;cursor:pointer;margin:0}
+  .rep-switch input{opacity:0;width:0;height:0;position:absolute}
+  .rep-slider{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:24px;transition:.2s}
+  .rep-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .rep-switch input:checked + .rep-slider{background:var(--ouro)}
+  .rep-switch input:checked + .rep-slider:before{transform:translateX(18px)}
+  .rep-mod-cfg{padding:4px 14px 16px;border-top:1px solid rgba(255,255,255,.06)}
+  .rep-cfg-row{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0}
+  .rep-fld{display:flex;flex-direction:column;gap:5px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--ouro);font-weight:600;flex:1;min-width:150px}
+  .rep-fld input,.rep-fld select{text-transform:none;letter-spacing:0;font-weight:400;color:var(--areia)}
+  .rep-grade{display:flex;flex-direction:column;gap:12px}
+  .rep-gcor{border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:10px 12px}
+  .rep-gcor-nome{font-weight:600;font-size:13px;margin-bottom:8px;color:var(--ouro-claro)}
+  .rep-gtams{display:flex;flex-wrap:wrap;gap:8px}
+  .rep-gtam{display:flex;flex-direction:column;align-items:center;gap:3px;width:54px}
+  .rep-gn{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+  .rep-gtam input{width:100%;text-align:center;padding:6px 2px;font-family:'DM Mono',monospace}
+  .rep-ge{font-size:9.5px;color:rgba(244,241,232,.45)}
+  /* fabricas */
+  .rep-forn-lista{margin-bottom:14px}
+  .rep-forn-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.06);font-size:14px}
+  .rep-forn-wa{font-size:11px;color:var(--ouro)}
+  .rep-forn-add{display:flex;flex-direction:column;gap:8px}
+  .lnk-del{background:transparent;border:none;color:#e06a4a;cursor:pointer;font-size:12.5px}
+  /* pedido */
+  .rep-ped-forn{border:1px solid var(--linha);border-radius:12px;margin-top:14px;overflow:hidden}
+  .rep-ped-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 16px;background:rgba(201,169,80,.08);flex-wrap:wrap}
+  .rep-ped-h h4{font-family:'Playfair Display',serif;font-weight:600;font-size:16px}
+  .rep-ped-tot{font-family:'DM Mono',monospace;font-size:13px;color:var(--ouro-claro)}
+  .rep-ped-itens{padding:8px 16px}
+  .rep-ped-it{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-top:1px solid rgba(255,255,255,.05);font-size:13.5px;flex-wrap:wrap}
+  .rep-ped-mc{font-weight:600}
+  .rep-ped-g{font-family:'DM Mono',monospace;font-size:12.5px;color:rgba(244,241,232,.7)}
+  .rep-ped-acts{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.06)}
+  /* impressao do pedido */
+  #repo-print{display:none}
+  body.print-repo #repo-print{display:block}
+  .rp2{font-family:'Barlow',sans-serif;color:#111;padding:10px}
+  .rp2-head{border-bottom:2px solid #4a5c2a;padding-bottom:8px;margin-bottom:14px}
+  .rp2-t{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:#4a5c2a}
+  .rp2-s{font-size:12px;color:#555;margin-top:3px}
+  .rp2-tab{width:100%;border-collapse:collapse;font-size:13px}
+  .rp2-tab th{text-align:left;border-bottom:1px solid #4a5c2a;padding:7px 6px;color:#4a5c2a;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+  .rp2-tab td{padding:7px 6px;border-bottom:1px solid #eee}
+  .rp2-tot{margin-top:14px;font-weight:700;color:#4a5c2a}
+  .rep-switch.sm{width:38px;height:22px}
+  .rep-switch.sm .rep-slider:before{height:16px;width:16px}
+  .rep-switch.sm input:checked + .rep-slider:before{transform:translateX(16px)}
+  .rep-gcor.off{opacity:.5}
+  .rep-gcor-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .rep-cor-toggle{background:transparent;border:1px solid var(--linha);color:var(--areia);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer}
+  .rep-cor-toggle:hover{background:rgba(201,169,80,.12)}
+  .rep-forn-acts{display:flex;align-items:center;gap:14px}
+  .rep-forn-row.off{opacity:.6}
+  .rep-forn-tag{font-size:10px;color:#e06a4a;border:1px solid #e06a4a;border-radius:5px;padding:1px 5px}
+  .sync-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;font-size:14px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--areia);cursor:pointer}
 </style>
 <style id="pageRule"></style>
 </head>
@@ -448,84 +534,67 @@
   </div>
 
   <div id="tab-reposicao" class="hide">
-    <div class="repo-bar">
-      <button class="btn btn-ghost" id="repoAddOpen">+ Modelo</button>
-      <button class="btn btn-ghost" id="repoBulkOpen">Meta em lote</button>
-      <button class="btn btn-ghost" id="repoHistOpen">Historico</button>
-      <button class="btn btn-ghost" id="repoClearEst">Limpar estoque</button>
-      <button class="btn btn-ouro" id="repoGerar">Gerar pedidos</button>
-    </div>
-    <div class="repo-tg" style="margin:12px 0">A pedir: <b id="repoTotal">0 pares</b></div>
-    <div id="repoList"></div>
-    <div id="repoResult"></div>
-
-    <div id="addModal" class="modal-bg hide">
-      <div class="modal">
-        <h3>Adicionar modelo a reposicao</h3>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <input type="text" id="repoForn" list="fornList" placeholder="Fornecedor">
-          <input type="text" id="repoModelo" list="repoModelosDL" placeholder="Modelo (digite para buscar)">
-          <select id="repoCor"><option value="">Todas as cores</option></select>
-        </div>
-        <div class="modal-acts" style="margin-top:16px">
-          <button class="btn btn-ghost" id="addCancel">Cancelar</button>
-          <button class="btn btn-ouro" id="addConfirm">Adicionar</button>
-        </div>
-        <datalist id="repoModelosDL"></datalist>
-        <datalist id="fornList"><option value="Manutt"></option><option value="Tchwm Shoes"></option><option value="Urbana Man"></option><option value="Tarragona"></option><option value="Murilo Mendes"></option></datalist>
-      </div>
+    <div class="rep-subnav">
+      <button class="rep-tab active" data-rep="estoque">1 &middot; Estoque</button>
+      <button class="rep-tab" data-rep="modelos">2 &middot; Modelos &amp; Grade</button>
+      <button class="rep-tab" data-rep="pedido">3 &middot; Pedido</button>
+      <button class="rep-tab" data-rep="config">Configuracoes</button>
     </div>
 
-    <div id="cfgModal" class="modal-bg hide">
-      <div class="modal modal-lg">
-        <h3 id="cfgTitle">Configurar</h3>
-        <div id="cfgBody"></div>
-        <div class="modal-acts" style="margin-top:16px">
-          <button class="btn btn-ouro" id="cfgClose">Concluir</button>
+    <section id="rep-estoque" class="rep-pane">
+      <div class="rep-card">
+        <div class="rep-card-h"><h3>Estoque atual</h3></div>
+        <p class="rep-hint">Importe o relatorio do Kigi (.xlsx). O sistema reconhece pelos codigos de barras e <b>substitui</b> o estoque anterior. Usa as colunas <b>Codigo Barras</b>, <b>Estoque</b> e <b>Valor custo</b> (se houver) &mdash; as demais sao ignoradas.</p>
+        <input type="file" id="repFile" accept=".xlsx" class="hide">
+        <div class="rep-actions">
+          <button class="btn btn-ouro" id="repImportBtn">Importar relatorio do Kigi</button>
+          <button class="btn btn-ghost" id="repLimparEst">Limpar estoque</button>
         </div>
+        <div id="repEstInfo" class="rep-info"></div>
       </div>
-    </div>
+      <div class="rep-card">
+        <div class="rep-card-h"><h3>Conferir estoque</h3><input type="text" id="repEstBusca" class="rep-busca" placeholder="Buscar modelo..."></div>
+        <div id="repEstLista" class="rep-est-lista"></div>
+      </div>
+    </section>
 
-    <div id="bulkModal" class="modal-bg hide">
-      <div class="modal modal-lg">
-        <h3>Meta em lote</h3>
-        <p class="hint">Defina uma grade-meta e aplique de uma vez a todos os modelos do fornecedor escolhido. So as numeracoes que o modelo tiver serao preenchidas. Voce pode ajustar depois modelo a modelo.</p>
-        <div class="cfg-lbl">Aplicar em</div>
-        <select id="bulkScope" style="width:100%;margin-bottom:14px"></select>
-        <div class="cfg-lbl">Grade-meta (pares por numeracao)</div>
-        <div id="bulkGrade" class="repo-grade"></div>
-        <div class="modal-acts" style="margin-top:16px">
-          <button class="btn btn-ghost" id="bulkCancel">Cancelar</button>
-          <button class="btn btn-ouro" id="bulkApply">Aplicar</button>
+    <section id="rep-modelos" class="rep-pane hide">
+      <div class="rep-card">
+        <div class="rep-card-h">
+          <h3>Modelos com reposicao</h3>
+          <div class="rep-filtros">
+            <input type="text" id="repModBusca" class="rep-busca" placeholder="Buscar modelo...">
+            <label class="rep-ck"><input type="checkbox" id="repSoFixos"> So fixos</label>
+          </div>
         </div>
+        <p class="rep-hint">Ligue a chave nos modelos que tem <b>reposicao (fixos)</b>; os demais (colecao) ficam de fora. Em cada fixo, defina a <b>fabrica</b>, o <b>custo</b> por par e a <b>grade</b> por cor e numeracao.</p>
+        <div id="repModLista" class="rep-mod-lista"></div>
       </div>
-    </div>
+    </section>
 
-    <div id="recebModal" class="modal-bg hide">
-      <div class="modal modal-lg">
-        <h3 id="recebTitle">Conferir chegada</h3>
-        <p class="hint">Confira o que chegou de cada item (ja vem preenchido com o que foi pedido; edite se veio diferente). Ao confirmar, as etiquetas do que chegou vao direto para a fila de impressao.</p>
-        <div id="recebAlerta" class="receb-alerta ok"></div>
-        <div id="recebBody"></div>
-        <div class="modal-acts" style="margin-top:16px;flex-wrap:wrap">
-          <button class="btn btn-ghost" id="recebCancel">Cancelar</button>
-          <button class="btn btn-ghost" id="recebBaixa">So dar baixa</button>
-          <button class="btn btn-ouro" id="recebConfirm">Confirmar e gerar etiquetas</button>
-        </div>
+    <section id="rep-pedido" class="rep-pane hide">
+      <div class="rep-card">
+        <div class="rep-card-h"><h3>Pedido de reposicao</h3><button class="btn btn-ouro btn-sm" id="repGerarBtn">Gerar pedido</button></div>
+        <p class="rep-hint">Pedido = <b>grade &minus; estoque</b>, por numeracao. Agrupado por fabrica, com o custo total esperado.</p>
+        <div id="repPedido" class="rep-pedido"></div>
       </div>
-    </div>
+    </section>
 
-    <div id="histModal" class="modal-bg hide">
-      <div class="modal modal-lg">
-        <h3>Historico de pedidos</h3>
-        <p class="hint">Pedidos marcados como enviados ficam "a caminho" e descontam do que falta pedir. Quando a mercadoria chegar, marque como recebido para dar baixa.</p>
-        <div id="histList"></div>
-        <div class="modal-acts" style="margin-top:16px">
-          <button class="btn btn-ouro" id="histClose">Fechar</button>
+    <section id="rep-config" class="rep-pane hide">
+      <div class="rep-card">
+        <div class="rep-card-h"><h3>Fabricas / fornecedores</h3></div>
+        <p class="rep-hint">Ative ou desative fabricas. As desativadas somem das opcoes de pedido e nao entram nos pedidos &mdash; sem apagar nada.</p>
+        <div id="cfgFornLista" class="rep-forn-lista"></div>
+        <div class="rep-forn-add">
+          <input type="text" id="cfgFornNome" placeholder="Nome da fabrica">
+          <input type="text" id="cfgFornWa" placeholder="Link do grupo no WhatsApp (opcional)">
+          <button class="btn btn-ouro" id="cfgFornAdd">Adicionar fabrica</button>
         </div>
       </div>
-    </div>
+    </section>
   </div>
+
+
 
   <div id="tab-financeiro" class="hide">
     <div id="finResumo" class="fin-resumo"></div>
@@ -616,6 +685,7 @@
       </div>
     </div>
   </div>
+
     </div>
   </main>
 </div>
@@ -623,27 +693,17 @@
 <div id="print-area"><div class="print-grid" id="printGrid"></div></div>
 <div id="repo-print"></div>
 <div id="syncModal" class="modal-bg hide">
-  <div class="modal modal-lg">
-    <h3>Sincronizar dispositivos</h3>
-    <div class="res">A fila de impressao fica igual no telefone e no computador. O Yuri marca os modelos e numeracoes pelo telefone; no computador, conectado a Zebra, e so mandar imprimir. Limpou num aparelho, limpa no outro.</div>
-    <label style="margin-top:0">Codigo de sincronizacao</label>
-    <input type="text" id="syncCodigo" placeholder="ex: estoque-yuri">
-    <div class="modal-nota" style="margin-top:6px">Use o mesmo codigo em todos os aparelhos que devem compartilhar a fila.</div>
-    <label>Configuracao do Firebase</label>
-    <textarea id="syncConfig" rows="7" placeholder='Cole aqui o firebaseConfig do seu projeto, ex:
-{
-  "apiKey": "...",
-  "authDomain": "...",
-  "projectId": "...",
-  "appId": "..."
-}'></textarea>
+  <div class="modal">
+    <h3>Sincronizacao</h3>
+    <div class="res">Sua fila de impressao e suas preferencias (favoritos e modelos/cores ocultos) ficam iguais em todos os seus aparelhos.</div>
+    <label style="margin-top:0">Voce esta usando como</label>
+    <input list="syncUsuarios" id="syncUsuario" placeholder="ex: Yuri" autocomplete="off">
+    <datalist id="syncUsuarios"><option value="Yuri"></option><option value="Edson"></option></datalist>
+    <div class="modal-nota" style="margin-top:6px">Com o login, isso passa a ser automatico por usuario.</div>
+    <label class="sync-toggle-row">Sincronizar entre meus aparelhos
+      <span class="rep-switch"><input type="checkbox" id="syncToggle"><span class="rep-slider"></span></span></label>
     <div class="sync-status" id="syncStatusBox"></div>
-    <div class="modal-acts" style="margin-top:16px">
-      <button class="btn btn-ghost" id="syncOff">Desligar</button>
-      <button class="btn btn-ouro" id="syncConnect">Conectar</button>
-    </div>
-    <button class="btn btn-ghost" id="syncClose" style="width:100%;margin-top:10px">Fechar</button>
-    <div class="modal-nota">A configuracao fica salva neste aparelho. Sem internet ou sem conectar, a fila funciona normalmente so aqui.</div>
+    <button class="btn btn-ouro" id="syncClose" style="width:100%;margin-top:16px">Concluir</button>
   </div>
 </div>
 <div id="layoutModal" class="modal-bg hide">
@@ -714,8 +774,8 @@ let logoData=localStorage.getItem('loretto_leao')||null;
 let editandoId=null, coresTmp=[];
 
 function carregar(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
-function salvarCatalogo(){localStorage.setItem('loretto_catalogo',JSON.stringify(catalogo));}
-function salvarFav(){localStorage.setItem('loretto_favoritos',JSON.stringify([...favoritos]));}
+function salvarCatalogo(){localStorage.setItem('loretto_catalogo',JSON.stringify(catalogo));if(typeof syncPushPrefs==='function')syncPushPrefs();}
+function salvarFav(){localStorage.setItem('loretto_favoritos',JSON.stringify([...favoritos]));if(typeof syncPushPrefs==='function')syncPushPrefs();}
 function marcarUser(){localStorage.setItem('loretto_usermod','1');}
 function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
@@ -940,30 +1000,19 @@ window.remover=(i)=>{fila.splice(i,1);refreshFila();};
 function refreshFila(){renderFila();renderLista();persistFila();}
 $('clearBtn').addEventListener('click',()=>{if(fila.length&&confirm('Limpar toda a fila?')){fila=[];refreshFila();}});
 
-/* ---------- SINCRONIZACAO ENTRE DISPOSITIVOS (Firestore) ---------- */
+/* ---------- SINCRONIZACAO (por usuario; Firebase embutido) ---------- */
 const FIREBASE_FIXO={apiKey:"AIzaSyCogQoTSULCdC1JhTb0IUilWAIA1itBJ8U",authDomain:"loretto-scarpa-l-icr.firebaseapp.com",projectId:"loretto-scarpa-l-icr",storageBucket:"loretto-scarpa-l-icr.firebasestorage.app",messagingSenderId:"428188657366",appId:"1:428188657366:web:c700c9a092bfa22d83cb77"};
-const CODIGO_PADRAO='estoque-yuri';
-let syncCfg=carregar('loretto_sync',null)||{config:FIREBASE_FIXO,codigo:CODIGO_PADRAO,on:true};
-if(!syncCfg.config)syncCfg.config=FIREBASE_FIXO;
-if(!syncCfg.codigo)syncCfg.codigo=CODIGO_PADRAO;
-let _db=null,_docRef=null,_unsub=null;
-function salvaSync(){try{localStorage.setItem('loretto_sync',JSON.stringify(syncCfg));}catch(e){}}
-function persistFila(){
-  try{localStorage.setItem('loretto_fila',JSON.stringify(fila));}catch(e){}
-  if(_docRef){_docRef.set({itens:fila,ts:Date.now()}).catch(function(){});}
-}
+let syncCfg=carregar('loretto_sync',null)||{usuario:'',on:false};
+if(syncCfg.codigo&&!syncCfg.usuario)syncCfg.usuario=syncCfg.codigo;
+if(typeof syncCfg.on!=='boolean')syncCfg.on=false;
+var _db=null,_fRef=null,_pRef=null,_unsubF=null,_unsubP=null;
+function salvaSync(){try{localStorage.setItem('loretto_sync',JSON.stringify({usuario:syncCfg.usuario||'',on:!!syncCfg.on}));}catch(e){}}
+function syncCodigo(){return (syncCfg.usuario||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^a-zA-Z0-9_-]/g,'').toLowerCase();}
 function setSyncStatus(st,msg){
   const map={on:['#39d353','Sincronizado'],off:['#8a8a8a','So neste aparelho'],wait:['#e0c876','Conectando...'],err:['#e06a4a','Erro de sincronizacao']};
   const m=map[st]||map.off,dot=$('syncDot'),lab=$('syncLabel'),box=$('syncStatusBox');
   if(dot)dot.style.background=m[0];if(lab)lab.textContent=m[1];
   if(box)box.innerHTML='<span style="color:'+m[0]+'">&#9679;</span> '+m[1]+(msg?(' &mdash; '+escapeHtml(String(msg))):'');
-}
-function parseFirebaseConfig(raw){
-  let s=(raw||'').trim();if(!s)throw new Error('cole a configuracao do Firebase');
-  s=s.replace(/^[A-Za-z0-9_$ ]*=\s*/,'').replace(/;\s*$/,'');
-  let o;try{o=JSON.parse(s);}catch(e){o=(new Function('return ('+s+')'))();}
-  if(!o||!o.projectId||!o.apiKey)throw new Error('faltou apiKey ou projectId');
-  return o;
 }
 function loadFirebase(cb){
   if(window.firebase&&window.firebase.firestore){cb();return;}
@@ -973,36 +1022,47 @@ function loadFirebase(cb){
   s1.onerror=function(){setSyncStatus('err','nao carregou o Firebase');};
   document.head.appendChild(s1);
 }
+function persistFila(){
+  try{localStorage.setItem('loretto_fila',JSON.stringify(fila));}catch(e){}
+  if(_fRef){_fRef.set({itens:fila,ts:Date.now()}).catch(function(){});}
+}
+function syncPushPrefs(){ if(!_pRef)return; _pRef.set({favoritos:[...favoritos],catalogo:catalogo,ts:Date.now()}).catch(function(){}); }
+function aplicarPrefsRemoto(data){
+  if(!data)return; let mudou=false;
+  if(Array.isArray(data.favoritos)){const nf=new Set(data.favoritos);if(JSON.stringify([...nf].sort())!==JSON.stringify([...favoritos].sort())){favoritos=nf;try{localStorage.setItem('loretto_favoritos',JSON.stringify([...favoritos]));}catch(e){}mudou=true;}}
+  if(Array.isArray(data.catalogo)&&data.catalogo.length){if(JSON.stringify(data.catalogo)!==JSON.stringify(catalogo)){catalogo=data.catalogo;try{localStorage.setItem('loretto_catalogo',JSON.stringify(catalogo));}catch(e){}mudou=true;}}
+  if(mudou){renderLista();if(typeof renderGerenciar==='function')renderGerenciar();renderFila();}
+}
 function conectarSync(){
-  if(!syncCfg.config||!syncCfg.codigo){setSyncStatus('off');return;}
+  const cod=syncCodigo(); if(!cod){setSyncStatus('off');return;}
   setSyncStatus('wait');
   loadFirebase(function(){
     try{
-      if(!firebase.apps.length)firebase.initializeApp(syncCfg.config||FIREBASE_FIXO);
+      if(!firebase.apps.length)firebase.initializeApp(FIREBASE_FIXO);
       _db=firebase.firestore();
-      _docRef=_db.collection('ls_fila_etiquetas').doc(syncCfg.codigo);
-      if(_unsub){_unsub();_unsub=null;}
-      _unsub=_docRef.onSnapshot(function(snap){
+      _fRef=_db.collection('ls_fila_etiquetas').doc(cod);
+      _pRef=_db.collection('ls_etiq_prefs').doc(cod);
+      if(_unsubF)_unsubF(); if(_unsubP)_unsubP();
+      _unsubF=_fRef.onSnapshot(function(snap){
         const data=snap.data(),remoto=(data&&Array.isArray(data.itens))?data.itens:[];
         if(JSON.stringify(remoto)!==JSON.stringify(fila)){fila=remoto;renderFila();renderLista();try{localStorage.setItem('loretto_fila',JSON.stringify(fila));}catch(e){}}
         setSyncStatus('on');
       },function(err){setSyncStatus('err',err&&err.message);});
-      _docRef.get().then(function(snap){if(!snap.exists)_docRef.set({itens:fila,ts:Date.now()});}).catch(function(){});
+      _unsubP=_pRef.onSnapshot(function(snap){aplicarPrefsRemoto(snap.data());},function(){});
+      _fRef.get().then(function(snp){if(!snp.exists)_fRef.set({itens:fila,ts:Date.now()});}).catch(function(){});
+      _pRef.get().then(function(snp){if(!snp.exists)syncPushPrefs();}).catch(function(){});
     }catch(e){setSyncStatus('err',e.message);}
   });
 }
-function desconectarSync(){if(_unsub){_unsub();_unsub=null;}_docRef=null;_db=null;setSyncStatus('off');}
-function preencheSyncModal(){if($('syncCodigo'))$('syncCodigo').value=syncCfg.codigo||'';if($('syncConfig'))$('syncConfig').value=syncCfg.config?JSON.stringify(syncCfg.config,null,2):'';}
-function iniciarSync(){preencheSyncModal();if(syncCfg.on&&syncCfg.config&&syncCfg.codigo)conectarSync();else setSyncStatus('off');}
-if($('syncOpen'))$('syncOpen').addEventListener('click',function(){preencheSyncModal();setSyncStatus(_docRef?'on':(syncCfg.on?'wait':'off'));$('syncModal').classList.remove('hide');});
+function desconectarSync(){if(_unsubF){_unsubF();_unsubF=null;}if(_unsubP){_unsubP();_unsubP=null;}_fRef=_pRef=_db=null;setSyncStatus('off');}
+function preencheSyncModal(){if($('syncUsuario'))$('syncUsuario').value=syncCfg.usuario||'';if($('syncToggle'))$('syncToggle').checked=!!syncCfg.on;}
+function aplicarSync(){salvaSync();if(syncCfg.on&&syncCodigo())conectarSync();else desconectarSync();}
+function iniciarSync(){preencheSyncModal();if(syncCfg.on&&syncCodigo())conectarSync();else setSyncStatus('off');}
+if($('syncOpen'))$('syncOpen').addEventListener('click',function(){preencheSyncModal();setSyncStatus(_fRef?'on':(syncCfg.on?'wait':'off'));$('syncModal').classList.remove('hide');});
 if($('syncClose'))$('syncClose').addEventListener('click',function(){$('syncModal').classList.add('hide');});
 if($('syncModal'))$('syncModal').addEventListener('click',function(e){if(e.target.id==='syncModal')$('syncModal').classList.add('hide');});
-if($('syncConnect'))$('syncConnect').addEventListener('click',function(){
-  const cod=$('syncCodigo').value.trim();if(!cod){setSyncStatus('err','defina um codigo');return;}
-  let cfg;try{cfg=parseFirebaseConfig($('syncConfig').value);}catch(e){setSyncStatus('err',e.message);return;}
-  syncCfg={config:cfg,codigo:cod,on:true};salvaSync();conectarSync();
-});
-if($('syncOff'))$('syncOff').addEventListener('click',function(){syncCfg.on=false;salvaSync();desconectarSync();});
+if($('syncUsuario'))$('syncUsuario').addEventListener('change',function(){syncCfg.usuario=this.value.trim();aplicarSync();});
+if($('syncToggle'))$('syncToggle').addEventListener('change',function(){syncCfg.on=this.checked;if(this.checked&&!syncCodigo()){setSyncStatus('err','informe o usuario acima');this.checked=false;syncCfg.on=false;salvaSync();return;}aplicarSync();});
 
 $('printBtn').addEventListener('click',()=>{
   if(!fila.length){toast('A fila esta vazia');return;}
@@ -1206,7 +1266,7 @@ document.querySelectorAll('.side-item').forEach(t=>t.addEventListener('click',()
   const tab=t.dataset.tab;
   ['etiquetas','entrada','reposicao','financeiro','modelos'].forEach(n=>{const el=$('tab-'+n);if(el)el.classList.toggle('hide',tab!==n);});
   const tt=$('topbarTitle');if(tt)tt.textContent=t.dataset.title||t.textContent.trim();
-  if(tab==='reposicao'){buildRepoDatalist();renderRepoList();}
+  if(tab==='reposicao'){repRender();}
   if(tab==='financeiro')renderFinanceiro();
   fecharMenu();const c=document.querySelector('.content');if(c)c.scrollTop=0;
 }));
@@ -1459,7 +1519,286 @@ function renderFinanceiro(){if(!$('finList'))return;
 }
 document.querySelectorAll('#finFiltros .rmode').forEach(b=>b.addEventListener('click',()=>{finFiltro=b.dataset.fin;document.querySelectorAll('#finFiltros .rmode').forEach(x=>x.classList.toggle('on',x===b));renderFinanceiro();}));
 
-aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();buildRepoDatalist();renderRepoList();renderFinanceiro();iniciarSync();
+/* ==== rep module ==== */
+/* ============ MODULO REPOSICAO (relatorio = fonte; inclui acessorios) ============ */
+let repCatalogo=carregar('loretto_rep_catalogo',[]);  // [{id,nome,cores:[{nome,skus:{tam:chave}}]}]
+let repEstoque=carregar('loretto_rep_estoque',{});    // {chave: qtd}
+let repInfo=carregar('loretto_rep_info',null);
+let repCfg=carregar('loretto_rep_cfg',{});            // {id:{fixo,fornId,custo,grade:{cor:{tam:meta}},coresOff:{cor:1}}}
+let repForn=carregar('loretto_rep_forn',null);        // {fid:{nome,whatsapp,off}}
+let repCusto=carregar('loretto_rep_custo',{});
+let repSub='estoque', repAberto=null, repPedidoCache=null;
+
+function repSalvar(){
+  try{
+    localStorage.setItem('loretto_rep_catalogo',JSON.stringify(repCatalogo));
+    localStorage.setItem('loretto_rep_estoque',JSON.stringify(repEstoque));
+    localStorage.setItem('loretto_rep_cfg',JSON.stringify(repCfg));
+    localStorage.setItem('loretto_rep_forn',JSON.stringify(repForn||{}));
+    localStorage.setItem('loretto_rep_custo',JSON.stringify(repCusto));
+    if(repInfo)localStorage.setItem('loretto_rep_info',JSON.stringify(repInfo));
+  }catch(e){}
+}
+function repInit(){
+  if(!repForn){
+    repForn={};
+    [['urbana','Urbana Man','https://chat.whatsapp.com/CZYOPZ56aQ2DrmEs20OaO5'],
+     ['tchwm','Tchwm Shoes','https://chat.whatsapp.com/Ea8S3b3X4MD6QiQKnyibZ4'],
+     ['tarragona','Tarragona',''],
+     ['manutt','Manutt','https://chat.whatsapp.com/B7xHN6p4mZk1O5sPzry15l']
+    ].forEach(([k,n,w])=>repForn[k]={nome:n,whatsapp:w,off:false});
+    repSalvar();
+  }
+}
+function repCfgDe(id){if(!repCfg[id])repCfg[id]={fixo:false,fornId:'',custo:0,grade:{},coresOff:{}};const c=repCfg[id];if(!c.grade)c.grade={};if(!c.coresOff)c.coresOff={};return c;}
+function repNormCab(s){return String(s==null?'':s).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLowerCase();}
+function repTams(c){return Object.keys(c.skus).sort((a,b)=>{const na=parseFloat(a),nb=parseFloat(b),an=!isNaN(na),bn=!isNaN(nb);if(an&&bn)return na-nb;if(an)return -1;if(bn)return 1;return String(a).localeCompare(String(b));});}
+function repModelo(id){return repCatalogo.find(m=>m.id===id);}
+function repEstoqueModelo(m){let s=0;m.cores.forEach(c=>repTams(c).forEach(t=>{s+=repEstoque[c.skus[t]]||0;}));return s;}
+function repBRL(v){return 'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function repFornAtivas(sel){return Object.keys(repForn||{}).filter(k=>!repForn[k].off||k===sel);}
+function repLixo(nome){const n=repNormCab(nome);return !n||n.indexOf('total geral')>=0||n==='taxa de entrega'||n.indexOf('(soma)')>=0;}
+
+/* ---------- sub-navegacao ---------- */
+function repSetSub(s){repSub=s;repRender();}
+function repRender(){
+  document.querySelectorAll('.rep-tab').forEach(b=>b.classList.toggle('active',b.dataset.rep===repSub));
+  ['estoque','modelos','pedido','config'].forEach(n=>{const el=$('rep-'+n);if(el)el.classList.toggle('hide',n!==repSub);});
+  if(repSub==='estoque')repRenderEstoque();
+  else if(repSub==='modelos')repRenderModelos();
+  else if(repSub==='config')repRenderConfig();
+}
+
+/* ---------- ESTOQUE / IMPORTACAO ---------- */
+function repRenderEstoque(){
+  const inf=$('repEstInfo');
+  if(inf){
+    inf.innerHTML = repInfo
+      ? `<div class="rep-info-ok"><b>Ultima importacao:</b> ${escapeHtml(repInfo.data)}<br>${repInfo.produtos} produtos &middot; ${repInfo.skus} itens &middot; <b>${repInfo.pares} unidades</b> em estoque${repInfo.lixo?` &middot; ${repInfo.lixo} linhas descartadas`:''}</div>`
+      : `<div class="rep-info-vazio">Nenhum estoque importado ainda. Importe o relatorio do Kigi para o sistema reconhecer os produtos (calcados e acessorios).</div>`;
+  }
+  const lst=$('repEstLista'); if(!lst)return;
+  const busca=normKey(($('repEstBusca')&&$('repEstBusca').value)||'');
+  const mods=repCatalogo.map(m=>({m,q:repEstoqueModelo(m)})).filter(x=>x.q>0).filter(x=>!busca||normKey(x.m.nome).includes(busca)).sort((a,b)=>b.q-a.q);
+  lst.innerHTML = mods.length ? mods.map(x=>`<div class="rep-est-row"><span>${escapeHtml(x.m.nome)}</span><b>${x.q}</b></div>`).join('') : '<div class="empty">Importe um relatorio para ver o estoque.</div>';
+}
+function repImportar(file){
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+      const head=(rows[0]||[]).map(repNormCab);
+      const find=names=>{for(let i=0;i<head.length;i++)if(names.indexOf(head[i])>=0)return i;return -1;};
+      const pi=find(['produto','modelo','descricao']);
+      const cori=find(['cor']);
+      const ti=find(['tamanho','numeracao','numero']);
+      const bi=find(['codigo barras','codigo de barras','codigobarras','ean','cod barras']);
+      const ei=find(['estoque','qtd estoque','saldo','quantidade']);
+      const cu=find(['valor custo','custo','preco custo']);
+      if(pi<0||ei<0){toast('Nao encontrei as colunas Produto e Estoque');return;}
+      const prod={},novoEst={},custoMod={}; let lixo=0,pares=0,skus=0;
+      for(let r=1;r<rows.length;r++){
+        const row=rows[r]; if(!row)continue;
+        const nome=pi>=0&&row[pi]!=null?String(row[pi]).trim():''; if(!nome||repLixo(nome)){lixo++;continue;}
+        const id=normKey(nome);
+        const cor=(cori>=0&&row[cori]!=null&&String(row[cori]).trim())||'Unica';
+        const tam=(ti>=0&&row[ti]!=null&&String(row[ti]).trim())||'-';
+        const cb=bi>=0&&row[bi]!=null?String(row[bi]).trim():'';
+        const chave=cb||(id+'|'+normKey(cor)+'|'+tam);
+        const q=parseInt(row[ei])||0;
+        if(!prod[id])prod[id]={id,nome,cores:{}};
+        if(!prod[id].cores[cor])prod[id].cores[cor]={nome:cor,skus:{}};
+        prod[id].cores[cor].skus[tam]=chave;
+        novoEst[chave]=q; pares+=q; skus++;
+        if(cu>=0){const v=parseFloat(row[cu]); if(v>0&&!custoMod[id])custoMod[id]=v;}
+      }
+      repCatalogo=Object.values(prod).map(p=>({id:p.id,nome:p.nome,cores:Object.values(p.cores)})).sort((a,b)=>a.nome.localeCompare(b.nome));
+      repEstoque=novoEst;
+      Object.keys(custoMod).forEach(id=>{repCusto[id]=custoMod[id];const cf=repCfgDe(id);if(!cf.custo)cf.custo=custoMod[id];});
+      repInfo={data:new Date().toLocaleString('pt-BR'),produtos:repCatalogo.length,skus,pares,lixo};
+      repSalvar(); repRender(); toast(repCatalogo.length+' produtos, '+pares+' unidades');
+    }catch(err){toast('Erro ao ler o arquivo');}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ---------- MODELOS & GRADE ---------- */
+function repRenderModelos(){
+  const lst=$('repModLista'); if(!lst)return;
+  if(!repCatalogo.length){lst.innerHTML='<div class="empty">Importe o relatorio do Kigi na aba Estoque para listar os produtos.</div>';return;}
+  const busca=normKey(($('repModBusca')&&$('repModBusca').value)||'');
+  const soFixos=$('repSoFixos')&&$('repSoFixos').checked;
+  const mods=repCatalogo
+    .filter(m=>!busca||normKey(m.nome).includes(busca))
+    .filter(m=>!soFixos||(repCfg[m.id]&&repCfg[m.id].fixo));
+  let html='';
+  mods.forEach(m=>{
+    const cf=repCfg[m.id]||{}; const fixo=!!cf.fixo; const est=repEstoqueModelo(m);
+    html+=`<div class="rep-mod${fixo?' on':''}">
+      <div class="rep-mod-top">
+        <label class="rep-switch"><input type="checkbox" ${fixo?'checked':''} onchange="repToggleFixo('${m.id}',this.checked)"><span class="rep-slider"></span></label>
+        <div class="rep-mod-nome" onclick="repExpand('${m.id}')">${escapeHtml(m.nome)}<span class="rep-mod-meta">${m.cores.length} cor(es) &middot; estoque ${est}${fixo?' &middot; fixo':''}</span></div>
+        ${fixo?`<button class="rep-exp" onclick="repExpand('${m.id}')">${repAberto===m.id?'&#9650;':'&#9660;'}</button>`:''}
+      </div>`;
+    if(fixo && repAberto===m.id){
+      const coresOff=cf.coresOff||{};
+      const coresOrd=m.cores.slice().sort((a,b)=>(coresOff[a.nome]?1:0)-(coresOff[b.nome]?1:0));
+      html+=`<div class="rep-mod-cfg">
+        <div class="rep-cfg-row">
+          <label class="rep-fld">Fabrica<select onchange="repSetForn('${m.id}',this.value)">${repFornOptions(cf.fornId)}</select></label>
+          <label class="rep-fld">Custo por par<input type="number" step="0.01" min="0" value="${cf.custo||''}" placeholder="0,00" oninput="repSetCusto('${m.id}',this.value)"></label>
+        </div>
+        <div class="rep-grade">`;
+      coresOrd.forEach(c=>{
+        const off=!!coresOff[c.nome];
+        const cor=String(c.nome).replace(/'/g,"\\'");
+        html+=`<div class="rep-gcor${off?' off':''}">
+          <div class="rep-gcor-h"><span class="rep-gcor-nome">${escapeHtml(c.nome)}</span>
+            <button class="rep-cor-toggle" onclick="repToggleCor('${m.id}','${cor}',${off?'false':'true'})">${off?'reativar':'desativar'}</button></div>`;
+        if(!off){
+          html+=`<div class="rep-gtams">`;
+          repTams(c).forEach(t=>{
+            const meta=(cf.grade&&cf.grade[c.nome]&&cf.grade[c.nome][t])||'';
+            const e=repEstoque[c.skus[t]]||0;
+            html+=`<div class="rep-gtam"><span class="rep-gn">${escapeHtml(t)}</span><input type="number" min="0" value="${meta}" placeholder="0" oninput="repSetGrade('${m.id}','${cor}','${escapeHtml(t)}',this.value)"><span class="rep-ge">tem ${e}</span></div>`;
+          });
+          html+=`</div>`;
+        }
+        html+=`</div>`;
+      });
+      html+=`</div></div>`;
+    }
+    html+=`</div>`;
+  });
+  lst.innerHTML=html||'<div class="empty">Nenhum produto encontrado.</div>';
+}
+function repFornOptions(sel){
+  let o='<option value="">— escolher fabrica —</option>';
+  repFornAtivas(sel).forEach(k=>{o+=`<option value="${k}"${k===sel?' selected':''}>${escapeHtml(repForn[k].nome)}${repForn[k].off?' (inativa)':''}</option>`;});
+  return o;
+}
+window.repToggleFixo=(id,v)=>{const cf=repCfgDe(id);cf.fixo=v;if(v)repAberto=id;repSalvar();repRenderModelos();};
+window.repExpand=(id)=>{repAberto=(repAberto===id?null:id);repRenderModelos();};
+window.repSetForn=(id,v)=>{repCfgDe(id).fornId=v;repSalvar();};
+window.repSetCusto=(id,v)=>{repCfgDe(id).custo=parseFloat(v)||0;repSalvar();};
+window.repSetGrade=(id,cor,tam,v)=>{const cf=repCfgDe(id);cf.grade[cor]=cf.grade[cor]||{};const n=parseInt(v);if(n>0)cf.grade[cor][tam]=n;else delete cf.grade[cor][tam];repSalvar();};
+window.repToggleCor=(id,cor,off)=>{const cf=repCfgDe(id);if(off)cf.coresOff[cor]=1;else delete cf.coresOff[cor];repSalvar();repRenderModelos();};
+
+/* ---------- CONFIGURACOES: fabricas ---------- */
+function repRenderConfig(){
+  const lst=$('cfgFornLista'); if(!lst)return;
+  const ks=Object.keys(repForn||{});
+  lst.innerHTML=ks.length?ks.map(k=>`<div class="rep-forn-row${repForn[k].off?' off':''}">
+      <div><b>${escapeHtml(repForn[k].nome)}</b>${repForn[k].off?' <span class="rep-forn-tag">inativa</span>':''}${repForn[k].whatsapp?'<br><span class="rep-forn-wa">grupo configurado</span>':''}</div>
+      <div class="rep-forn-acts">
+        <label class="rep-switch sm"><input type="checkbox" ${repForn[k].off?'':'checked'} onchange="repFornToggle('${k}',this.checked)"><span class="rep-slider"></span></label>
+        <button class="lnk-del" onclick="repDelForn('${k}')">remover</button>
+      </div></div>`).join(''):'<div class="empty">Nenhuma fabrica cadastrada.</div>';
+}
+window.repFornToggle=(k,ativo)=>{if(repForn[k]){repForn[k].off=!ativo;repSalvar();repRenderConfig();}};
+window.repDelForn=(k)=>{if(confirm('Remover esta fabrica? (desativar mantem o historico)')){delete repForn[k];repSalvar();repRenderConfig();}};
+
+/* ---------- PEDIDO ---------- */
+function repGerar(){
+  const porForn={};
+  repCatalogo.forEach(m=>{
+    const cf=repCfg[m.id]; if(!cf||!cf.fixo)return;
+    const fid=cf.fornId||'_sem';
+    if(fid!=='_sem'&&repForn[fid]&&repForn[fid].off)return; // fabrica desativada: fora do pedido
+    const coresOff=cf.coresOff||{};
+    m.cores.forEach(c=>{
+      if(coresOff[c.nome])return; // cor desativada
+      const g=cf.grade&&cf.grade[c.nome]; if(!g)return;
+      Object.keys(g).forEach(t=>{
+        const meta=g[t]||0; if(meta<=0)return;
+        const est=repEstoque[c.skus[t]]||0;
+        const pedir=Math.max(0,meta-est);
+        if(pedir>0){
+          if(!porForn[fid])porForn[fid]={pares:0,valor:0,mods:{}};
+          const F=porForn[fid];
+          if(!F.mods[m.id])F.mods[m.id]={nome:m.nome,custo:cf.custo||0,cores:{}};
+          if(!F.mods[m.id].cores[c.nome])F.mods[m.id].cores[c.nome]={};
+          F.mods[m.id].cores[c.nome][t]=pedir;
+          F.pares+=pedir; F.valor+=pedir*(cf.custo||0);
+        }
+      });
+    });
+  });
+  repPedidoCache=porForn;
+  repRenderPedido();
+}
+function repRenderPedido(){
+  const box=$('repPedido'); if(!box)return;
+  const porForn=repPedidoCache||{};
+  const fids=Object.keys(porForn);
+  if(!fids.length){box.innerHTML='<div class="empty">Nada a pedir. Marque produtos como fixos, defina a grade e importe o estoque.</div>';return;}
+  let html='';
+  fids.forEach(fid=>{
+    const F=porForn[fid];
+    const fnome=fid==='_sem'?'Sem fabrica definida':((repForn[fid]&&repForn[fid].nome)||fid);
+    html+=`<div class="rep-ped-forn">
+      <div class="rep-ped-h"><h4>${escapeHtml(fnome)}</h4><div class="rep-ped-tot">${F.pares} un &middot; ${repBRL(F.valor)}</div></div>
+      <div class="rep-ped-itens">`;
+    Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];
+      Object.keys(M.cores).forEach(cor=>{
+        const tams=M.cores[cor];
+        const det=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b)).map(t=>`${escapeHtml(t)}×${tams[t]}`).join('  ');
+        html+=`<div class="rep-ped-it"><span class="rep-ped-mc">${escapeHtml(M.nome)} — ${escapeHtml(cor)}</span><span class="rep-ped-g">${det}</span></div>`;
+      });
+    });
+    html+=`</div><div class="rep-ped-acts">
+        <button class="btn btn-ouro btn-sm" onclick="repCopiar('${fid}')">Copiar p/ WhatsApp</button>
+        ${fid!=='_sem'&&repForn[fid]&&repForn[fid].whatsapp?`<button class="btn btn-ghost btn-sm" onclick="repAbrirGrupo('${fid}')">Abrir grupo</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="repImprimir('${fid}')">Imprimir / PDF</button>
+      </div></div>`;
+  });
+  box.innerHTML=html;
+}
+function repPedidoTexto(fid){
+  const F=repPedidoCache[fid]; if(!F)return '';
+  const fnome=fid==='_sem'?'(sem fabrica)':((repForn[fid]&&repForn[fid].nome)||fid);
+  let t=`*Pedido de reposicao — Loretto Scarpa*\nFabrica: ${fnome}\n\n`;
+  Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];
+    Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];
+      const det=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b)).map(x=>`${x} (${tams[x]})`).join(', ');
+      t+=`• ${M.nome} - ${cor}: ${det}\n`;});
+  });
+  t+=`\nTotal: ${F.pares} un\nCusto esperado: ${repBRL(F.valor)}`;
+  return t;
+}
+window.repCopiar=(fid)=>{const t=repPedidoTexto(fid);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Pedido copiado')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Pedido copiado');}catch(e){toast('Copie manualmente');}document.body.removeChild(ta);});};
+window.repAbrirGrupo=(fid)=>{const w=repForn[fid]&&repForn[fid].whatsapp;if(w)window.open(w,'_blank');};
+window.repImprimir=(fid)=>{
+  const F=repPedidoCache[fid]; if(!F)return;
+  const fnome=fid==='_sem'?'(sem fabrica)':((repForn[fid]&&repForn[fid].nome)||fid);
+  let linhas='';
+  Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];
+    Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];
+      const det=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b)).map(x=>`${x}×${tams[x]}`).join('  ');
+      linhas+=`<tr><td>${escapeHtml(M.nome)}</td><td>${escapeHtml(cor)}</td><td>${det}</td></tr>`;});
+  });
+  const area=$('repo-print');
+  area.innerHTML=`<div class="rp2"><div class="rp2-head"><div class="rp2-t">Pedido de Reposicao</div><div class="rp2-s">Loretto Scarpa &middot; ${escapeHtml(fnome)} &middot; ${new Date().toLocaleDateString('pt-BR')}</div></div>
+    <table class="rp2-tab"><thead><tr><th>Produto</th><th>Cor</th><th>Numeracoes</th></tr></thead><tbody>${linhas}</tbody></table>
+    <div class="rp2-tot">Total: ${F.pares} un &middot; Custo esperado: ${repBRL(F.valor)}</div></div>`;
+  document.body.classList.add('print-repo'); window.print();
+  setTimeout(()=>{document.body.classList.remove('print-repo');area.innerHTML='';},400);
+};
+
+/* ---------- listeners ---------- */
+document.querySelectorAll('.rep-tab').forEach(b=>b.addEventListener('click',()=>repSetSub(b.dataset.rep)));
+if($('repImportBtn'))$('repImportBtn').addEventListener('click',()=>$('repFile').click());
+if($('repFile'))$('repFile').addEventListener('change',e=>{if(e.target.files[0])repImportar(e.target.files[0]);e.target.value='';});
+if($('repLimparEst'))$('repLimparEst').addEventListener('click',()=>{if(confirm('Limpar o estoque importado?')){repEstoque={};repInfo=null;try{localStorage.removeItem('loretto_rep_info');}catch(e){}repSalvar();repRender();}});
+if($('repEstBusca'))$('repEstBusca').addEventListener('input',repRenderEstoque);
+if($('repModBusca'))$('repModBusca').addEventListener('input',repRenderModelos);
+if($('repSoFixos'))$('repSoFixos').addEventListener('change',repRenderModelos);
+if($('repGerarBtn'))$('repGerarBtn').addEventListener('click',repGerar);
+if($('cfgFornAdd'))$('cfgFornAdd').addEventListener('click',()=>{const n=$('cfgFornNome').value.trim();if(!n){toast('Nome da fabrica');return;}const id='f'+Date.now().toString(36);repForn[id]={nome:n,whatsapp:$('cfgFornWa').value.trim(),off:false};$('cfgFornNome').value='';$('cfgFornWa').value='';repSalvar();repRenderConfig();});
+
+aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();repInit();repRender();renderFinanceiro();iniciarSync();
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
 </script>
 </body>
