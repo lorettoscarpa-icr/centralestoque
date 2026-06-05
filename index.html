@@ -451,10 +451,41 @@
   .rep-forn-row.off{opacity:.6}
   .rep-forn-tag{font-size:10px;color:#e06a4a;border:1px solid #e06a4a;border-radius:5px;padding:1px 5px}
   .sync-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;font-size:14px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--areia);cursor:pointer}
+  .login-screen{position:fixed;inset:0;z-index:9999;background:var(--verde-escuro);display:flex;align-items:center;justify-content:center;padding:24px}
+  .login-screen.hide{display:none}
+  .login-card{width:100%;max-width:420px;text-align:center}
+  .login-crest{width:84px;height:84px;margin:0 auto 18px}
+  .login-crest svg,.login-crest img{width:100%;height:100%;object-fit:contain}
+  .login-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--ouro-claro);font-weight:700}
+  .login-sub{color:var(--areia);opacity:.8;margin:6px 0 26px;letter-spacing:.5px}
+  .login-users{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .login-user{display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 12px;background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:14px;cursor:pointer;transition:.15s}
+  .login-user:hover{background:rgba(201,169,80,.12);border-color:var(--ouro)}
+  .lu-ava{width:52px;height:52px;border-radius:50%;background:var(--ouro);color:var(--verde-escuro);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:22px;font-weight:700}
+  .lu-nome{color:var(--areia);font-weight:600;font-size:15px}
+  .login-add{background:none;border:1px dashed var(--linha);color:var(--areia);opacity:.75;padding:12px;border-radius:10px;width:100%;cursor:pointer;font-size:14px}
+  .login-add:hover{opacity:1;border-color:var(--ouro);color:var(--ouro-claro)}
+  .side-foot{margin-top:auto;padding:12px}
+  .side-user{display:flex;align-items:center;gap:10px;width:100%;background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;padding:9px 11px;cursor:pointer;color:var(--areia)}
+  .side-user:hover{border-color:var(--ouro)}
+  .su-ava{width:30px;height:30px;border-radius:50%;background:var(--ouro);color:var(--verde-escuro);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:0 0 auto}
+  .su-nome{font-weight:600;flex:1;text-align:left}
+  .su-troca{font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.5px}
+  .sync-user-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;color:var(--areia);font-size:14px}
+  .sync-user-row strong{color:var(--ouro-claro)}
 </style>
 <style id="pageRule"></style>
 </head>
 <body>
+<div id="loginScreen" class="login-screen hide">
+  <div class="login-card">
+    <div class="login-crest" id="loginCrest"></div>
+    <div class="login-title">Central do Estoque</div>
+    <div class="login-sub">Quem esta acessando?</div>
+    <div class="login-users" id="loginUsers"></div>
+    <button class="login-add" id="loginAdd">+ Adicionar usuario</button>
+  </div>
+</div>
 <div class="app-shell" id="appShell">
   <aside class="sidebar" id="sidebar">
     <div class="side-brand">
@@ -468,6 +499,9 @@
       <button class="side-item" data-tab="financeiro" data-title="Financeiro"><span class="si-ic">&#128176;</span> Financeiro</button>
       <button class="side-item" data-tab="modelos" data-title="Modelos"><span class="si-ic">&#128097;</span> Modelos</button>
     </nav>
+    <div class="side-foot">
+      <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
+    </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
   <main class="content">
@@ -695,11 +729,8 @@
 <div id="syncModal" class="modal-bg hide">
   <div class="modal">
     <h3>Sincronizacao</h3>
-    <div class="res">Sua fila de impressao e suas preferencias (favoritos e modelos/cores ocultos) ficam iguais em todos os seus aparelhos.</div>
-    <label style="margin-top:0">Voce esta usando como</label>
-    <input list="syncUsuarios" id="syncUsuario" placeholder="ex: Yuri" autocomplete="off">
-    <datalist id="syncUsuarios"><option value="Yuri"></option><option value="Edson"></option></datalist>
-    <div class="modal-nota" style="margin-top:6px">Com o login, isso passa a ser automatico por usuario.</div>
+    <div class="res">Sua fila, favoritos e modelos/cores ocultos ficam iguais em todos os aparelhos do seu usuario.</div>
+    <div class="sync-user-row">Conectado como <strong id="syncUserName">&mdash;</strong><button class="btn btn-ghost btn-sm" id="syncTrocar">Trocar usuario</button></div>
     <label class="sync-toggle-row">Sincronizar entre meus aparelhos
       <span class="rep-switch"><input type="checkbox" id="syncToggle"><span class="rep-slider"></span></span></label>
     <div class="sync-status" id="syncStatusBox"></div>
@@ -883,7 +914,7 @@ function renderLista(){
     const body=open?`<div class="acc-body">${m.cores.map((c2,ci)=>{
       if(c2.off)return'';
       const tams=getTamanhos(m,c2);
-      return `<div class="cor-bloco"><div class="cor-titulo"><span class="cor-swatch" style="background:${c2.hex||'#888'}"></span>${escapeHtml(c2.nome)}${c2.sigla?`<span class="cor-sigla">${escapeHtml(c2.sigla)}</span>`:''}</div><div class="tamanhos">${tams.map(t=>{const cod=getCodigo(m,c2,t);const it=fila.find(f=>f.key===m.id+'|'+ci+'|'+t);return `<button class="tam-btn" title="${escapeHtml(cod)}" onclick="addFila('${m.id}',${ci},'${escapeHtml(t)}')">${escapeHtml(t)}${it?`<span class="cnt">${it.qtd}</span>`:''}</button>`;}).join('')}</div><details class="grade-det"><summary>Grade / curva</summary><div class="grade-body"><div class="grade-tams">${tams.map(t=>`<div class="grade-cell"><label>${escapeHtml(t)}</label><input type="text" class="g-q" data-tam="${escapeHtml(t)}" value="0"></div>`).join('')}</div><div class="grade-acts"><span class="mini">Todos:</span><input type="text" class="grade-all" value="1"><button class="gbtn" onclick="gradeAll(this)">aplicar</button><select class="grade-curva">${curvaOptions()}</select><button class="gbtn" onclick="gradeUsarCurva(this)">usar</button><button class="gbtn" onclick="gradeSalvar(this)">salvar curva</button><button class="gbtn solid" onclick="gradeAdd(this,'${m.id}',${ci})">Adicionar grade</button></div></div></details></div>`;
+      return `<div class="cor-bloco"><div class="cor-titulo"><span class="cor-swatch" style="background:${c2.hex||'#888'}"></span>${escapeHtml(c2.nome)}${c2.sigla?`<span class="cor-sigla">${escapeHtml(c2.sigla)}</span>`:''}</div><div class="tamanhos">${tams.map(t=>{const cod=getCodigo(m,c2,t);const it=fila.find(f=>f.key===m.id+'|'+ci+'|'+t);return `<button class="tam-btn" title="${escapeHtml(cod)}" onclick="addFila('${m.id}',${ci},'${escapeHtml(t)}')">${escapeHtml(t)}${it?`<span class="cnt">${it.qtd}</span>`:''}</button>`;}).join('')}</div></div>`;
     }).join('')}</div>`:'';
     return `<div class="acc-item ${open?'aberto':''}"><div class="acc-head" onclick="toggleAcc('${m.id}')"><button class="star ${fav?'fav':''}" title="Favoritar" onclick="event.stopPropagation();toggleFav('${m.id}')">${fav?'&#9733;':'&#9734;'}</button><span class="acc-nome">${escapeHtml(m.nome)}</span><div class="acc-right"><div class="acc-dots">${m.cores.filter(c2=>!c2.off).slice(0,6).map(c2=>`<span class="acc-dot" style="background:${c2.hex||'#888'}"></span>`).join('')}</div>${m.prefixo?`<span class="acc-pref">${escapeHtml(m.prefixo)}</span>`:''}${tot?`<span class="acc-tot">${tot}</span>`:''}<button class="acc-toggle" onclick="event.stopPropagation();toggleAcc('${m.id}')">${open?'&minus;':'+'}</button></div></div>${body}</div>`;
   }).join('');
@@ -1002,12 +1033,11 @@ $('clearBtn').addEventListener('click',()=>{if(fila.length&&confirm('Limpar toda
 
 /* ---------- SINCRONIZACAO (por usuario; Firebase embutido) ---------- */
 const FIREBASE_FIXO={apiKey:"AIzaSyCogQoTSULCdC1JhTb0IUilWAIA1itBJ8U",authDomain:"loretto-scarpa-l-icr.firebaseapp.com",projectId:"loretto-scarpa-l-icr",storageBucket:"loretto-scarpa-l-icr.firebasestorage.app",messagingSenderId:"428188657366",appId:"1:428188657366:web:c700c9a092bfa22d83cb77"};
-let syncCfg=carregar('loretto_sync',null)||{usuario:'',on:false};
-if(syncCfg.codigo&&!syncCfg.usuario)syncCfg.usuario=syncCfg.codigo;
-if(typeof syncCfg.on!=='boolean')syncCfg.on=false;
+let syncCfg=carregar('loretto_sync',null)||{on:true};
+if(typeof syncCfg.on!=='boolean')syncCfg.on=true;
 var _db=null,_fRef=null,_pRef=null,_unsubF=null,_unsubP=null;
-function salvaSync(){try{localStorage.setItem('loretto_sync',JSON.stringify({usuario:syncCfg.usuario||'',on:!!syncCfg.on}));}catch(e){}}
-function syncCodigo(){return (syncCfg.usuario||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^a-zA-Z0-9_-]/g,'').toLowerCase();}
+function salvaSync(){try{localStorage.setItem('loretto_sync',JSON.stringify({on:!!syncCfg.on}));}catch(e){}}
+function syncCodigo(){return ((typeof userAtual!=='undefined'&&userAtual)||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^a-zA-Z0-9_-]/g,'').toLowerCase();}
 function setSyncStatus(st,msg){
   const map={on:['#39d353','Sincronizado'],off:['#8a8a8a','So neste aparelho'],wait:['#e0c876','Conectando...'],err:['#e06a4a','Erro de sincronizacao']};
   const m=map[st]||map.off,dot=$('syncDot'),lab=$('syncLabel'),box=$('syncStatusBox');
@@ -1055,14 +1085,42 @@ function conectarSync(){
   });
 }
 function desconectarSync(){if(_unsubF){_unsubF();_unsubF=null;}if(_unsubP){_unsubP();_unsubP=null;}_fRef=_pRef=_db=null;setSyncStatus('off');}
-function preencheSyncModal(){if($('syncUsuario'))$('syncUsuario').value=syncCfg.usuario||'';if($('syncToggle'))$('syncToggle').checked=!!syncCfg.on;}
+function preencheSyncModal(){if($('syncUserName'))$('syncUserName').textContent=(typeof userAtual!=='undefined'&&userAtual)||'\u2014';if($('syncToggle'))$('syncToggle').checked=!!syncCfg.on;}
 function aplicarSync(){salvaSync();if(syncCfg.on&&syncCodigo())conectarSync();else desconectarSync();}
 function iniciarSync(){preencheSyncModal();if(syncCfg.on&&syncCodigo())conectarSync();else setSyncStatus('off');}
 if($('syncOpen'))$('syncOpen').addEventListener('click',function(){preencheSyncModal();setSyncStatus(_fRef?'on':(syncCfg.on?'wait':'off'));$('syncModal').classList.remove('hide');});
 if($('syncClose'))$('syncClose').addEventListener('click',function(){$('syncModal').classList.add('hide');});
 if($('syncModal'))$('syncModal').addEventListener('click',function(e){if(e.target.id==='syncModal')$('syncModal').classList.add('hide');});
-if($('syncUsuario'))$('syncUsuario').addEventListener('change',function(){syncCfg.usuario=this.value.trim();aplicarSync();});
-if($('syncToggle'))$('syncToggle').addEventListener('change',function(){syncCfg.on=this.checked;if(this.checked&&!syncCodigo()){setSyncStatus('err','informe o usuario acima');this.checked=false;syncCfg.on=false;salvaSync();return;}aplicarSync();});
+if($('syncTrocar'))$('syncTrocar').addEventListener('click',function(){$('syncModal').classList.add('hide');if(typeof trocarUsuario==='function')trocarUsuario();});
+if($('syncToggle'))$('syncToggle').addEventListener('change',function(){syncCfg.on=this.checked;if(this.checked&&!syncCodigo()){setSyncStatus('err','entre com um usuario primeiro');this.checked=false;syncCfg.on=false;salvaSync();return;}aplicarSync();});
+
+/* ---------- LOGIN (quem esta acessando) ---------- */
+var USUARIOS_PADRAO=['Yuri','Edson','Gregory'];
+var usuarios=carregar('loretto_usuarios',null)||USUARIOS_PADRAO.slice();
+var userAtual=carregar('loretto_user',null);
+function salvarUsuarios(){try{localStorage.setItem('loretto_usuarios',JSON.stringify(usuarios));}catch(e){}}
+function inicialDe(n){return (String(n||'?').trim().charAt(0)||'?').toUpperCase();}
+function renderLogin(){
+  const box=$('loginUsers'); if(!box)return;
+  box.innerHTML=usuarios.map(u=>'<button class="login-user" data-user="'+escapeHtml(u)+'"><span class="lu-ava">'+escapeHtml(inicialDe(u))+'</span><span class="lu-nome">'+escapeHtml(u)+'</span></button>').join('');
+  box.querySelectorAll('.login-user').forEach(b=>b.addEventListener('click',function(){fazerLogin(b.dataset.user);}));
+}
+function atualizarUserUI(){if($('userNome'))$('userNome').textContent=userAtual||'Entrar';if($('userAva'))$('userAva').textContent=inicialDe(userAtual||'?');}
+window.fazerLogin=function(nome){
+  userAtual=nome; try{localStorage.setItem('loretto_user',nome);}catch(e){}
+  const ls=$('loginScreen'); if(ls)ls.classList.add('hide');
+  atualizarUserUI();
+  syncCfg.on=true; salvaSync(); desconectarSync(); conectarSync();
+};
+window.trocarUsuario=function(){renderLogin();const ls=$('loginScreen'); if(ls)ls.classList.remove('hide');};
+window.addUsuario=function(){const n=prompt('Nome do novo usuario:');if(!n)return;const nm=n.trim();if(!nm)return;if(!usuarios.some(u=>u.toLowerCase()===nm.toLowerCase()))usuarios.push(nm);salvarUsuarios();renderLogin();};
+if($('loginAdd'))$('loginAdd').addEventListener('click',addUsuario);
+if($('userBtn'))$('userBtn').addEventListener('click',trocarUsuario);
+function iniciarLogin(){
+  if($('loginCrest')&&$('crestHolder'))$('loginCrest').innerHTML=$('crestHolder').innerHTML;
+  renderLogin(); atualizarUserUI();
+  const ls=$('loginScreen'); if(ls)ls.classList.toggle('hide',!!userAtual);
+}
 
 $('printBtn').addEventListener('click',()=>{
   if(!fila.length){toast('A fila esta vazia');return;}
@@ -1798,7 +1856,7 @@ if($('repSoFixos'))$('repSoFixos').addEventListener('change',repRenderModelos);
 if($('repGerarBtn'))$('repGerarBtn').addEventListener('click',repGerar);
 if($('cfgFornAdd'))$('cfgFornAdd').addEventListener('click',()=>{const n=$('cfgFornNome').value.trim();if(!n){toast('Nome da fabrica');return;}const id='f'+Date.now().toString(36);repForn[id]={nome:n,whatsapp:$('cfgFornWa').value.trim(),off:false};$('cfgFornNome').value='';$('cfgFornWa').value='';repSalvar();repRenderConfig();});
 
-aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();repInit();repRender();renderFinanceiro();iniciarSync();
+aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();repInit();repRender();renderFinanceiro();iniciarLogin();iniciarSync();
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
 </script>
 </body>
