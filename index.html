@@ -81,6 +81,10 @@
   .fila-panel{background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:14px;padding:22px;position:sticky;top:20px}
   .fila-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap}
   .fila-head h2{font-family:'Playfair Display',serif;font-weight:600;font-size:18px}
+  .fila-pol{font-size:12px;color:rgba(244,241,232,.65);display:flex;align-items:center;gap:6px;margin-left:auto}
+  .fila-pol select{background:rgba(0,0,0,.3);color:var(--areia);border:1px solid var(--linha);border-radius:7px;padding:4px 7px;font-size:12px;font-family:'Barlow',sans-serif}
+  .fi-imp{color:#39d353;font-weight:600;white-space:nowrap}
+  .fila-item.impresso{border-left:3px solid #39d353}
   .sync-pill{margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid var(--linha);color:var(--areia);border-radius:30px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'Barlow',sans-serif;transition:.2s}
   .sync-pill:hover{background:rgba(201,169,80,.1);border-color:rgba(201,169,80,.45)}
   .sync-dot{width:9px;height:9px;border-radius:50%;background:#888;flex-shrink:0;transition:.2s}
@@ -496,6 +500,12 @@
   .av-item .ai-x{background:none;border:none;color:rgba(244,241,232,.4);cursor:pointer;font-size:18px;flex-shrink:0;line-height:1}
   .av-item .ai-re{background:none;border:none;color:var(--ouro);cursor:pointer;font-size:17px;flex-shrink:0;line-height:1}
   .av-item .tp{color:var(--ouro);font-weight:700;white-space:nowrap}
+  .av-item .ai-ed,.av-item .ai-du{background:none;border:none;color:rgba(244,241,232,.55);cursor:pointer;font-size:15px;flex-shrink:0;line-height:1}
+  .av-item .ai-ed:hover,.av-item .ai-du:hover,.av-item .ai-re:hover{color:var(--ouro-claro)}
+  .av-editbar{background:rgba(201,169,80,.14);border:1px solid var(--ouro);color:var(--ouro-claro);border-radius:9px;padding:9px 12px;font-size:13px;margin-bottom:12px}
+  .av-editbar.hide{display:none}
+  .av-acts .btn.hide{display:none}
+  .av-opt{font-size:11px;opacity:.5;font-weight:400;text-transform:none;letter-spacing:0}
   /* etiquetas especiais */
   .etiqueta.tipo-defeito,.etiqueta.tipo-petrocado{justify-content:flex-start}
   .et-titulo{font-weight:800;font-size:calc(var(--lh)*.14);text-align:center;text-transform:uppercase;letter-spacing:.5px;line-height:1;border-bottom:2px solid #000;padding-bottom:calc(var(--lh)*.03);margin-bottom:calc(var(--lh)*.045)}
@@ -587,6 +597,7 @@
         <div class="fila-foot">
           <button class="btn btn-ouro" id="printBtn">Imprimir fila</button>
           <button class="btn btn-ghost" id="clearBtn">Limpar fila</button>
+          <label class="fila-pol">Apos imprimir: <select id="filaPol"><option value="perguntar">perguntar</option><option value="sempre">sempre limpar</option><option value="nunca">nunca limpar</option></select></label>
         </div>
         <div class="mini-prev"><div class="lbl">Previa</div><div class="prev-holder"><div class="etiqueta" id="preview"></div></div></div>
       </div>
@@ -778,13 +789,14 @@
       <div class="rep-card">
         <div class="rep-card-h"><h3>Registrar defeito</h3></div>
         <div class="av-form">
-          <div class="av-full"><label>Modelo</label><select id="dfModelo"></select><input id="dfModeloTxt" class="hide" placeholder="Nome do modelo (nao cadastrado)"></div>
+          <div class="av-full"><label>Modelo</label><input list="avModelos" id="dfModelo" autocomplete="off" placeholder="Digite ou escolha o modelo"></div>
           <div><label>Cor</label><select id="dfCor"></select><input id="dfCorTxt" class="hide" placeholder="Cor"></div>
-          <div><label>Fabricante</label><input list="avForns" id="dfFab" placeholder="ex: Urbana Man" autocomplete="off"></div>
-          <div><label>Custo do par (R$)</label><input id="dfCusto" inputmode="decimal" placeholder="puxado da reposicao"></div>
-          <div class="av-full"><label>Descricao do defeito</label><input id="dfDesc" placeholder="ex: Biqueira descolou"></div>
+          <div><label>Fabricante</label><input list="avForns" id="dfFab" placeholder="puxado do modelo" autocomplete="off"></div>
+          <div><label>Custo do par (R$) <span class="av-opt">opcional</span></label><input id="dfCusto" inputmode="decimal" placeholder="puxado do cadastro"></div>
+          <div class="av-full"><label>Descricao do defeito <span class="av-opt">opcional</span></label><input id="dfDesc" placeholder="ex: Biqueira descolou"></div>
         </div>
-        <div class="av-acts"><button class="btn btn-ouro" id="dfAdd">Adicionar a fila + registrar</button><button class="btn btn-ghost" id="dfReg">So registrar</button></div>
+        <div id="dfEditBar" class="av-editbar hide">Editando lancamento &mdash; altere e salve.</div>
+        <div class="av-acts"><button class="btn btn-ouro" id="dfAdd">Adicionar a fila + registrar</button><button class="btn btn-ghost" id="dfReg">So registrar</button><button class="btn btn-ouro hide" id="dfSave">Salvar alteracao</button><button class="btn btn-ghost hide" id="dfCancel">Cancelar</button></div>
       </div>
       <div class="rep-card">
         <div class="rep-card-h"><h3>Defeitos por fabricante</h3><button class="btn btn-ouro btn-sm" id="dfPdf">PDF de todas</button></div>
@@ -800,12 +812,13 @@
       <div class="rep-card">
         <div class="rep-card-h"><h3>Registrar pe trocado</h3></div>
         <div class="av-form">
-          <div class="av-full"><label>Modelo</label><select id="ptModelo"></select><input id="ptModeloTxt" class="hide" placeholder="Nome do modelo (nao cadastrado)"></div>
+          <div class="av-full"><label>Modelo</label><input list="avModelos" id="ptModelo" autocomplete="off" placeholder="Digite ou escolha o modelo"></div>
           <div class="av-full"><label>Cor</label><select id="ptCor"></select><input id="ptCorTxt" class="hide" placeholder="Cor"></div>
           <div><label>Numero pe direito</label><select id="ptN1"></select><input id="ptN1Txt" class="hide" placeholder="No"></div>
           <div><label>Numero pe esquerdo</label><select id="ptN2"></select><input id="ptN2Txt" class="hide" placeholder="No"></div>
         </div>
-        <div class="av-acts"><button class="btn btn-ouro" id="ptAdd">Adicionar a fila + registrar</button><button class="btn btn-ghost" id="ptReg">So registrar</button></div>
+        <div id="ptEditBar" class="av-editbar hide">Editando lancamento &mdash; altere e salve.</div>
+        <div class="av-acts"><button class="btn btn-ouro" id="ptAdd">Adicionar a fila + registrar</button><button class="btn btn-ghost" id="ptReg">So registrar</button><button class="btn btn-ouro hide" id="ptSave">Salvar alteracao</button><button class="btn btn-ghost hide" id="ptCancel">Cancelar</button></div>
       </div>
       <div class="rep-card">
         <div class="rep-card-h"><h3>Pes trocados</h3><div style="display:flex;gap:8px"><button class="btn btn-ouro btn-sm" id="ptPdf">Relatorio PDF</button><button class="btn btn-ghost btn-sm" id="ptLimpar">Limpar tudo</button></div></div>
@@ -1142,7 +1155,7 @@ function renderFila(){
     if(e.tipo==='defeito'){nome='&#9888; DEFEITO &middot; '+escapeHtml(e.nome);meta=escapeHtml(e.fab||'-')+' &middot; '+escapeHtml(e.desc||'');}
     else if(e.tipo==='petrocado'){nome='&#128095; PE TROCADO &middot; '+escapeHtml(e.nome);meta='Dir '+escapeHtml(e.n1||'')+' &middot; Esq '+escapeHtml(e.n2||'');}
     else {nome=escapeHtml(e.nome)+' &middot; '+escapeHtml(e.cor);meta=escapeHtml(e.codigo)+' &middot; no '+escapeHtml(e.numero);}
-    return `<div class="fila-item"><div class="fi-info"><div class="fi-nome">${nome}</div><div class="fi-meta">${meta}</div></div><div class="qtd-ctrl"><button onclick="qtd(${i},-1)">&minus;</button><input type="text" value="${e.qtd}" onchange="setQtd(${i},this.value)"><button onclick="qtd(${i},1)">+</button></div><button class="fi-x" onclick="remover(${i})">&times;</button></div>`;
+    return `<div class="fila-item${e.impressoEm?' impresso':''}"><div class="fi-info"><div class="fi-nome">${nome}</div><div class="fi-meta">${meta}${e.impressoEm?' &middot; <span class="fi-imp">impressa '+fmtHora(e.impressoEm)+'</span>':''}</div></div><div class="qtd-ctrl"><button onclick="qtd(${i},-1)">&minus;</button><input type="text" value="${e.qtd}" onchange="setQtd(${i},this.value)"><button onclick="qtd(${i},1)">+</button></div><button class="fi-x" onclick="remover(${i})">&times;</button></div>`;
   }).join('');
 }
 window.qtd=(i,d)=>{fila[i].qtd=Math.max(1,fila[i].qtd+d);refreshFila();};
@@ -1274,8 +1287,15 @@ $('printConfirm').addEventListener('click',()=>{
   localStorage.setItem('loretto_uso',JSON.stringify(uso));
   const grid=$('printGrid');grid.innerHTML='';let bc=0;
   fila.forEach(e=>{for(let k=0;k<e.qtd;k++){const div=document.createElement('div');div.className='etiqueta';grid.appendChild(div);montaEtiqueta(div,e,'bc-print-'+(bc++));}});
-  setTimeout(()=>window.print(),300);
+  setTimeout(()=>{
+    window.print();
+    const pol=($('filaPol')&&$('filaPol').value)||'perguntar';
+    const limpar=pol==='sempre'||(pol==='perguntar'&&confirm('Impressao enviada. Deseja limpar a fila?'));
+    if(limpar){fila.length=0;}else{const t=Date.now();fila.forEach(e=>{e.impressoEm=t;});}
+    refreshFila();
+  },300);
 });
+if($('filaPol')){$('filaPol').value=carregar('loretto_fila_limpar','perguntar');$('filaPol').addEventListener('change',()=>{try{localStorage.setItem('loretto_fila_limpar',JSON.stringify($('filaPol').value));}catch(e){}});}
 $('ordenar').value=ordenacao;
 $('ordenar').addEventListener('change',()=>{ordenacao=$('ordenar').value;localStorage.setItem('loretto_ordenacao',ordenacao);renderLista();});
 $('busca').addEventListener('input',renderLista);
@@ -1303,24 +1323,27 @@ function salvarPetroca(){try{localStorage.setItem('loretto_petrocados',JSON.stri
 function brMoney(n){return 'R$ '+(Number(n)||0).toFixed(2).replace('.',',');}
 function parseMoney(v){return parseFloat(String(v||'').replace(/[^\d,.-]/g,'').replace(',','.'))||0;}
 function fmtData(ts){return new Date(ts||Date.now()).toLocaleDateString('pt-BR');}
+function fmtHora(ts){return new Date(ts||Date.now()).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}
 function tempoParado(ts){const dias=Math.floor((Date.now()-(ts||Date.now()))/86400000);if(dias<=0)return 'hoje';if(dias===1)return 'ha 1 dia';if(dias<7)return 'ha '+dias+' dias';if(dias<14)return 'ha 1 semana';if(dias<30)return 'ha '+Math.floor(dias/7)+' semanas';if(dias<60)return 'ha 1 mes';return 'ha '+Math.floor(dias/30)+' meses';}
 const AV_OUTRO='__outro__';
 function brNum(n){return (Number(n)||0).toFixed(2).replace('.',',');}
 function avModeloPorId(id){return catalogo.find(m=>m.id===id);}
+function avModeloPorNome(nome){const n=normKey(nome||'');return n?catalogo.find(m=>normKey(m.nome)===n):null;}
+function avFabricaModelo(nome){const id=normKey(nome);try{if(typeof repCfg!=='undefined'&&repCfg&&repCfg[id]&&repCfg[id].fornId&&typeof repForn!=='undefined'&&repForn&&repForn[repCfg[id].fornId])return repForn[repCfg[id].fornId].nome||'';}catch(e){}return '';}
 function avCustoModelo(nome){const id=normKey(nome);try{if(typeof repCfg!=='undefined'&&repCfg&&repCfg[id]&&repCfg[id].custo)return Number(repCfg[id].custo)||0;}catch(e){}try{if(typeof repCusto!=='undefined'&&repCusto&&repCusto[id])return Number(repCusto[id])||0;}catch(e){}return 0;}
 function avCustoDefeito(d){const c=avCustoModelo(d.nome);return c>0?c:(Number(d.custo)||0);}
 function avOptsModelos(){return '<option value="">Selecione o modelo...</option>'+catalogo.slice().sort((a,b)=>(a.nome||'').localeCompare(b.nome||'')).map(m=>`<option value="${escapeHtml(m.id)}">${escapeHtml(m.nome)}</option>`).join('')+`<option value="${AV_OUTRO}">Outro (digitar)...</option>`;}
 function avOptsCores(m){return '<option value="">Selecione a cor...</option>'+(m?m.cores.map(c=>`<option value="${escapeHtml(c.nome)}">${escapeHtml(c.nome)}</option>`).join(''):'')+`<option value="${AV_OUTRO}">Outra (digitar)...</option>`;}
 function avTamsDe(m,corNome){if(!m)return [];const c=m.cores.find(x=>x.nome===corNome);if(c)return getTamanhos(m,c);const set=new Set();m.cores.forEach(cc=>getTamanhos(m,cc).forEach(t=>set.add(t)));return [...set].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0));}
 function avOptsTams(m,corNome){return '<option value="">--</option>'+avTamsDe(m,corNome).map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')+`<option value="${AV_OUTRO}">Outro</option>`;}
-function dfRenderForm(){if(!$('dfModelo'))return;const k=$('dfModelo').value;$('dfModelo').innerHTML=avOptsModelos();if(k)$('dfModelo').value=k;dfSyncModelo();}
-function dfSyncModelo(){const v=$('dfModelo').value,outro=(v===AV_OUTRO),m=outro?null:avModeloPorId(v);$('dfModeloTxt').classList.toggle('hide',!outro);if(outro){$('dfCor').classList.add('hide');$('dfCorTxt').classList.remove('hide');}else{$('dfCorTxt').classList.add('hide');$('dfCor').classList.remove('hide');$('dfCor').innerHTML=avOptsCores(m);}if(m){const c=avCustoModelo(m.nome);if(c>0)$('dfCusto').value=brNum(c);}}
+function dfRenderForm(){if($('dfModelo'))dfSyncModelo();}
+function dfSyncModelo(){const m=avModeloPorNome($('dfModelo').value);if(m){$('dfCorTxt').classList.add('hide');$('dfCor').classList.remove('hide');$('dfCor').innerHTML=avOptsCores(m);const f=avFabricaModelo(m.nome);if(f&&!$('dfFab').value)$('dfFab').value=f;const c=avCustoModelo(m.nome);if(c>0&&!$('dfCusto').value)$('dfCusto').value=brNum(c);}else{$('dfCor').classList.add('hide');$('dfCorTxt').classList.remove('hide');}}
 function dfSyncCor(){$('dfCorTxt').classList.toggle('hide',$('dfCor').value!==AV_OUTRO);}
-function dfLerForm(){let nome='',cor='';if($('dfModelo').value===AV_OUTRO)nome=$('dfModeloTxt').value.trim();else{const m=avModeloPorId($('dfModelo').value);nome=m?m.nome:'';}if($('dfModelo').value===AV_OUTRO||$('dfCor').value===AV_OUTRO)cor=$('dfCorTxt').value.trim();else cor=($('dfCor').value===AV_OUTRO?'':$('dfCor').value)||'';return {nome,cor,fab:$('dfFab').value.trim(),desc:$('dfDesc').value.trim(),custo:parseMoney($('dfCusto').value)};}
-function ptRenderForm(){if(!$('ptModelo'))return;const k=$('ptModelo').value;$('ptModelo').innerHTML=avOptsModelos();if(k)$('ptModelo').value=k;ptSyncModelo();}
-function ptSyncModelo(){const v=$('ptModelo').value,outro=(v===AV_OUTRO),m=outro?null:avModeloPorId(v);$('ptModeloTxt').classList.toggle('hide',!outro);if(outro){['ptCor','ptN1','ptN2'].forEach(id=>$(id).classList.add('hide'));['ptCorTxt','ptN1Txt','ptN2Txt'].forEach(id=>$(id).classList.remove('hide'));}else{['ptCorTxt','ptN1Txt','ptN2Txt'].forEach(id=>$(id).classList.add('hide'));['ptCor','ptN1','ptN2'].forEach(id=>$(id).classList.remove('hide'));$('ptCor').innerHTML=avOptsCores(m);ptSyncCor();}}
-function ptSyncCor(){const outro=$('ptCor').value===AV_OUTRO;$('ptCorTxt').classList.toggle('hide',!outro);const m=avModeloPorId($('ptModelo').value);const cor=outro?'':$('ptCor').value;$('ptN1').innerHTML=avOptsTams(m,cor);$('ptN2').innerHTML=avOptsTams(m,cor);}
-function ptLerForm(){const mOutro=$('ptModelo').value===AV_OUTRO;let nome='';if(mOutro)nome=$('ptModeloTxt').value.trim();else{const m=avModeloPorId($('ptModelo').value);nome=m?m.nome:'';}const cor=(mOutro||$('ptCor').value===AV_OUTRO)?$('ptCorTxt').value.trim():(($('ptCor').value===AV_OUTRO?'':$('ptCor').value)||'');const n1=(mOutro||$('ptN1').value===AV_OUTRO)?$('ptN1Txt').value.trim():($('ptN1').value||'');const n2=(mOutro||$('ptN2').value===AV_OUTRO)?$('ptN2Txt').value.trim():($('ptN2').value||'');return {nome,cor,n1,n2};}
+function dfLerForm(){const nome=$('dfModelo').value.trim();const m=avModeloPorNome(nome);let cor;if(!m||$('dfCor').value===AV_OUTRO)cor=$('dfCorTxt').value.trim();else cor=($('dfCor').value||'');return {nome,cor,fab:$('dfFab').value.trim(),desc:$('dfDesc').value.trim(),custo:parseMoney($('dfCusto').value)};}
+function ptRenderForm(){if($('ptModelo'))ptSyncModelo();}
+function ptSyncModelo(){const m=avModeloPorNome($('ptModelo').value);if(m){['ptCorTxt','ptN1Txt','ptN2Txt'].forEach(id=>$(id).classList.add('hide'));['ptCor','ptN1','ptN2'].forEach(id=>$(id).classList.remove('hide'));$('ptCor').innerHTML=avOptsCores(m);ptSyncCor();}else{['ptCor','ptN1','ptN2'].forEach(id=>$(id).classList.add('hide'));['ptCorTxt','ptN1Txt','ptN2Txt'].forEach(id=>$(id).classList.remove('hide'));}}
+function ptSyncCor(){const outro=$('ptCor').value===AV_OUTRO;$('ptCorTxt').classList.toggle('hide',!outro);const m=avModeloPorNome($('ptModelo').value);const cor=outro?'':$('ptCor').value;$('ptN1').innerHTML=avOptsTams(m,cor);$('ptN2').innerHTML=avOptsTams(m,cor);}
+function ptLerForm(){const nome=$('ptModelo').value.trim();const m=avModeloPorNome(nome);const cor=(!m||$('ptCor').value===AV_OUTRO)?$('ptCorTxt').value.trim():($('ptCor').value||'');const n1=(!m||$('ptN1').value===AV_OUTRO)?$('ptN1Txt').value.trim():($('ptN1').value||'');const n2=(!m||$('ptN2').value===AV_OUTRO)?$('ptN2Txt').value.trim():($('ptN2').value||'');return {nome,cor,n1,n2};}
 window.avSetSub=function(x){avSub=x;document.querySelectorAll('.av-subnav .rep-tab').forEach(b=>b.classList.toggle('active',b.dataset.av===x));['defeito','petrocado'].forEach(n=>{const el=$('av-'+n);if(el)el.classList.toggle('hide',n!==x);});};
 function avDatalists(){
   if($('avModelos'))$('avModelos').innerHTML=catalogo.map(m=>'<option value="'+escapeHtml(m.nome)+'">').join('');
@@ -1336,16 +1359,35 @@ function renderDefeitos(){
   const tot=defeitos.length,totv=defeitos.reduce((s,d)=>s+avCustoDefeito(d),0);
   $('dfResumo').innerHTML=tot?(fs.map(f=>`<div class="av-forn-row"><span class="nome">${escapeHtml(f)}</span><span class="qt">${map[f].n} par(es)</span><span class="val">${brMoney(map[f].v)}</span><button class="btn btn-ghost btn-sm pdf-fab" data-fab="${escapeHtml(f)}">PDF</button></div>`).join('')+`<div class="av-forn-row" style="border-color:var(--ouro)"><span class="nome">TOTAL</span><span class="qt">${tot}</span><span class="val">${brMoney(totv)}</span></div>`):'<div class="empty">Nenhum defeito registrado.</div>';
   $('dfResumo').querySelectorAll('.pdf-fab').forEach(b=>b.onclick=()=>avPdfDefeitos(b.dataset.fab));
-  $('dfLista').innerHTML=defeitos.map((d,i)=>`<div class="av-item"><div class="ai-main"><div class="ai-t">${escapeHtml(d.nome)}${d.cor?' &middot; '+escapeHtml(d.cor):''}</div><div class="ai-s">${escapeHtml(d.fab||'-')} &middot; ${escapeHtml(d.desc||'')}${avCustoDefeito(d)?(' &middot; '+brMoney(avCustoDefeito(d))):''} &middot; <span class="tp">parado ${tempoParado(d.ts)}</span></div></div><button class="ai-re" title="Reimprimir" onclick="avReimpDefeito(${i})">&#8635;</button><button class="ai-x" onclick="avDelDefeito(${i})">&times;</button></div>`).join('');
+  $('dfLista').innerHTML=defeitos.map((d,i)=>`<div class="av-item"><div class="ai-main"><div class="ai-t">${escapeHtml(d.nome)}${d.cor?' &middot; '+escapeHtml(d.cor):''}</div><div class="ai-s">${escapeHtml(d.fab||'-')} &middot; ${escapeHtml(d.desc||'')}${avCustoDefeito(d)?(' &middot; '+brMoney(avCustoDefeito(d))):''} &middot; <span class="tp">parado ${tempoParado(d.ts)}</span></div></div><button class="ai-ed" title="Editar" onclick="avEditarDefeito(${i})">&#9998;</button><button class="ai-du" title="Duplicar" onclick="avDuplicarDefeito(${i})">&#10697;</button><button class="ai-re" title="Reimprimir" onclick="avReimpDefeito(${i})">&#8635;</button><button class="ai-x" onclick="avDelDefeito(${i})">&times;</button></div>`).join('');
 }
 function renderPetroca(){
   if(!$('ptLista'))return;
-  $('ptLista').innerHTML=petrocados.length?petrocados.map((p,i)=>`<div class="av-item"><div class="ai-main"><div class="ai-t">${escapeHtml(p.nome)}${p.cor?' &middot; '+escapeHtml(p.cor):''}</div><div class="ai-s">Direito: no ${escapeHtml(p.n1||'')} &middot; Esquerdo: no ${escapeHtml(p.n2||'')} &middot; <span class="tp">parado ${tempoParado(p.ts)}</span></div></div><button class="ai-re" title="Reimprimir" onclick="avReimpPetroca(${i})">&#8635;</button><button class="ai-x" onclick="avDelPetroca(${i})">&times;</button></div>`).join(''):'<div class="empty">Nenhum pe trocado registrado.</div>';
+  $('ptLista').innerHTML=petrocados.length?petrocados.map((p,i)=>`<div class="av-item"><div class="ai-main"><div class="ai-t">${escapeHtml(p.nome)}${p.cor?' &middot; '+escapeHtml(p.cor):''}</div><div class="ai-s">Direito: no ${escapeHtml(p.n1||'')} &middot; Esquerdo: no ${escapeHtml(p.n2||'')} &middot; <span class="tp">parado ${tempoParado(p.ts)}</span></div></div><button class="ai-ed" title="Editar" onclick="avEditarPetroca(${i})">&#9998;</button><button class="ai-du" title="Duplicar" onclick="avDuplicarPetroca(${i})">&#10697;</button><button class="ai-re" title="Reimprimir" onclick="avReimpPetroca(${i})">&#8635;</button><button class="ai-x" onclick="avDelPetroca(${i})">&times;</button></div>`).join(''):'<div class="empty">Nenhum pe trocado registrado.</div>';
 }
 window.avDelDefeito=(i)=>{defeitos.splice(i,1);salvarDefeitos();renderDefeitos();};
 window.avDelPetroca=(i)=>{petrocados.splice(i,1);salvarPetroca();renderPetroca();};
 window.avReimpDefeito=(i)=>{const d=defeitos[i];if(!d)return;fila.push({key:'df-'+Date.now(),tipo:'defeito',modId:'',ts:d.ts,nome:d.nome,cor:d.cor,numero:d.numero,fab:d.fab,desc:d.desc,qtd:1});refreshFila();toast('Etiqueta de defeito na fila');};
 window.avReimpPetroca=(i)=>{const p=petrocados[i];if(!p)return;fila.push({key:'pt-'+Date.now(),tipo:'petrocado',modId:'',ts:p.ts,nome:p.nome,cor:p.cor,n1:p.n1,n2:p.n2,qtd:1});refreshFila();toast('Etiqueta de pe trocado na fila');};
+let avEditDef=null,avEditPt=null;
+function avLimparFormDefeito(){$('dfModelo').value='';$('dfCorTxt').value='';$('dfFab').value='';$('dfDesc').value='';$('dfCusto').value='';dfSyncModelo();}
+function avLimparFormPt(){$('ptModelo').value='';$('ptCorTxt').value='';$('ptN1Txt').value='';$('ptN2Txt').value='';ptSyncModelo();}
+function avPreencheDefeito(d){$('dfModelo').value=d.nome||'';dfSyncModelo();const m=avModeloPorNome(d.nome);if(m){if([...$('dfCor').options].some(o=>o.value===d.cor)){$('dfCor').value=d.cor;dfSyncCor();}else{$('dfCor').value=AV_OUTRO;dfSyncCor();$('dfCorTxt').value=d.cor||'';}}else{$('dfCorTxt').value=d.cor||'';}$('dfFab').value=d.fab||'';$('dfCusto').value=d.custo?brNum(d.custo):'';$('dfDesc').value=d.desc||'';}
+function avDefEditOn(){$('dfEditBar').classList.remove('hide');$('dfAdd').classList.add('hide');$('dfReg').classList.add('hide');$('dfSave').classList.remove('hide');$('dfCancel').classList.remove('hide');}
+function avDefEditOff(){avEditDef=null;$('dfEditBar').classList.add('hide');$('dfAdd').classList.remove('hide');$('dfReg').classList.remove('hide');$('dfSave').classList.add('hide');$('dfCancel').classList.add('hide');}
+window.avEditarDefeito=(i)=>{const d=defeitos[i];if(!d)return;avEditDef=d.id;avSetSub('defeito');avPreencheDefeito(d);avDefEditOn();const c=document.querySelector('.content');if(c)c.scrollTop=0;};
+window.avDuplicarDefeito=(i)=>{const d=defeitos[i];if(!d)return;avDefEditOff();avSetSub('defeito');avPreencheDefeito(d);toast('Copiado, ajuste e registre');const c=document.querySelector('.content');if(c)c.scrollTop=0;};
+function dfSalvarEdicao(){const d=dfLerForm();if(!d.nome){toast('Informe o modelo');return;}const idx=defeitos.findIndex(x=>x.id===avEditDef);if(idx<0){avDefEditOff();return;}defeitos[idx]=Object.assign({},defeitos[idx],{nome:d.nome,cor:d.cor,fab:d.fab,desc:d.desc,custo:d.custo});salvarDefeitos();avLimparFormDefeito();avDefEditOff();renderDefeitos();toast('Lancamento atualizado');}
+function avPreenchePt(p){$('ptModelo').value=p.nome||'';ptSyncModelo();const m=avModeloPorNome(p.nome);if(m){if([...$('ptCor').options].some(o=>o.value===p.cor)){$('ptCor').value=p.cor;}else{$('ptCor').value=AV_OUTRO;}ptSyncCor();const setN=(sel,txt,val)=>{if([...$(sel).options].some(o=>o.value===val)){$(sel).value=val;$(txt).classList.add('hide');}else{$(sel).value=AV_OUTRO;$(txt).classList.remove('hide');$(txt).value=val||'';}};setN('ptN1','ptN1Txt',p.n1);setN('ptN2','ptN2Txt',p.n2);if($('ptCor').value===AV_OUTRO)$('ptCorTxt').value=p.cor||'';}else{$('ptCorTxt').value=p.cor||'';$('ptN1Txt').value=p.n1||'';$('ptN2Txt').value=p.n2||'';}}
+function avPtEditOn(){$('ptEditBar').classList.remove('hide');$('ptAdd').classList.add('hide');$('ptReg').classList.add('hide');$('ptSave').classList.remove('hide');$('ptCancel').classList.remove('hide');}
+function avPtEditOff(){avEditPt=null;$('ptEditBar').classList.add('hide');$('ptAdd').classList.remove('hide');$('ptReg').classList.remove('hide');$('ptSave').classList.add('hide');$('ptCancel').classList.add('hide');}
+window.avEditarPetroca=(i)=>{const p=petrocados[i];if(!p)return;avEditPt=p.id;avSetSub('petrocado');avPreenchePt(p);avPtEditOn();const c=document.querySelector('.content');if(c)c.scrollTop=0;};
+window.avDuplicarPetroca=(i)=>{const p=petrocados[i];if(!p)return;avPtEditOff();avSetSub('petrocado');avPreenchePt(p);toast('Copiado, ajuste e registre');const c=document.querySelector('.content');if(c)c.scrollTop=0;};
+function ptSalvarEdicao(){const p=ptLerForm();if(!p.nome){toast('Informe o modelo');return;}if(!p.n1||!p.n2){toast('Informe os dois numeros');return;}const idx=petrocados.findIndex(x=>x.id===avEditPt);if(idx<0){avPtEditOff();return;}petrocados[idx]=Object.assign({},petrocados[idx],{nome:p.nome,cor:p.cor,n1:p.n1,n2:p.n2});salvarPetroca();avLimparFormPt();avPtEditOff();renderPetroca();toast('Lancamento atualizado');}
+if($('dfSave'))$('dfSave').addEventListener('click',dfSalvarEdicao);
+if($('dfCancel'))$('dfCancel').addEventListener('click',()=>{avLimparFormDefeito();avDefEditOff();});
+if($('ptSave'))$('ptSave').addEventListener('click',ptSalvarEdicao);
+if($('ptCancel'))$('ptCancel').addEventListener('click',()=>{avLimparFormPt();avPtEditOff();});
 function dfRegistrar(toFila){
   const d=dfLerForm();
   if(!d.nome){toast('Selecione ou digite o modelo');return;}
@@ -1354,7 +1396,7 @@ function dfRegistrar(toFila){
   salvarDefeitos();
   if(toFila){fila.push({key:'df-'+ts,tipo:'defeito',modId:'',ts:ts,nome:d.nome,cor:d.cor,numero:'',fab:d.fab,desc:d.desc,qtd:1});refreshFila();toast('Etiqueta de defeito na fila');}
   else toast('Defeito registrado');
-  $('dfModelo').value='';$('dfModeloTxt').value='';$('dfCorTxt').value='';$('dfDesc').value='';$('dfCusto').value='';dfSyncModelo();renderDefeitos();
+  avLimparFormDefeito();renderDefeitos();
 }
 function ptRegistrar(toFila){
   const p=ptLerForm();
@@ -1365,7 +1407,7 @@ function ptRegistrar(toFila){
   salvarPetroca();
   if(toFila){fila.push({key:'pt-'+ts,tipo:'petrocado',modId:'',ts:ts,nome:p.nome,cor:p.cor,n1:p.n1,n2:p.n2,qtd:1});refreshFila();toast('Etiqueta de pe trocado na fila');}
   else toast('Pe trocado registrado');
-  $('ptModelo').value='';$('ptModeloTxt').value='';$('ptCorTxt').value='';$('ptN1Txt').value='';$('ptN2Txt').value='';ptSyncModelo();renderPetroca();
+  avLimparFormPt();renderPetroca();
 }
 if($('dfAdd'))$('dfAdd').addEventListener('click',()=>dfRegistrar(true));
 if($('dfReg'))$('dfReg').addEventListener('click',()=>dfRegistrar(false));
@@ -1374,9 +1416,9 @@ if($('ptReg'))$('ptReg').addEventListener('click',()=>ptRegistrar(false));
 if($('dfLimpar'))$('dfLimpar').addEventListener('click',()=>{if(defeitos.length&&confirm('Apagar todos os defeitos registrados?')){defeitos=[];salvarDefeitos();renderDefeitos();}});
 if($('ptLimpar'))$('ptLimpar').addEventListener('click',()=>{if(petrocados.length&&confirm('Apagar todos os pes trocados?')){petrocados=[];salvarPetroca();renderPetroca();}});
 document.querySelectorAll('.av-subnav .rep-tab').forEach(b=>b.addEventListener('click',()=>avSetSub(b.dataset.av)));
-if($('dfModelo'))$('dfModelo').addEventListener('change',dfSyncModelo);
+if($('dfModelo'))['input','change'].forEach(ev=>$('dfModelo').addEventListener(ev,dfSyncModelo));
 if($('dfCor'))$('dfCor').addEventListener('change',dfSyncCor);
-if($('ptModelo'))$('ptModelo').addEventListener('change',ptSyncModelo);
+if($('ptModelo'))['input','change'].forEach(ev=>$('ptModelo').addEventListener(ev,ptSyncModelo));
 if($('ptCor'))$('ptCor').addEventListener('change',ptSyncCor);
 if($('ptN1'))$('ptN1').addEventListener('change',()=>$('ptN1Txt').classList.toggle('hide',$('ptN1').value!==AV_OUTRO));
 if($('ptN2'))$('ptN2').addEventListener('change',()=>$('ptN2Txt').classList.toggle('hide',$('ptN2').value!==AV_OUTRO));
