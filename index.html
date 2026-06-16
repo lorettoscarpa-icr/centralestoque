@@ -3767,5 +3767,51 @@ function renderSuprimentos(){
 window.abrirModal=abrirModal;window.aoSelecionarItem=aoSelecionarItem;window.atualizarTotalPedido=atualizarTotalPedido;window.calcTotal=calcTotal;window.calcUnitFromTotal=calcUnitFromTotal;window.carregarTeto=carregarTeto;window.diasAteReposicao=diasAteReposicao;window.duracaoBaseDias=duracaoBaseDias;window.executarPedidoSelecionado=executarPedidoSelecionado;window.exportarCSV=exportarCSV;window.fecharModal=fecharModal;window.fecharModalFora=fecharModalFora;window.filtrarMes=filtrarMes;window.gastoMes=gastoMes;window.getHistoricoFiltrado=getHistoricoFiltrado;window.getMesFiltro=getMesFiltro;window.iniciarApp=iniciarApp;window.initBadgePedido=initBadgePedido;window.pillStatus=pillStatus;window.proxReposicao=proxReposicao;window.registrarCompra=registrarCompra;window.removerCompra=removerCompra;window.removerDoFirestore=removerDoFirestore;window.renderAlertas=renderAlertas;window.renderAlertasBadge=renderAlertasBadge;window.renderCatalogo=renderCatalogo;window.renderChartMensal=renderChartMensal;window.renderComparativo=renderComparativo;window.renderComparativoInit=renderComparativoInit;window.renderDetalhe=renderDetalhe;window.renderFornecedores=renderFornecedores;window.renderHistorico=renderHistorico;window.renderKPIs=renderKPIs;window.renderOrcamento=renderOrcamento;window.renderPedidoSugerido=renderPedidoSugerido;window.renderTabelaVisao=renderTabelaVisao;window.renderVisao=renderVisao;window.salvarCompra=salvarCompra;window.salvarTeto=salvarTeto;window.selecionarMes=selecionarMes;window.switchTab=switchTab;window.togglePedidoCheck=togglePedidoCheck;window.toggleTodosPedido=toggleTodosPedido;window.ultimaCompra=ultimaCompra;window.verificarVariacaoPreco=verificarVariacaoPreco;window.renderSuprimentos=renderSuprimentos;
 })();
 </script>
+
+<!-- =====================================================================
+  ESTOQUE DENTRO DO HUB  ·  Central Loretto Scarpa
+  =====================================================================
+  Cole este bloco UMA vez no índice do painel ESTOQUE (centralestoque),
+  logo antes de </body>. Não precisa trocar nada.
+
+  O que ele faz, SÓ quando o Estoque está aberto dentro do hub (iframe):
+   • esconde a barra lateral própria do Estoque (acaba a barra dupla);
+   • o conteúdo passa a ocupar a largura toda;
+   • troca de seção (Etiquetas, Entrada, ...) quando você clica no
+     sub-item correspondente no menu do hub.
+
+  Quando o Estoque é aberto direto (fora do hub), nada muda — a barra
+  dele continua normal.
+
+  Obs.: o hub manda os comandos pelas mesmas "data-tab" do Estoque:
+  etiquetas, entrada, reposicao, pronta, financeiro, modelos, avarias,
+  suprimentos. Se a aba de Suprimentos no seu Estoque usar outro
+  data-tab, me avise que ajusto a lista no hub.
+  ===================================================================== -->
+<script>
+(function(){
+  if (window.self === window.top) return;   // só age quando embarcado no hub
+
+  // 1) esconde a barra lateral e o botão de menu do próprio Estoque
+  var st = document.createElement('style');
+  st.textContent = '#sidebar,#sidebarBg,#hamb{display:none!important}';
+  (document.head || document.documentElement).appendChild(st);
+
+  // 2) troca de seção sob comando do hub
+  window.addEventListener('message', function(e){
+    var d = e.data || {};
+    if (d && d.tipo === 'central-tab' && d.tab){
+      var btn = document.querySelector('.side-item[data-tab="' + d.tab + '"]');
+      if (btn) btn.click();
+    }
+  });
+
+  // 3) avisa o hub que está pronto (pra receber a seção pendente)
+  function pronto(){ try{ parent.postMessage({tipo:'central-ready', painel:'centralestoque'}, '*'); }catch(_){ } }
+  if (document.readyState === 'complete') pronto();
+  else window.addEventListener('load', pronto);
+})();
+</script>
+
 </body>
 </html>
