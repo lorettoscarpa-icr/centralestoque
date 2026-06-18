@@ -30,6 +30,7 @@
   .side-item.active .si-ic{background:rgba(0,0,0,.22);border-color:var(--ouro);color:var(--ouro-claro)}
   .side-item.active::before{content:"";position:absolute;left:-1px;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--ouro);border-radius:0 2px 2px 0}
   .content{flex:1;min-width:0;display:flex;flex-direction:column}
+  body.embed .sidebar,body.embed #sidebarBg,body.embed .hamb,body.embed .side-foot,body.embed #loginScreen{display:none!important}
   .topbar{display:flex;align-items:center;gap:14px;padding:15px 24px;border-bottom:1px solid var(--linha);position:sticky;top:0;background:rgba(54,68,31,.94);backdrop-filter:blur(6px);z-index:40}
   .topbar-title{font-family:'Playfair Display',serif;font-weight:600;font-size:20px}
   .hamb{display:none;background:transparent;border:1px solid var(--linha);color:var(--ouro);width:40px;height:40px;border-radius:9px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
@@ -445,6 +446,11 @@
   .rep-ped-it{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-top:1px solid rgba(255,255,255,.05);font-size:13.5px;flex-wrap:wrap}
   .rep-ped-mc{font-weight:600}
   .rep-ped-g{font-family:'DM Mono',monospace;font-size:12.5px;color:rgba(251,249,238,.7)}
+  .rep-ped-grade-ed{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end}
+  .rep-ped-cell{display:flex;flex-direction:column;align-items:center;gap:2px}
+  .rep-ped-cell label{font-size:10px;color:rgba(251,249,238,.55);font-family:'DM Mono',monospace}
+  .rep-ped-cell input{width:46px;padding:5px 4px!important;text-align:center;font-family:'DM Mono',monospace!important;font-size:13px!important}
+  .rep-ped-sub{margin-left:8px;font-size:11px;color:var(--ouro-claro);font-weight:400}
   .rep-pull{display:inline-block;margin-top:6px;background:rgba(220,189,96,.12);border:1px solid var(--linha);color:var(--ouro-claro);font-family:'Barlow',sans-serif;font-weight:600;font-size:11px;letter-spacing:0;text-transform:none;padding:3px 9px;border-radius:7px;cursor:pointer;align-self:flex-start}
   .rep-pull:hover{background:rgba(220,189,96,.22)}
   .rep-foto-row{display:flex;gap:13px;align-items:center;margin:4px 0 14px}
@@ -3520,6 +3526,9 @@ window.repMoverModelo=function(fid,mid,dir){
   const t=cur[i];cur[i]=cur[j];cur[j]=t;
   repPedidoOrdem[fid]=cur;salvarPedidoOrdem();repRenderPedido();
 };
+function repTamanhosDe(mid,cor){const m=(repCatalogo||[]).find(x=>x.id===mid);if(!m)return [];const c=(m.cores||[]).find(c=>c.nome===cor);return c&&c.skus?Object.keys(c.skus):[];}
+function repRecalcForn(fid){const F=repPedidoCache&&repPedidoCache[fid];if(!F)return;let pares=0,valor=0;Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];const cu=M.custo||0;Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];Object.keys(tams).forEach(t=>{const q=parseInt(tams[t])||0;pares+=q;valor+=q*cu;});});});F.pares=pares;F.valor=valor;}
+window.repSetPedidoQtd=function(fid,mid,cor,tam,val){const F=repPedidoCache&&repPedidoCache[fid];if(!F||!F.mods[mid])return;const c=F.mods[mid].cores;if(!c[cor])c[cor]={};const q=parseInt(val)||0;if(q>0)c[cor][tam]=q;else delete c[cor][tam];repRecalcForn(fid);repRenderPedido();};
 function repRenderPedido(){
   const box=$('repPedido'); if(!box)return;
   const porForn=repPedidoCache||{};
@@ -3536,9 +3545,11 @@ function repRenderPedido(){
       html+=`<div class="rep-ped-mod"><div class="rep-ped-modh"><span class="rep-ped-ord"><button type="button" onclick="repMoverModelo('${fid}','${mid}',-1)" title="Subir">&#9650;</button><button type="button" onclick="repMoverModelo('${fid}','${mid}',1)" title="Descer">&#9660;</button></span><span class="rep-ped-modn">${escapeHtml(M.nome)}</span></div>`;
       Object.keys(M.cores).forEach(cor=>{
         const tams=M.cores[cor];
-        const det=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b)).map(t=>`${escapeHtml(t)}×${tams[t]}`).join('  ');
         const ft=repFotoDe(mid,cor);const ref=repRefDe(mid,cor);const corJs=String(cor).replace(/'/g,"\\'");
-        html+=`<div class="rep-ped-it"><div class="rep-ped-cor">${ft?`<img class="rep-ped-foto" src="${ft}" alt="">`:`<label class="rep-ped-foto ph">+ foto<input type="file" accept="image/*" onchange="repSetFoto('${mid}','${corJs}',this)" hidden></label>`}<span class="rep-ped-mc">${escapeHtml(cor)}${ref?` <span class="rep-ped-ref">ref ${escapeHtml(ref)}</span>`:''}</span></div><span class="rep-ped-g">${det}</span></div>`;
+        const sizes=Array.from(new Set(repTamanhosDe(mid,cor).concat(Object.keys(tams)))).sort((a,b)=>parseFloat(a)-parseFloat(b));
+        const subp=Object.keys(tams).reduce((s,t)=>s+(parseInt(tams[t])||0),0);
+        const gradeEd=sizes.map(t=>`<span class="rep-ped-cell"><label>${escapeHtml(t)}</label><input type="number" min="0" inputmode="numeric" value="${tams[t]||''}" onchange="repSetPedidoQtd('${fid}','${mid}','${corJs}','${escapeHtml(t)}',this.value)"></span>`).join('');
+        html+=`<div class="rep-ped-it"><div class="rep-ped-cor">${ft?`<img class="rep-ped-foto" src="${ft}" alt="">`:`<label class="rep-ped-foto ph">+ foto<input type="file" accept="image/*" onchange="repSetFoto('${mid}','${corJs}',this)" hidden></label>`}<span class="rep-ped-mc">${escapeHtml(cor)}${ref?` <span class="rep-ped-ref">ref ${escapeHtml(ref)}</span>`:''}<span class="rep-ped-sub">${subp} par${subp===1?'':'es'}</span></span></div><div class="rep-ped-grade-ed">${gradeEd}</div></div>`;
       });
       html+=`</div>`;
     });
@@ -3556,7 +3567,7 @@ function repPedidoTexto(fid){
   const fnome=fid==='_sem'?'(sem fábrica)':((repForn[fid]&&repForn[fid].nome)||fid);
   let t=`*Pedido de reposição — Loretto Scarpa*\nFabrica: ${fnome}\n\n`;
   Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];
-    Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];const ref=repRefDe(mid,cor);
+    Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];if(!Object.keys(tams).length)return;const ref=repRefDe(mid,cor);
       const det=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b)).map(x=>`${x} (${tams[x]})`).join(', ');
       t+=`• ${M.nome} - ${cor}${ref?' (ref '+ref+')':''}: ${det}\n`;});
   });
@@ -3572,9 +3583,9 @@ window.repImprimir=(fid)=>{
   let body='';
   Object.keys(F.mods).length&&repOrdenarMids(fid,Object.keys(F.mods)).forEach(mid=>{const M=F.mods[mid];
     let modtot=0,blocos='';
-    Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];const ts=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b));const tot=ts.reduce((s,t)=>s+tams[t],0);modtot+=tot;const ft=repFotoDe(mid,cor);const ref=repRefDe(mid,cor);const unit=M.custo||0;const csub=tot*unit;
+    Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];const ts=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b));const tot=ts.reduce((s,t)=>s+(parseInt(tams[t])||0),0);if(tot<=0)return;modtot+=tot;const ft=repFotoDe(mid,cor);const ref=repRefDe(mid,cor);const unit=M.custo||0;const csub=tot*unit;
       blocos+=`<div class="rp2-cor"><div class="rp2-foto">${ft?`<img src="${ft}">`:'<span>sem foto</span>'}</div><div class="rp2-cor-info"><div class="rp2-cor-nome">${escapeHtml(cor)}${ref?` <span class="rp2-ref">Ref ${escapeHtml(ref)}</span>`:''}${unit?` <span class="rp2-cor-unit">${repBRL(unit)}/par</span>`:''}</div><table class="rp2-grade"><tr>${ts.map(t=>`<th>${escapeHtml(t)}</th>`).join('')}<th>Total</th></tr><tr>${ts.map(t=>`<td>${tams[t]}</td>`).join('')}<td class="rp2-tt">${tot}</td></tr></table><div class="rp2-cor-sub">${tot} pares${unit?` &middot; <b>${repBRL(csub)}</b>`:''}</div></div></div>`;});
-    body+=`<div class="rp2-mod"><div class="rp2-mod-h"><div class="rp2-mod-nome">${escapeHtml(M.nome)}</div><div class="rp2-mod-tot">${modtot} pares${M.custo?' &middot; <b>'+repBRL(modtot*M.custo)+'</b>':''}</div></div>${blocos}</div>`;});
+    if(modtot>0)body+=`<div class="rp2-mod"><div class="rp2-mod-h"><div class="rp2-mod-nome">${escapeHtml(M.nome)}</div><div class="rp2-mod-tot">${modtot} pares${M.custo?' &middot; <b>'+repBRL(modtot*M.custo)+'</b>':''}</div></div>${blocos}</div>`;});
   const area=$('repo-print');
   area.innerHTML=`<div class="rp2"><div class="rp2-head"><div class="rp2-brand"><div class="rp2-leao">${leao}</div><div><div class="rp2-marca">LORETTO SCARPA</div><div class="rp2-pt">Pedido de Reposição</div></div></div><div class="rp2-meta"><div><span>Fornecedor</span>${escapeHtml(fnome)}</div><div><span>Data</span>${new Date().toLocaleDateString('pt-BR')}</div></div></div>${body||'<p>Sem itens.</p>'}<div class="rp2-foot"><div>Total: <b>${F.pares} pares</b></div>${F.valor?`<div>Custo esperado: <b>${repBRL(F.valor)}</b></div>`:''}</div></div>`;
   repoPrintHtml=area.innerHTML;document.body.classList.add('modo-pedido');$('pageRule').textContent='@page{size:A4;margin:11mm}';
@@ -3594,6 +3605,24 @@ if($('repGerarBtn'))$('repGerarBtn').addEventListener('click',repGerar);
 if($('cfgFornAdd'))$('cfgFornAdd').addEventListener('click',()=>{const n=$('cfgFornNome').value.trim();if(!n){toast('Nome da fábrica');return;}const id='f'+Date.now().toString(36);repForn[id]={nome:n,whatsapp:$('cfgFornWa').value.trim(),off:false};$('cfgFornNome').value='';$('cfgFornWa').value='';repSalvar();repRenderConfig();});
 
 aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();repInit();repRender();renderFinanceiro();iniciarLogin();iniciarSync();
+/* ===== MODO EMBUTIDO: dentro da Central/ecossistema, esconde o menu e o login deste app e usa o usuário + navegação do ecossistema ===== */
+(function(){
+  var EMBED=(function(){var p=/[?&]embed=1/.test(location.search);var inFrame;try{inFrame=window.self!==window.top;}catch(e){inFrame=true;}return p||inFrame;})();
+  if(!EMBED)return;
+  function paramUser(){try{var m=location.search.match(/[?&](?:user|u|usuario)=([^&#]+)/);return m?decodeURIComponent(m[1].replace(/\+/g,' ')).trim():'';}catch(e){return '';}}
+  var ALIAS={defeitos:'avarias',pe:'pronta','pronta-entrega':'pronta',prontaentrega:'pronta'};
+  function hashTab(){var h=(location.hash||'').replace(/^#/,'').split(/[?&\/]/)[0].toLowerCase();return h?(ALIAS[h]||h):'';}
+  function applyHashTab(){var t=hashTab();if(!t)return;var b=document.querySelector('.side-item[data-tab="'+t+'"]');if(b)b.click();}
+  document.body.classList.add('embed');
+  var u=paramUser();
+  if(u){userAtual=u;try{localStorage.setItem('loretto_user',u);}catch(e){}}
+  if(!userAtual)userAtual='Central';
+  var ls=$('loginScreen');if(ls)ls.classList.add('hide');
+  try{atualizarUserUI();}catch(e){}
+  if(u){try{syncCfg.on=true;salvaSync();desconectarSync();conectarSync();}catch(e){}}
+  applyHashTab();
+  window.addEventListener('hashchange',applyHashTab);
+})();
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
 
 /* ===== JS CENTRAL DE SUPRIMENTOS ===== */
