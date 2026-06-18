@@ -2019,20 +2019,40 @@ function conectarSync(){
       _rcRef=_db.collection('ls_rep_cfg').doc('loja');
       if(_unsubRC)_unsubRC();
       _unsubRC=_rcRef.onSnapshot(function(snap){
-        if(!snap.exists)return; var d=snap.data(); if(!d||!d.cfg)return;
+        if(!snap.exists)return; var d=snap.data(); if(!d)return;
         if((d.ts||0)<=_rcLastPush)return;            // ignora o proprio push
         if((d.ts||0)<=repCfgTs)return;               // ja temos versao igual/mais nova
-        repCfg=d.cfg; repCfgTs=d.ts||Date.now();
-        try{localStorage.setItem('loretto_rep_cfg',JSON.stringify(repCfg));localStorage.setItem('loretto_rep_cfg_ts',String(repCfgTs));}catch(e){}
-        if(typeof repSub!=='undefined'&&repSub==='modelos'&&typeof repRenderModelos==='function')repRenderModelos();
+        if(d.cfg)repCfg=d.cfg;
+        if(d.forn)repForn=d.forn;
+        if(d.custo)repCusto=d.custo;
+        if(d.fornReport)repFornReport=d.fornReport;
+        if(d.info!==undefined)repInfo=d.info;
+        if(Array.isArray(d.catalogo))repCatalogo=d.catalogo;
+        if(d.estoque)repEstoque=d.estoque;
+        repCfgTs=d.ts||Date.now();
+        try{localStorage.setItem('loretto_rep_cfg',JSON.stringify(repCfg));localStorage.setItem('loretto_rep_forn',JSON.stringify(repForn||{}));localStorage.setItem('loretto_rep_custo',JSON.stringify(repCusto||{}));localStorage.setItem('loretto_rep_forn_report',JSON.stringify(repFornReport||{}));if(repInfo)localStorage.setItem('loretto_rep_info',JSON.stringify(repInfo));localStorage.setItem('loretto_rep_catalogo',JSON.stringify(repCatalogo||[]));localStorage.setItem('loretto_rep_estoque',JSON.stringify(repEstoque||{}));localStorage.setItem('loretto_rep_cfg_ts',String(repCfgTs));}catch(e){}
+        if(typeof repRender==='function'&&$('tab-reposicao')&&!$('tab-reposicao').classList.contains('hide'))repRender();
+        if(typeof peRender==='function'&&$('tab-pronta')&&!$('tab-pronta').classList.contains('hide'))peRender();
       },function(){});
-      _rcRef.get().then(function(snp){var d=snp.exists?snp.data():null;if(!d||!d.cfg||((d.ts||0)<repCfgTs))repPushCfg();}).catch(function(){});
+      _rcRef.get().then(function(snp){var d=snp.exists?snp.data():null;if(!d||((d.ts||0)<repCfgTs))repPushCfg();}).catch(function(){});
+      _rfRef=_db.collection('ls_rep_fotos').doc('loja');
+      if(_unsubRF)_unsubRF();
+      _unsubRF=_rfRef.onSnapshot(function(snap){
+        if(!snap.exists)return; var d=snap.data(); if(!d||!d.fotos)return;
+        if((d.ts||0)<=_rfLastPush)return;
+        if((d.ts||0)<=repFotosTs)return;
+        repFotos=d.fotos; repFotosTs=d.ts||Date.now();
+        try{localStorage.setItem('loretto_rep_fotos',JSON.stringify(repFotos));localStorage.setItem('loretto_rep_fotos_ts',String(repFotosTs));}catch(e){}
+        if(typeof repSub!=='undefined'&&repSub==='modelos'&&typeof repRenderModelos==='function')repRenderModelos();
+        if(typeof peRender==='function'&&$('tab-pronta')&&!$('tab-pronta').classList.contains('hide'))peRender();
+      },function(){});
+      _rfRef.get().then(function(snp){var d=snp.exists?snp.data():null;if(!d||((d.ts||0)<repFotosTs))repPushFotos();}).catch(function(){});
     }catch(e){setSyncStatus('err',e.message);}
   });
 }
 function mergeFila(local,remoto){const seen={};const out=(remoto||[]).filter(x=>x&&x.key!=null);out.forEach(x=>seen[x.key]=1);(local||[]).forEach(x=>{if(x&&x.key!=null&&!seen[x.key]){out.push(x);seen[x.key]=1;}});return out;}
 function mergeCatalogo(local,remoto){const seen={};const out=(remoto||[]).filter(x=>x&&x.id!=null);out.forEach(x=>seen[x.id]=1);(local||[]).forEach(x=>{if(x&&x.id!=null&&!seen[x.id]){out.push(x);seen[x.id]=1;}});return out;}
-function desconectarSync(){if(_unsubF){_unsubF();_unsubF=null;}if(_unsubP){_unsubP();_unsubP=null;}if(_unsubA){_unsubA();_unsubA=null;}if(_unsubC){_unsubC();_unsubC=null;}if(_unsubRC){_unsubRC();_unsubRC=null;}_rcRef=null;_avInit=false;_catInit=false;_filaInit=false;_fRef=_pRef=_aRef=_cRef=_db=null;setSyncStatus('off');}
+function desconectarSync(){if(_unsubF){_unsubF();_unsubF=null;}if(_unsubP){_unsubP();_unsubP=null;}if(_unsubA){_unsubA();_unsubA=null;}if(_unsubC){_unsubC();_unsubC=null;}if(_unsubRC){_unsubRC();_unsubRC=null;}if(_unsubRF){_unsubRF();_unsubRF=null;}_rcRef=_rfRef=null;_avInit=false;_catInit=false;_filaInit=false;_fRef=_pRef=_aRef=_cRef=_db=null;setSyncStatus('off');}
 function preencheSyncModal(){if($('syncUserName'))$('syncUserName').textContent=(typeof userAtual!=='undefined'&&userAtual)||'\u2014';if($('syncToggle'))$('syncToggle').checked=!!syncCfg.on;}
 function aplicarSync(){salvaSync();if(syncCfg.on&&syncCodigo())conectarSync();else desconectarSync();}
 function iniciarSync(){preencheSyncModal();if(syncCfg.on&&syncCodigo())conectarSync();else setSyncStatus('off');}
@@ -3126,14 +3146,25 @@ function repFornKeyByName(nome){if(!repForn)repInit();const n=repNormCab(nome);l
 /* sincronizacao da config de reposicao (fixos, fabrica, custo, referencia por cor) entre aparelhos */
 let _rcRef=null,_unsubRC=null,_rcLastPush=0,_rcPushT=null;
 let repCfgTs=parseInt(localStorage.getItem('loretto_rep_cfg_ts'))||0;
+let _rfRef=null,_unsubRF=null,_rfLastPush=0,_rfPushT=null;
+let repFotosTs=parseInt(localStorage.getItem('loretto_rep_fotos_ts'))||0;
 function repPushCfg(){
   if(!_rcRef)return;
   clearTimeout(_rcPushT);
   _rcPushT=setTimeout(function(){
     _rcLastPush=Date.now(); repCfgTs=_rcLastPush;
     try{localStorage.setItem('loretto_rep_cfg_ts',String(repCfgTs));}catch(e){}
-    _rcRef.set({cfg:repCfg,ts:_rcLastPush}).catch(function(){});
+    _rcRef.set({cfg:repCfg,forn:repForn||{},custo:repCusto||{},fornReport:repFornReport||{},info:repInfo||null,catalogo:repCatalogo||[],estoque:repEstoque||{},ts:_rcLastPush}).catch(function(){});
   },800);
+}
+function repPushFotos(){
+  if(!_rfRef)return;
+  clearTimeout(_rfPushT);
+  _rfPushT=setTimeout(function(){
+    _rfLastPush=Date.now(); repFotosTs=_rfLastPush;
+    try{localStorage.setItem('loretto_rep_fotos_ts',String(repFotosTs));}catch(e){}
+    _rfRef.set({fotos:repFotos||{},ts:_rfLastPush}).catch(function(){});
+  },1000);
 }
 function repInit(){
   if(!repForn){
@@ -3202,13 +3233,14 @@ function repImportar(file){
       const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
       const head=(rows[0]||[]).map(repNormCab);
       const find=names=>{for(let i=0;i<head.length;i++)if(names.indexOf(head[i])>=0)return i;return -1;};
-      const pi=find(['produto','modelo','descrição']);
+      const findPref=names=>{for(let n=0;n<names.length;n++){const i=head.indexOf(names[n]);if(i>=0)return i;}return -1;};
+      const pi=findPref(['produto','descrição','descricao','modelo']);
       const cori=find(['cor']);
       const ti=find(['tamanho','numeração','número']);
       const bi=find(['codigo barras','código de barras','codigobarras','ean','cod barras']);
       const ei=find(['estoque','qtd estoque','saldo','quantidade']);
       const cu=find(['valor custo','custo','preco custo']);
-      const fai=find(['fabrica','fábrica','fornecedor','fabricante','marca']);
+      const fai=findPref(['fornecedor nome','fabrica','fornecedor','fabricante']);
       if(pi<0||ei<0){toast('Não encontrei as colunas Produto e Estoque');return;}
       const prod={},novoEst={},custoMod={},fabMod={}; let lixo=0,pares=0,skus=0;
       for(let r=1;r<rows.length;r++){
@@ -3225,7 +3257,7 @@ function repImportar(file){
         prod[id].cores[cor].skus[tam]=chave;
         novoEst[chave]=q; pares+=q; skus++;
         if(cu>=0){const v=parseFloat(row[cu]); if(v>0&&!custoMod[id])custoMod[id]=v;}
-        if(fai>=0&&row[fai]!=null){const fb=String(row[fai]).trim(); if(fb&&!fabMod[id])fabMod[id]=fb;}
+        if(fai>=0&&row[fai]!=null){const fb=String(row[fai]).trim(); if(fb&&repNormCab(fb)!=='sem fornecedor'&&!fabMod[id])fabMod[id]=fb;}
       }
       repCatalogo=Object.values(prod).map(p=>({id:p.id,nome:p.nome,cores:Object.values(p.cores)})).sort((a,b)=>a.nome.localeCompare(b.nome));
       repEstoque=novoEst;
