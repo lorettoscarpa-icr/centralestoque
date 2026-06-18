@@ -30,7 +30,6 @@
   .side-item.active .si-ic{background:rgba(0,0,0,.22);border-color:var(--ouro);color:var(--ouro-claro)}
   .side-item.active::before{content:"";position:absolute;left:-1px;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--ouro);border-radius:0 2px 2px 0}
   .content{flex:1;min-width:0;display:flex;flex-direction:column}
-  body.embed .sidebar,body.embed #sidebarBg,body.embed .hamb,body.embed .side-foot,body.embed #loginScreen{display:none!important}
   .topbar{display:flex;align-items:center;gap:14px;padding:15px 24px;border-bottom:1px solid var(--linha);position:sticky;top:0;background:rgba(54,68,31,.94);backdrop-filter:blur(6px);z-index:40}
   .topbar-title{font-family:'Playfair Display',serif;font-weight:600;font-size:20px}
   .hamb{display:none;background:transparent;border:1px solid var(--linha);color:var(--ouro);width:40px;height:40px;border-radius:9px;font-size:20px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
@@ -3605,24 +3604,6 @@ if($('repGerarBtn'))$('repGerarBtn').addEventListener('click',repGerar);
 if($('cfgFornAdd'))$('cfgFornAdd').addEventListener('click',()=>{const n=$('cfgFornNome').value.trim();if(!n){toast('Nome da fábrica');return;}const id='f'+Date.now().toString(36);repForn[id]={nome:n,whatsapp:$('cfgFornWa').value.trim(),off:false};$('cfgFornNome').value='';$('cfgFornWa').value='';repSalvar();repRenderConfig();});
 
 aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();repInit();repRender();renderFinanceiro();iniciarLogin();iniciarSync();
-/* ===== MODO EMBUTIDO: dentro da Central/ecossistema, esconde o menu e o login deste app e usa o usuário + navegação do ecossistema ===== */
-(function(){
-  var EMBED=(function(){var p=/[?&]embed=1/.test(location.search);var inFrame;try{inFrame=window.self!==window.top;}catch(e){inFrame=true;}return p||inFrame;})();
-  if(!EMBED)return;
-  function paramUser(){try{var m=location.search.match(/[?&](?:user|u|usuario)=([^&#]+)/);return m?decodeURIComponent(m[1].replace(/\+/g,' ')).trim():'';}catch(e){return '';}}
-  var ALIAS={defeitos:'avarias',pe:'pronta','pronta-entrega':'pronta',prontaentrega:'pronta'};
-  function hashTab(){var h=(location.hash||'').replace(/^#/,'').split(/[?&\/]/)[0].toLowerCase();return h?(ALIAS[h]||h):'';}
-  function applyHashTab(){var t=hashTab();if(!t)return;var b=document.querySelector('.side-item[data-tab="'+t+'"]');if(b)b.click();}
-  document.body.classList.add('embed');
-  var u=paramUser();
-  if(u){userAtual=u;try{localStorage.setItem('loretto_user',u);}catch(e){}}
-  if(!userAtual)userAtual='Central';
-  var ls=$('loginScreen');if(ls)ls.classList.add('hide');
-  try{atualizarUserUI();}catch(e){}
-  if(u){try{syncCfg.on=true;salvaSync();desconectarSync();conectarSync();}catch(e){}}
-  applyHashTab();
-  window.addEventListener('hashchange',applyHashTab);
-})();
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
 
 /* ===== JS CENTRAL DE SUPRIMENTOS ===== */
