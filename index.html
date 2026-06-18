@@ -326,12 +326,15 @@
   .rp2-mod-nome{font-family:'Playfair Display',serif;font-weight:600;font-size:16px;color:#314b21}
   .rp2-ref{font-family:'DM Mono',monospace;font-size:11px;background:#f0ecd8;color:#314b21;padding:1px 7px;border-radius:4px;margin-right:4px}
   .rp2-mod-tot{font-size:11.5px;color:#555;white-space:nowrap}
-  .rp2-cor{display:flex;gap:12px;align-items:center;padding:7px 0;page-break-inside:avoid;break-inside:avoid}
-  .rp2-foto{width:60px;height:60px;flex:0 0 auto;border:1px solid #ccc;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fafafa}
+  .rp2-cor{display:flex;gap:14px;align-items:flex-start;padding:9px 0;page-break-inside:avoid;break-inside:avoid}
+  .rp2-foto{width:120px;height:120px;flex:0 0 auto;border:1px solid #ccc;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fafafa}
   .rp2-foto img{width:100%;height:100%;object-fit:cover}
-  .rp2-foto span{font-size:8px;color:#aaa}
+  .rp2-foto span{font-size:9px;color:#aaa}
   .rp2-cor-info{flex:1}
-  .rp2-cor-nome{font-weight:700;font-size:12.5px;margin-bottom:4px;color:#222}
+  .rp2-cor-nome{font-weight:700;font-size:13px;margin-bottom:5px;color:#222;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .rp2-cor-unit{font-family:'DM Mono',monospace;font-size:11px;color:#7a6a2e;font-weight:600}
+  .rp2-cor-sub{margin-top:5px;font-size:11.5px;color:#555}
+  .rp2-cor-sub b{color:#314b21;font-size:12.5px}
   .rp2-grade{border-collapse:collapse}
   .rp2-grade th,.rp2-grade td{border:1px solid #bbb;padding:4px 9px;font-size:12px;text-align:center;min-width:30px;font-family:'DM Mono',monospace}
   .rp2-grade th{background:#314b21;color:#fbf9ee;font-weight:600;border-color:#314b21}
@@ -455,6 +458,9 @@
   .rep-ped-mod{border-top:1px solid rgba(255,255,255,.06);padding-top:8px}
   .rep-ped-mod:first-child{border-top:0;padding-top:0}
   .rep-ped-modh{display:flex;align-items:center;gap:11px;padding:4px 0 2px}
+  .rep-ped-ord{display:inline-flex;flex-direction:column;gap:1px}
+  .rep-ped-ord button{background:rgba(220,189,96,.12);border:1px solid var(--linha);color:var(--ouro);width:22px;height:15px;line-height:1;font-size:8px;cursor:pointer;border-radius:4px;padding:0;display:flex;align-items:center;justify-content:center}
+  .rep-ped-ord button:hover{background:rgba(220,189,96,.25);border-color:var(--ouro)}
   .rep-ped-foto{width:42px;height:42px;flex:0 0 auto;border-radius:7px;object-fit:cover;border:1px solid var(--linha);background:rgba(0,0,0,.18)}
   .rep-ped-foto.ph{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ouro-claro);cursor:pointer}
   .rep-ped-modn{font-weight:700;font-size:14.5px}
@@ -686,6 +692,46 @@
   .pe-forn-tag{font-size:10px;color:#e0a86a;font-weight:400}
   .pe-forns-add{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
   .pe-forns-add input{flex:1;min-width:150px}
+  .lnk-edit{background:none;border:none;color:var(--ouro-claro);font-size:12px;cursor:pointer;text-decoration:underline;font-family:'Barlow',sans-serif}
+  .lnk-edit:hover{color:var(--ouro)}
+  .pe-forn-of{display:block;font-size:11px;font-weight:400;color:rgba(251,249,238,.45);margin-top:1px}
+  .pe-forn-edit{border-top:1px solid rgba(255,255,255,.05);padding:12px 0;display:flex;flex-direction:column;gap:10px}
+  .pe-fe-fld{display:flex;flex-direction:column;gap:4px}
+  .pe-fe-fld label{font-size:11px;color:var(--ouro-claro);text-transform:uppercase;letter-spacing:.4px}
+  .pe-fe-btns{display:flex;gap:8px;margin-top:2px}
+  .pe-modrem{color:#e08a8a !important;padding:7px 10px !important}
+  #peModeloModal .modal{position:relative;max-height:88vh;display:flex;flex-direction:column}
+  #peModeloModal .modal-x{position:absolute;top:14px;right:14px}
+  .pe-modal-h{font-family:'Playfair Display',serif;font-size:20px;color:var(--ouro-claro);margin:0 30px 4px 0}
+  .pe-pick-hint{font-size:12.5px;color:rgba(251,249,238,.6);margin:0 0 12px}
+  #peModeloBox>input{margin-bottom:10px}
+  .pe-pick-list{overflow:auto;flex:1;display:flex;flex-direction:column;gap:14px}
+  .pe-pick-jah{background:rgba(220,189,96,.07);border:1px solid var(--linha);border-radius:10px;padding:10px 12px}
+  .pe-pick-jah-t{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ouro-claro);margin-bottom:6px}
+  .pe-pick-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;border-radius:8px;font-size:14px;color:var(--areia)}
+  .pe-pick-row.on{justify-content:space-between;padding:5px 0}
+  .pe-pick-row.add{background:rgba(0,0,0,.16);border:1px solid var(--linha);cursor:pointer;transition:.15s}
+  .pe-pick-row.add:hover{border-color:var(--ouro);background:rgba(220,189,96,.1)}
+  .pe-pick-row.add span:first-child{flex:1;font-weight:600}
+  .pe-pick-cor{font-size:11px;color:rgba(251,249,238,.5)}
+  .pe-pick-add{font-size:11px;color:var(--ouro);font-weight:600;white-space:nowrap}
+  .pe-pick-disp{display:flex;flex-direction:column;gap:7px}
+  .pe-pick-empty{font-size:13px;color:rgba(251,249,238,.55);padding:8px 2px}
+  .pe-modal-foot{padding-top:14px;margin-top:4px;border-top:1px solid var(--linha);display:flex;justify-content:flex-end}
+  .btn.xs{padding:5px 9px;font-size:11px;border-radius:7px}
+  .pe-modacts{display:flex;gap:7px;align-items:flex-start}
+  .pe-stop{color:#e0a86a !important;border-color:rgba(224,168,106,.4) !important}
+  .pe-custoi{width:96px;padding:4px 8px !important;font-size:13px !important;font-family:'DM Mono',monospace !important}
+  .pe-corblk{margin-top:14px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.08)}
+  .pe-corblk:first-of-type{border-top:none}
+  .pe-corh{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .pe-corfoto{width:42px;height:42px;border-radius:8px;object-fit:cover;border:1px solid var(--linha);flex:0 0 auto}
+  .pe-corfoto.ph{display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(0,0,0,.2);color:rgba(220,189,96,.5)}
+  .pe-cornome{font-weight:600;color:var(--areia);font-size:14px;margin-right:auto}
+  .pe-corhide{color:#e08a8a !important;border-color:rgba(224,138,138,.35) !important}
+  .pe-corhidden{margin-top:12px;font-size:12px;color:rgba(251,249,238,.55);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .pe-corchip{background:rgba(0,0,0,.2);border:1px dashed var(--linha);border-radius:20px;padding:3px 11px;font-size:12px;color:var(--ouro-claro);cursor:pointer;font-family:'Barlow',sans-serif}
+  .pe-corchip:hover{border-color:var(--ouro);border-style:solid}
   .pe-cfg input{width:58px;background:rgba(0,0,0,.25);border:1px solid var(--linha);border-radius:7px;color:var(--ouro-claro);font-weight:700;font-size:14px;text-align:center;padding:5px}
 
 /* ===== CENTRAL DE SUPRIMENTOS (acoplada) ===== */
@@ -1158,6 +1204,14 @@ textarea.cons-field{min-height:80px;resize:vertical}
       <p class="pe-sub">Publique os modelos de cada fábrica e envie o link. A fábrica mantém as quantidades disponíveis atualizadas — você acompanha aqui na hora de comprar.</p>
     </div>
     <div id="peFabricas"></div>
+  </div>
+
+  <div id="peModeloModal" class="modal-bg hide" onclick="if(event.target===this)peCadModeloFechar()">
+    <div class="modal modal-lg">
+      <button class="modal-x" type="button" onclick="peCadModeloFechar()" aria-label="Fechar">&times;</button>
+      <div id="peModeloBox"></div>
+      <div class="pe-modal-foot"><button class="btn btn-ouro" onclick="peCadModeloFechar()">Concluir</button></div>
+    </div>
   </div>
 
   <div id="tab-financeiro" class="hide">
@@ -2152,7 +2206,7 @@ const AV_OUTRO='__outro__';
 function brNum(n){return (Number(n)||0).toFixed(2).replace('.',',');}
 function avModeloPorId(id){return catalogo.find(m=>m.id===id);}
 function avModeloPorNome(nome){const n=normKey(nome||'');return n?catalogo.find(m=>normKey(m.nome)===n):null;}
-function avFabricaModelo(nome){const id=normKey(nome);try{if(typeof repCfg!=='undefined'&&repCfg&&repCfg[id]&&repCfg[id].fornId&&typeof repForn!=='undefined'&&repForn&&repForn[repCfg[id].fornId])return repForn[repCfg[id].fornId].nome||'';}catch(e){}return '';}
+function avFabricaModelo(nome){const id=normKey(nome);try{if(typeof repCfg!=='undefined'&&repCfg&&repCfg[id]&&repCfg[id].fornId&&typeof repForn!=='undefined'&&repForn&&repForn[repCfg[id].fornId])return repFornNome(repCfg[id].fornId)||'';}catch(e){}return '';}
 function avCustoModelo(nome){const id=normKey(nome);try{if(typeof repCfg!=='undefined'&&repCfg&&repCfg[id]&&repCfg[id].custo)return Number(repCfg[id].custo)||0;}catch(e){}try{if(typeof repCusto!=='undefined'&&repCusto&&repCusto[id])return Number(repCusto[id])||0;}catch(e){}return 0;}
 function avCustoDefeito(d){const c=avCustoModelo(d.nome);return c>0?c:(Number(d.custo)||0);}
 function avOptsModelos(){return '<option value="">Selecione o modelo...</option>'+catalogo.slice().sort((a,b)=>(a.nome||'').localeCompare(b.nome||'')).map(m=>`<option value="${escapeHtml(m.id)}">${escapeHtml(m.nome)}</option>`).join('')+`<option value="${AV_OUTRO}">Outro (digitar)...</option>`;}
@@ -2609,7 +2663,7 @@ function afterHist(){renderHist();if(typeof renderFinanceiro==='function')render
 window.repConfirmarPedido=(fid)=>{
   const F=repPedidoCache&&repPedidoCache[fid];
   if(!F||!F.mods||!Object.keys(F.mods).length){toast('Gere o pedido primeiro');return;}
-  const fornNome=fid==='_sem'?'(sem fábrica)':((repForn[fid]&&repForn[fid].nome)||fid);
+  const fornNome=fid==='_sem'?'(sem fábrica)':repFornNome(fid);
   const itens=[];
   Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];Object.keys(M.cores).forEach(cor=>{const g={};Object.keys(M.cores[cor]).forEach(t=>g[t]=M.cores[cor][t]);itens.push({mk:mid,ck:cor,fk:fid,modelo:M.nome,cor:cor,grade:g,preco:M.custo||0});});});
   if(!itens.length){toast('Nada a confirmar');return;}
@@ -2643,17 +2697,61 @@ function peLink(fid){return PE_BASE+'?f='+encodeURIComponent(fid)+'&k='+encodeUR
 const PE_PREVIA={tchwm:Object.assign({"fabrica": "Tchwm Shoes", "modelos": [{"id": "pv1", "nome": "Paris Mouro", "cod": "7600", "custo": 259.9, "cores": [{"nome": "Mouro", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv2", "nome": "Paris Preto", "cod": "7600", "custo": 259.9, "cores": [{"nome": "Preto", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv3", "nome": "Milano Branco", "cod": "5505", "custo": 199.9, "cores": [{"nome": "Branco", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv4", "nome": "Milano Preto", "cod": "5505", "custo": 199.9, "cores": [{"nome": "Preto", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}], "estoque": {"pv1|Mouro|38": 2, "pv1|Mouro|39": 26, "pv1|Mouro|40": 14, "pv1|Mouro|41": 13, "pv1|Mouro|42": 7, "pv1|Mouro|43": 11, "pv2|Preto|37": 2, "pv2|Preto|38": 3, "pv2|Preto|39": 15, "pv2|Preto|40": 3, "pv2|Preto|41": 3, "pv2|Preto|42": 2, "pv2|Preto|43": 7, "pv3|Branco|38": 2, "pv3|Branco|40": 3, "pv3|Branco|41": 5, "pv3|Branco|43": 5, "pv4|Preto|39": 4, "pv4|Preto|43": 6}, "produzindo": {"pv1|Mouro|37": 1, "pv2|Preto|37": 1, "pv2|Preto|38": 3, "pv2|Preto|40": 2, "pv2|Preto|43": 1}, "pedido": {"pv1|Mouro|37": 4, "pv1|Mouro|38": 4, "pv2|Preto|37": 2, "pv2|Preto|40": 5, "pv2|Preto|41": 7, "pv2|Preto|42": 6, "pv3|Branco|37": 4, "pv3|Branco|38": 6, "pv3|Branco|39": 15, "pv3|Branco|40": 12, "pv3|Branco|41": 10, "pv3|Branco|42": 12, "pv4|Preto|38": 4, "pv4|Preto|39": 11, "pv4|Preto|40": 15, "pv4|Preto|41": 15, "pv4|Preto|42": 8}, "meta": {"pv1|Mouro|37": 3, "pv1|Mouro|38": 6, "pv1|Mouro|39": 15, "pv1|Mouro|40": 12, "pv1|Mouro|41": 10, "pv1|Mouro|42": 8, "pv1|Mouro|43": 4, "pv2|Preto|37": 3, "pv2|Preto|38": 6, "pv2|Preto|39": 15, "pv2|Preto|40": 12, "pv2|Preto|41": 10, "pv2|Preto|42": 8, "pv2|Preto|43": 4, "pv3|Branco|37": 3, "pv3|Branco|38": 6, "pv3|Branco|39": 15, "pv3|Branco|40": 12, "pv3|Branco|41": 10, "pv3|Branco|42": 8, "pv3|Branco|43": 4, "pv4|Preto|37": 3, "pv4|Preto|38": 6, "pv4|Preto|39": 15, "pv4|Preto|40": 12, "pv4|Preto|41": 10, "pv4|Preto|42": 8, "pv4|Preto|43": 4}},{atualizadoEm:Date.now()-2*86400000,publicadoEm:Date.now()-5*86400000,lorettoEm:Date.now()-4*86400000,lorettoPor:"Yuri",historico:[{ts:Date.now()-2*86400000,mudancas:[{label:"Paris Mouro 39",de:30,para:26},{label:"Paris Preto 40",de:6,para:3}]}]})};
 function peModelosDaFabrica(fid){
   const out=[];
-  (repCatalogo||[]).forEach(m=>{
-    const cf=repCfg[m.id];if(!cf||cf.fornId!==fid)return;
+  const ids=(peFornModelos&&peFornModelos[fid])||[];
+  ids.forEach(function(mid){
+    const m=(repCatalogo||[]).find(x=>x.id===mid);if(!m)return;
+    const cf=repCfg[m.id]||{};
     const cores=[];
     (m.cores||[]).forEach(c=>{if(cf.coresOff&&cf.coresOff[c.nome])return;const tams=Object.keys(c.skus||{});if(tams.length)cores.push({nome:c.nome,tams});});
     if(cores.length)out.push({id:m.id,nome:m.nome,custo:cf.custo||0,cores});
   });
-  if(!out.length&&PE_PREVIA[fid])return PE_PREVIA[fid].modelos.map(function(m){return {id:m.id,nome:m.nome,custo:m.custo||0,cores:m.cores};});
   return out;
 }
+/* cadastro manual de modelos por fábrica (escolhidos do catálogo importado) */
+window.peCadModelo=function(fid){_peCadFid=fid;$('peModeloModal').classList.remove('hide');peCadModeloRender();};
+window.peCadModeloFechar=function(){$('peModeloModal').classList.add('hide');_peCadFid=null;};
+function peCadModeloRender(){
+  const fid=_peCadFid;const box=$('peModeloBox');if(!fid||!box)return;
+  const nomeF=repFornNome(fid);
+  if(!repCatalogo||!repCatalogo.length){box.innerHTML='<div class="pe-modal-h">Cadastrar modelos — '+escapeHtml(nomeF)+'</div><p class="pe-pick-empty">Nenhum modelo no catálogo ainda. Importe o relatório do Kigi na aba <b>Reposição</b> primeiro — os modelos vêm de lá — depois volte aqui e escolha quais esta fábrica produz.</p>';return;}
+  box.innerHTML='<div class="pe-modal-h">Cadastrar modelos — '+escapeHtml(nomeF)+'</div>'+
+    '<p class="pe-pick-hint">Marque os modelos que <b>esta fábrica</b> produz. Eles vêm do catálogo importado do Kigi, já com as cores e numerações.</p>'+
+    '<input type="text" id="peModeloBusca" placeholder="Buscar modelo..." oninput="peCadModeloFiltrar()">'+
+    '<div class="pe-pick-list" id="peModeloLista"></div>';
+  peCadModeloFiltrar();
+}
+function peCadModeloFiltrar(){
+  const fid=_peCadFid;const lst=$('peModeloLista');if(!fid||!lst)return;
+  const atuais=(peFornModelos[fid]||[]);
+  const q=normKey(($('peModeloBusca')&&$('peModeloBusca').value)||'');
+  const jah=atuais.map(id=>(repCatalogo||[]).find(m=>m.id===id)).filter(Boolean).sort((a,b)=>a.nome.localeCompare(b.nome));
+  const disp=(repCatalogo||[]).filter(m=>atuais.indexOf(m.id)<0&&(!q||normKey(m.nome).includes(q))).sort((a,b)=>a.nome.localeCompare(b.nome));
+  let html='';
+  if(jah.length)html+='<div class="pe-pick-jah"><div class="pe-pick-jah-t">Nesta fábrica ('+jah.length+')</div>'+jah.map(m=>'<div class="pe-pick-row on"><span>'+escapeHtml(m.nome)+'</span><button class="lnk-del" onclick="peRemModelo(\''+fid+'\',\''+m.id+'\')">tirar</button></div>').join('')+'</div>';
+  html+='<div class="pe-pick-disp">'+(disp.length?disp.map(m=>'<button class="pe-pick-row add" onclick="peAddModelo(\''+m.id+'\')"><span>'+escapeHtml(m.nome)+'</span><span class="pe-pick-cor">'+(m.cores||[]).length+' cor(es)</span><span class="pe-pick-add">+ adicionar</span></button>').join(''):'<p class="pe-pick-empty">'+(q?'Nenhum modelo encontrado.':'Todos os modelos do catálogo já estão nesta fábrica.')+'</p>')+'</div>';
+  lst.innerHTML=html;
+}
+window.peCadModeloFiltrar=peCadModeloFiltrar;
+window.peAddModelo=function(mid){const fid=_peCadFid;if(!fid)return;if(!peFornModelos[fid])peFornModelos[fid]=[];if(peFornModelos[fid].indexOf(mid)<0)peFornModelos[fid].push(mid);peSalvarFornModelos();peCadModeloFiltrar();peRender();};
+window.peRemModelo=function(fid,mid){peFornModelos[fid]=(peFornModelos[fid]||[]).filter(x=>x!==mid);peSalvarFornModelos();if(_peCadFid)peCadModeloFiltrar();peRender();};
+function jsq(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+window.peSetCusto=function(mid,v){var c=repCfgDe(mid);c.custo=parseFloat(v)||0;if(typeof repCusto!=='undefined')repCusto[mid]=c.custo;repSalvar();peRender();};
+window.peEsconderCor=function(fid,mid,cor){var c=repCfgDe(mid);if(!c.coresOff)c.coresOff={};c.coresOff[cor]=1;repSalvar();peRender();toast('Cor escondida');};
+window.peMostrarCor=function(fid,mid,cor){var c=repCfgDe(mid);if(c.coresOff)delete c.coresOff[cor];repSalvar();peRender();};
+window.peZerarMetas=function(fid,mid){
+  var nome=((repCatalogo||[]).find(function(x){return x.id===mid;})||{}).nome||mid;
+  if(!confirm('Zerar as metas de "'+nome+'"? A fábrica deixa de receber pedido de reposição deste modelo. O estoque atual continua aparecendo, e os pedidos já feitos não mudam.'))return;
+  var cache=_peEstoqueCache[fid]||{};var meta=Object.assign({},cache.meta||{});
+  Object.keys(meta).forEach(function(k){if(k.indexOf(mid+'|')===0)delete meta[k];});
+  if(!_db){if(_peEstoqueCache[fid])_peEstoqueCache[fid].meta=meta;peRender();toast('Metas zeradas');return;}
+  var ref=_db.collection('ls_pe').doc(peDocId(fid));var stamp={meta:meta,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'};
+  ref.update(stamp).catch(function(){return ref.set(stamp,{merge:true});}).then(function(){if(_peEstoqueCache[fid])_peEstoqueCache[fid].meta=meta;toast('Metas zeradas — a fábrica para de produzir este modelo');peRender();}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+};
 const PE_PADRAO=[{fid:'manutt',nome:'Manutt'},{fid:'tchwm',nome:'Tchwm Shoes'},{fid:'tarragona',nome:'Tarragona'},{fid:'urbana',nome:'Urbana Man'}];
-let peView='lista';var PE_CRIT_PCT=50;let peFornsOpen=false;
+let peView='lista';var PE_CRIT_PCT=50;let peFornsOpen=false;let peFornEdit=null;
+let peFornModelos=(function(){try{return JSON.parse(localStorage.getItem('loretto_pe_forn_modelos')||'{}')||{};}catch(e){return {};}})();
+let _peCadFid=null;
+function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}}
 function peEnsureForns(){
   if(!repForn)repInit();
   var changed=false;
@@ -2666,10 +2764,11 @@ function peEnsureForns(){
   }
   if(changed)repSalvar();
 }
+function repFornNome(fid){var f=repForn&&repForn[fid];return f?(f.apelido||f.nome||fid):fid;}
 function peFabricas(){
   peEnsureForns();
   let out=[];
-  Object.keys(repForn).forEach(function(fid){var ff=repForn[fid];if(ff.off||ff.pe===false)return;out.push({fid:fid,nome:ff.nome||fid,qtdModelos:peModelosDaFabrica(fid).length});});
+  Object.keys(repForn).forEach(function(fid){var ff=repForn[fid];if(ff.off||ff.pe===false)return;out.push({fid:fid,nome:(ff.apelido||ff.nome||fid),qtdModelos:peModelosDaFabrica(fid).length});});
   return out.sort((a,b)=>a.nome.localeCompare(b.nome));
 }
 function peFornsHTML(){
@@ -2679,8 +2778,17 @@ function peFornsHTML(){
   if(!peFornsOpen){
     return '<div class="pe-forns"><div class="pe-forns-h" onclick="peFornsToggle()"><span class="pe-cfg-ic">&#127981;</span> Fábricas que usam a pronta-entrega <span class="pe-forns-ct">'+ativas+' ativa(s)</span><span class="pe-forns-car">&#9660;</span></div></div>';
   }
-  var rows=ks.map(function(k){var ff=repForn[k];var on=ff.pe!==false&&!ff.off;
-    return '<div class="pe-forn-row"><span class="pe-forn-nome">'+escapeHtml(ff.nome||k)+(ff.off?' <span class="pe-forn-tag">inativa na reposição</span>':'')+'</span>'+
+  var rows=ks.map(function(k){var ff=repForn[k];var on=ff.pe!==false&&!ff.off;var disp=ff.apelido||ff.nome||k;
+    if(peFornEdit===k){
+      return '<div class="pe-forn-edit">'+
+        '<div class="pe-fe-fld"><label>Apelido (como você reconhece)</label><input id="pfeApelido" type="text" value="'+escapeHtml(ff.apelido||'')+'" placeholder="ex.: Murilo"></div>'+
+        '<div class="pe-fe-fld"><label>Nome oficial / CNPJ (vem do Kigi — usado pra casar a importação, não mexa sem precisar)</label><input id="pfeNome" type="text" value="'+escapeHtml(ff.nome||'')+'"></div>'+
+        '<div class="pe-fe-fld"><label>Link do grupo no WhatsApp (opcional)</label><input id="pfeWa" type="text" value="'+escapeHtml(ff.whatsapp||'')+'"></div>'+
+        '<div class="pe-fe-btns"><button class="btn btn-ouro sm" onclick="peFornSalvarEdit(\''+k+'\')">Salvar</button> <button class="btn sm" onclick="peFornCancelarEdit()">Cancelar</button></div>'+
+        '</div>';
+    }
+    return '<div class="pe-forn-row"><span class="pe-forn-nome">'+escapeHtml(disp)+(ff.apelido?'<span class="pe-forn-of">'+escapeHtml(ff.nome||'')+'</span>':'')+(ff.off?' <span class="pe-forn-tag">inativa na reposição</span>':'')+'</span>'+
+      '<button class="lnk-edit" onclick="peFornEditar(\''+k+'\')">editar</button>'+
       '<label class="rep-switch sm" title="Aparece na pronta-entrega"><input type="checkbox" '+(on?'checked':'')+(ff.off?' disabled':'')+' onchange="peFornPE(\''+k+'\',this.checked)"><span class="rep-slider"></span></label>'+
       '<button class="lnk-del" onclick="peFornDel(\''+k+'\')">remover</button></div>';
   }).join('');
@@ -2689,6 +2797,9 @@ function peFornsHTML(){
     '<div class="pe-forns-add"><input type="text" id="peFornNome" placeholder="Nome da nova fábrica"><input type="text" id="peFornWa" placeholder="Link do grupo no WhatsApp (opcional)"><button class="btn btn-ouro sm" onclick="peFornAdd()">Adicionar fábrica</button></div></div></div>';
 }
 window.peFornsToggle=function(){peFornsOpen=!peFornsOpen;peRender();};
+window.peFornEditar=function(k){peFornEdit=k;peFornsOpen=true;peRender();};
+window.peFornCancelarEdit=function(){peFornEdit=null;peRender();};
+window.peFornSalvarEdit=function(k){if(!repForn[k])return;var ap=($('pfeApelido')&&$('pfeApelido').value||'').trim();var nm=($('pfeNome')&&$('pfeNome').value||'').trim();var wa=($('pfeWa')&&$('pfeWa').value||'').trim();repForn[k].apelido=ap;if(nm)repForn[k].nome=nm;repForn[k].whatsapp=wa;peFornEdit=null;repSalvar();peRender();toast('Fábrica atualizada');};
 window.peFornPE=function(k,on){if(repForn[k]){repForn[k].pe=!!on;repSalvar();peRender();}};
 window.peFornDel=function(k){if(confirm('Remover esta fábrica da lista? Ela some da pronta-entrega. (Se você usa ela na Reposição, prefira só desligar o botão.)')){delete repForn[k];repSalvar();peRender();}};
 window.peFornAdd=function(){var n=($('peFornNome')&&$('peFornNome').value||'').trim();if(!n){toast('Digite o nome da fábrica');return;}var id='f'+Date.now().toString(36);repForn[id]={nome:n,whatsapp:($('peFornWa')&&$('peFornWa').value||'').trim(),off:false,pe:true};repSalvar();peFornsOpen=true;peRender();toast('Fábrica adicionada à pronta-entrega');};
@@ -2696,7 +2807,7 @@ function pePublicar(fid){
   if(!_db){toast('Conecte à internet para publicar');return;}
   const modelos=peModelosDaFabrica(fid);
   if(!modelos.length){toast('Esta fábrica não tem modelos na Reposição');return;}
-  const nome=(repForn[fid]&&repForn[fid].nome)||fid;
+  const nome=repFornNome(fid);
   _db.collection('ls_pe').doc(peDocId(fid)).set({fabrica:nome,modelos:modelos,publicadoEm:Date.now(),lorettoEm:Date.now(),lorettoPor:userAtual||'Loretto'},{merge:true})
     .then(function(){toast('Portal da '+nome+' atualizado ('+modelos.length+' modelos)');peCarregarEstoques();})
     .catch(function(e){toast('Erro ao publicar: '+((e&&e.message)||''));});
@@ -2764,14 +2875,14 @@ function peRenderFabrica(c,fid){
   let totalFalta=0;
   const modelos=peModelosDaFabrica(f.fid);
   const grade=modelos.length?modelos.map(m=>{
-    const foto=fotos[m.id];
-    const fotoEl=foto?'<img class="pe-foto" src="'+foto+'">':'<div class="pe-foto ph">&#128095;</div>';
     let estM=0,metaM=0;
     m.cores.forEach(co=>co.tams.forEach(t=>{const k=m.id+'|'+co.nome+'|'+t;estM+=parseInt(mapas.estoque[k])||0;metaM+=meta[k]||0;}));
     const critico=metaM>0&&estM<(PE_CRIT_PCT/100)*metaM;
     const critAviso=critico?'<div class="pe-critaviso">&#9888; Grade crítica: só '+Math.round(estM/metaM*100)+'% do estoque ideal</div>':'';
     const cores=m.cores.map(co=>{
       const tams=co.tams;
+      const cfoto=fotos[m.id+'|'+co.nome]||fotos[m.id];
+      const cfotoEl=cfoto?'<img class="pe-corfoto" src="'+cfoto+'">':'<div class="pe-corfoto ph">&#128095;</div>';
       const head='<tr><th class="pe-glbl">'+escapeHtml(co.nome)+'</th>'+tams.map(t=>'<th>'+escapeHtml(t)+'</th>').join('')+'</tr>';
       const linhas=TP.map(tp=>{
         const cels=tams.map(t=>{const q=mapas[tp[0]][m.id+'|'+co.nome+'|'+t]||0;return '<td class="pe-gc'+(q>0?' tem '+tp[2]:'')+'">'+(q||'·')+'</td>';}).join('');
@@ -2781,11 +2892,17 @@ function peRenderFabrica(c,fid){
       const metaRow='<tr><td class="pe-glbl meta">Meta</td>'+metaCels+'</tr>';
       const faltaCels=tams.map(t=>{const k=m.id+'|'+co.nome+'|'+t;const mv=meta[k]||0;const tem=(parseInt(mapas.estoque[k])||0)+(parseInt(mapas.produzindo[k])||0)+(parseInt(mapas.pedido[k])||0);const fa=Math.max(0,mv-tem);if(fa>0)totalFalta+=fa;return '<td class="pe-gc'+(fa>0?' falta':(mv?' okmeta':''))+'">'+(fa>0?'+'+fa:(mv?'ok':'·'))+'</td>';}).join('');
       const faltaRow='<tr><td class="pe-glbl rep">Repor</td>'+faltaCels+'</tr>';
-      return '<div class="pe-gtbl"><table class="pe-grade">'+head+linhas+metaRow+faltaRow+'</table></div>';
+      return '<div class="pe-corblk"><div class="pe-corh">'+cfotoEl+'<span class="pe-cornome">'+escapeHtml(co.nome)+'</span>'+
+        '<button class="btn xs" onclick="peTrocarFoto(\''+f.fid+'\',\''+m.id+'\',\''+jsq(co.nome)+'\')">'+(cfoto?'Trocar foto':'+ Foto')+'</button>'+
+        '<button class="btn xs pe-corhide" title="Esconder esta cor (não peço mais e não tenho estoque)" onclick="peEsconderCor(\''+f.fid+'\',\''+m.id+'\',\''+jsq(co.nome)+'\')">Esconder</button></div>'+
+        '<div class="pe-gtbl"><table class="pe-grade">'+head+linhas+metaRow+faltaRow+'</table></div></div>';
     }).join('');
-    return '<div class="pe-mod'+(critico?' pe-mod-crit':'')+'"><div class="pe-modtop">'+fotoEl+'<div class="pe-modi"><div class="pe-modh">'+escapeHtml(m.nome)+'</div><div class="pe-custo">Compra: R$ '+(m.custo||0).toFixed(2)+'</div></div><button class="btn sm" onclick="peTrocarFoto(\''+f.fid+'\',\''+m.id+'\')">'+(foto?'Trocar foto':'+ Foto')+'</button></div>'+critAviso+cores+'</div>';
+    const catM=(repCatalogo||[]).find(x=>x.id===m.id);
+    const hid=catM?catM.cores.filter(c=>repCfg[m.id]&&repCfg[m.id].coresOff&&repCfg[m.id].coresOff[c.nome]):[];
+    const hidHTML=hid.length?'<div class="pe-corhidden">Cores escondidas: '+hid.map(c=>'<button class="pe-corchip" title="Mostrar de novo" onclick="peMostrarCor(\''+f.fid+'\',\''+m.id+'\',\''+jsq(c.nome)+'\')">'+escapeHtml(c.nome)+' &#8634;</button>').join(' ')+'</div>':'';
+    return '<div class="pe-mod'+(critico?' pe-mod-crit':'')+'"><div class="pe-modtop"><div class="pe-modi"><div class="pe-modh">'+escapeHtml(m.nome)+'</div><div class="pe-custo">Compra: R$ <input class="pe-custoi" type="number" min="0" step="0.01" inputmode="decimal" value="'+(m.custo||0)+'" onchange="peSetCusto(\''+m.id+'\',this.value)"></div></div><div class="pe-modacts"><button class="btn sm pe-stop" title="Zera as metas: a fábrica deixa de receber pedido de reposição deste modelo" onclick="peZerarMetas(\''+f.fid+'\',\''+m.id+'\')">Parar produção</button><button class="btn sm pe-modrem" title="Tirar modelo desta fábrica" onclick="if(confirm(\'Tirar este modelo desta fábrica?\'))peRemModelo(\''+f.fid+'\',\''+m.id+'\')">&#10005;</button></div></div>'+critAviso+cores+hidHTML+'</div>';
   }).join('')
-  :'<div class="empty">Esta fábrica ainda não tem modelos na Reposição. Cadastre os modelos dela na aba Reposição (definindo esta fábrica) e clique em <b>Publicar</b>.</div>';
+  :'<div class="empty">Esta fábrica ainda não tem modelos. Clique em <b>+ Cadastrar modelo</b> acima para escolher, do catálogo do Kigi, quais modelos ela produz.</div>';
   const hist=(cache.historico||[]).slice(-3).reverse().map(h=>{const ms=(h.mudancas||[]).slice(0,7).map(x=>escapeHtml(x.label)+' '+x.de+'\u2192'+x.para).join(', ');return '<div class="pe-hist">'+fmtData(h.ts)+' \u2014 '+(ms||'salvou')+'</div>';}).join('');
   const ped=_pePedidoCache[f.fid];
   const pedidoBox=ped?('<div class="pe-pedbox"><div class="pe-pedh"><b>Pedido de produção</b> &middot; '+ped.totPares+' pares &middot; '+brl(ped.totCusto)+' <span class="pe-pedx" onclick="pePedidoFechar(\''+f.fid+'\')">&#10005;</span></div>'+(ped.itens.length?(ped.itens.map(function(it){return '<div class="pe-pedit"><div class="pe-pedm">'+escapeHtml(it.modelo)+' '+escapeHtml(it.cor)+(it.cod?' &middot; '+escapeHtml(it.cod):'')+'</div><div class="pe-pednums">'+it.nums.map(function(n){return '<span>'+n.tam+':<b>'+n.qtd+'</b></span>';}).join('')+'<span class="pe-pedpar">'+it.pares+' pares</span></div></div>';}).join('')+'<div class="pe-pedacts"><button class="btn btn-ouro sm" onclick="pePedidoLancar(\''+f.fid+'\')">Lançar como pedido</button><button class="btn btn-ouro sm" onclick="pePedidoWhats(\''+f.fid+'\')">Enviar no WhatsApp</button><button class="btn sm" onclick="pePedidoCopiar(\''+f.fid+'\')">Copiar pedido</button></div>'):'<div class="pe-pedempty">Nenhuma numeração em falta — a grade já está completa.</div>')+'</div>'):'';
@@ -2795,7 +2912,8 @@ function peRenderFabrica(c,fid){
     '<div class="pe-totbox"><div class="pe-tot">'+totEst+'</div><div class="pe-totl">em estoque</div></div></div>'+
     '<div class="pe-status'+(parada?' alerta':'')+'">'+escapeHtml(atual)+(parada?' \u00b7 '+diasSem+' dias sem mexer':'')+'</div>'+
     (totalFalta>0?'<div class="pe-faltar">Faltam repor '+totalFalta+' pares para bater a meta</div>':'')+
-    '<div class="pe-actions"><button class="btn btn-ouro sm" onclick="pePublicar(\''+f.fid+'\')">Publicar / atualizar</button>'+
+    '<div class="pe-actions"><button class="btn btn-ouro sm" onclick="peCadModelo(\''+f.fid+'\')">+ Cadastrar modelo</button>'+
+    '<button class="btn btn-ouro sm" onclick="pePublicar(\''+f.fid+'\')">Publicar / atualizar</button>'+
     '<button class="btn sm" onclick="peSalvarMetas(\''+f.fid+'\')">Salvar metas</button>'+
     '<button class="btn sm" onclick="pePedido(\''+f.fid+'\')">Gerar pedido</button>'+
     '<button class="btn sm" onclick="peCopiarLink(\''+f.fid+'\')">Copiar link</button></div>'+
@@ -2818,14 +2936,15 @@ function peSalvarMetas(fid){
   document.querySelectorAll('#peFabricas input[data-meta][data-fid="'+fid+'"]').forEach(function(inp){const q=parseInt(inp.value)||0;if(q>0)meta[inp.dataset.meta]=q;});
   _db.collection('ls_pe').doc(peDocId(fid)).set({meta:meta,lorettoEm:Date.now(),lorettoPor:userAtual||'Loretto'},{merge:true}).then(function(){if(_peEstoqueCache[fid]){_peEstoqueCache[fid].meta=meta;_peEstoqueCache[fid].lorettoEm=Date.now();_peEstoqueCache[fid].lorettoPor=userAtual||'Loretto';}toast('Metas salvas — a fábrica já vê o que precisa repor');peRender();}).catch(function(e){toast('Erro ao salvar metas: '+((e&&e.message)||''));});
 }
-function peTrocarFoto(fid,modId){
+function peTrocarFoto(fid,modId,cor){
   if(!_db){toast('Conecte à internet para salvar a foto');return;}
+  const key=cor?(modId+'|'+cor):modId;
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
   inp.onchange=function(){const file=inp.files&&inp.files[0];if(!file)return;
     const r=new FileReader();r.onload=function(){const img=new Image();img.onload=function(){
       const cv=document.createElement('canvas');const max=240;let w=img.width,h=img.height;const sc=Math.min(max/w,max/h,1);w=Math.round(w*sc);h=Math.round(h*sc);cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
-      const data=cv.toDataURL('image/jpeg',0.7);const m={};m[modId]=data;
-      _db.collection('ls_pe_fotos').doc(peDocId(fid)).set({fotos:m},{merge:true}).then(function(){_peFotos[fid]=_peFotos[fid]||{};_peFotos[fid][modId]=data;toast('Foto salva');peRender();}).catch(function(e){toast('Erro ao salvar foto: '+((e&&e.message)||''));});
+      const data=cv.toDataURL('image/jpeg',0.7);const m={};m[key]=data;
+      _db.collection('ls_pe_fotos').doc(peDocId(fid)).set({fotos:m},{merge:true}).then(function(){_peFotos[fid]=_peFotos[fid]||{};_peFotos[fid][key]=data;toast('Foto salva');peRender();}).catch(function(e){toast('Erro ao salvar foto: '+((e&&e.message)||''));});
     };img.src=r.result;};r.readAsDataURL(file);};
   inp.click();
 }
@@ -3257,14 +3376,12 @@ function repImportar(file){
         prod[id].cores[cor].skus[tam]=chave;
         novoEst[chave]=q; pares+=q; skus++;
         if(cu>=0){const v=parseFloat(row[cu]); if(v>0&&!custoMod[id])custoMod[id]=v;}
-        if(fai>=0&&row[fai]!=null){const fb=String(row[fai]).trim(); if(fb&&repNormCab(fb)!=='sem fornecedor'&&!fabMod[id])fabMod[id]=fb;}
       }
       repCatalogo=Object.values(prod).map(p=>({id:p.id,nome:p.nome,cores:Object.values(p.cores)})).sort((a,b)=>a.nome.localeCompare(b.nome));
       repEstoque=novoEst;
       Object.keys(custoMod).forEach(id=>{repCusto[id]=custoMod[id];const cf=repCfgDe(id);if(!cf.custo)cf.custo=custoMod[id];});
       if(!repForn)repInit();
-      Object.keys(fabMod).forEach(id=>{const fid=repFornKeyByName(fabMod[id]);repFornReport[id]=fid;const cf=repCfgDe(id);if(!cf.fornId)cf.fornId=fid;});
-      salvaFornReport();
+      /* fábricas NÃO são mais deduzidas do relatório (CNPJ bagunçado) — cadastro é manual na Pronta-entrega */
       repInfo={data:new Date().toLocaleString('pt-BR'),produtos:repCatalogo.length,skus,pares,lixo};
       repSalvar(); repRender(); toast(repCatalogo.length+' produtos, '+pares+' unidades');
     }catch(err){toast('Erro ao ler o arquivo');}
@@ -3295,7 +3412,7 @@ function repRenderModelos(){
       const coresOrd=m.cores.slice().sort((a,b)=>(coresOff[a.nome]?1:0)-(coresOff[b.nome]?1:0));
       html+=`<div class="rep-mod-cfg">
         <div class="rep-cfg-row">
-          <label class="rep-fld">Fábrica<select onchange="repSetForn('${m.id}',this.value)">${repFornOptions(cf.fornId)}</select>${(()=>{const uf=repUltimaFabrica(m.id);return uf&&uf!==cf.fornId&&repForn[uf]?`<button type="button" class="rep-pull" onclick="repAplicarForn('${m.id}')">última: ${escapeHtml(repForn[uf].nome)} &middot; usar</button>`:'';})()}</label>
+          <label class="rep-fld">Fábrica<select onchange="repSetForn('${m.id}',this.value)">${repFornOptions(cf.fornId)}</select>${(()=>{const uf=repUltimaFabrica(m.id);return uf&&uf!==cf.fornId&&repForn[uf]?`<button type="button" class="rep-pull" onclick="repAplicarForn('${m.id}')">última: ${escapeHtml(repFornNome(uf))} &middot; usar</button>`:'';})()}</label>
           <label class="rep-fld">Custo por par<input type="number" step="0.01" min="0" value="${cf.custo||''}" placeholder="0,00" oninput="repSetCusto('${m.id}',this.value)">${(()=>{const uc=repUltimoCusto(m.id);return uc.valor>0&&Math.abs(uc.valor-(cf.custo||0))>0.005?`<button type="button" class="rep-pull" onclick="repAplicarCusto('${m.id}')">último: ${repBRL(uc.valor)} (${uc.origem}) &middot; usar</button>`:'';})()}</label>
         </div>
         <p class="rep-hint" style="margin:2px 0 10px">A <b>foto</b> e a <b>referência da fábrica</b> são por cor &mdash; preencha em cada cor abaixo. A foto vai junto no PDF do pedido.</p>
@@ -3327,7 +3444,7 @@ function repRenderModelos(){
 }
 function repFornOptions(sel){
   let o='<option value="">— escolher fábrica —</option>';
-  repFornAtivas(sel).forEach(k=>{o+=`<option value="${k}"${k===sel?' selected':''}>${escapeHtml(repForn[k].nome)}${repForn[k].off?' (inativa)':''}</option>`;});
+  repFornAtivas(sel).forEach(k=>{o+=`<option value="${k}"${k===sel?' selected':''}>${escapeHtml(repFornNome(k))}${repForn[k].off?' (inativa)':''}</option>`;});
   return o;
 }
 window.repToggleFixo=(id,v)=>{const cf=repCfgDe(id);cf.fixo=v;if(v){repAberto=id;if(!cf.fornId){const uf=repUltimaFabrica(id);if(uf)cf.fornId=uf;}if(!cf.custo){const uc=repUltimoCusto(id);if(uc.valor>0)cf.custo=uc.valor;}}repSalvar();repRenderModelos();};
@@ -3347,7 +3464,7 @@ function repRenderConfig(){
   const lst=$('cfgFornLista'); if(!lst)return;
   const ks=Object.keys(repForn||{});
   lst.innerHTML=ks.length?ks.map(k=>`<div class="rep-forn-row${repForn[k].off?' off':''}">
-      <div><b>${escapeHtml(repForn[k].nome)}</b>${repForn[k].off?' <span class="rep-forn-tag">inativa</span>':''}${repForn[k].whatsapp?'<br><span class="rep-forn-wa">grupo configurado</span>':''}</div>
+      <div><b>${escapeHtml(repFornNome(k))}</b>${repForn[k].off?' <span class="rep-forn-tag">inativa</span>':''}${repForn[k].whatsapp?'<br><span class="rep-forn-wa">grupo configurado</span>':''}</div>
       <div class="rep-forn-acts">
         <label class="rep-switch sm"><input type="checkbox" ${repForn[k].off?'':'checked'} onchange="repFornToggle('${k}',this.checked)"><span class="rep-slider"></span></label>
         <button class="lnk-del" onclick="repDelForn('${k}')">remover</button>
@@ -3385,6 +3502,24 @@ function repGerar(){
   repPedidoCache=porForn;
   repRenderPedido();
 }
+let repPedidoOrdem=carregar('loretto_rep_pedido_ordem',{});
+function salvarPedidoOrdem(){try{localStorage.setItem('loretto_rep_pedido_ordem',JSON.stringify(repPedidoOrdem));}catch(e){}}
+function repOrdenarMids(fid,mids){
+  const ord=(repPedidoOrdem[fid]||[]);
+  return mids.slice().sort((a,b)=>{
+    let ia=ord.indexOf(a),ib=ord.indexOf(b);
+    if(ia<0)ia=10000+mids.indexOf(a); if(ib<0)ib=10000+mids.indexOf(b);
+    return ia-ib;
+  });
+}
+window.repMoverModelo=function(fid,mid,dir){
+  if(!repPedidoCache||!repPedidoCache[fid])return;
+  const cur=repOrdenarMids(fid,Object.keys(repPedidoCache[fid].mods));
+  const i=cur.indexOf(mid),j=i+dir;
+  if(i<0||j<0||j>=cur.length)return;
+  const t=cur[i];cur[i]=cur[j];cur[j]=t;
+  repPedidoOrdem[fid]=cur;salvarPedidoOrdem();repRenderPedido();
+};
 function repRenderPedido(){
   const box=$('repPedido'); if(!box)return;
   const porForn=repPedidoCache||{};
@@ -3397,8 +3532,8 @@ function repRenderPedido(){
     html+=`<div class="rep-ped-forn">
       <div class="rep-ped-h"><h4>${escapeHtml(fnome)}</h4><div class="rep-ped-tot">${F.pares} un &middot; ${repBRL(F.valor)}</div></div>
       <div class="rep-ped-itens">`;
-    Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];
-      html+=`<div class="rep-ped-mod"><div class="rep-ped-modh"><span class="rep-ped-modn">${escapeHtml(M.nome)}</span></div>`;
+    repOrdenarMids(fid,Object.keys(F.mods)).forEach(mid=>{const M=F.mods[mid];
+      html+=`<div class="rep-ped-mod"><div class="rep-ped-modh"><span class="rep-ped-ord"><button type="button" onclick="repMoverModelo('${fid}','${mid}',-1)" title="Subir">&#9650;</button><button type="button" onclick="repMoverModelo('${fid}','${mid}',1)" title="Descer">&#9660;</button></span><span class="rep-ped-modn">${escapeHtml(M.nome)}</span></div>`;
       Object.keys(M.cores).forEach(cor=>{
         const tams=M.cores[cor];
         const det=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b)).map(t=>`${escapeHtml(t)}×${tams[t]}`).join('  ');
@@ -3435,10 +3570,10 @@ window.repImprimir=(fid)=>{
   const fnome=fid==='_sem'?'(sem fábrica)':((repForn[fid]&&repForn[fid].nome)||fid);
   const leao=(typeof logoData!=='undefined'&&logoData)?`<img src="${logoData}">`:LEAO_SVG;
   let body='';
-  Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];
+  Object.keys(F.mods).length&&repOrdenarMids(fid,Object.keys(F.mods)).forEach(mid=>{const M=F.mods[mid];
     let modtot=0,blocos='';
-    Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];const ts=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b));const tot=ts.reduce((s,t)=>s+tams[t],0);modtot+=tot;const ft=repFotoDe(mid,cor);const ref=repRefDe(mid,cor);
-      blocos+=`<div class="rp2-cor"><div class="rp2-foto">${ft?`<img src="${ft}">`:'<span>sem foto</span>'}</div><div class="rp2-cor-info"><div class="rp2-cor-nome">${escapeHtml(cor)}${ref?` <span class="rp2-ref">${escapeHtml(ref)}</span>`:''}</div><table class="rp2-grade"><tr>${ts.map(t=>`<th>${escapeHtml(t)}</th>`).join('')}<th>Total</th></tr><tr>${ts.map(t=>`<td>${tams[t]}</td>`).join('')}<td class="rp2-tt">${tot}</td></tr></table></div></div>`;});
+    Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];const ts=Object.keys(tams).sort((a,b)=>parseFloat(a)-parseFloat(b));const tot=ts.reduce((s,t)=>s+tams[t],0);modtot+=tot;const ft=repFotoDe(mid,cor);const ref=repRefDe(mid,cor);const unit=M.custo||0;const csub=tot*unit;
+      blocos+=`<div class="rp2-cor"><div class="rp2-foto">${ft?`<img src="${ft}">`:'<span>sem foto</span>'}</div><div class="rp2-cor-info"><div class="rp2-cor-nome">${escapeHtml(cor)}${ref?` <span class="rp2-ref">Ref ${escapeHtml(ref)}</span>`:''}${unit?` <span class="rp2-cor-unit">${repBRL(unit)}/par</span>`:''}</div><table class="rp2-grade"><tr>${ts.map(t=>`<th>${escapeHtml(t)}</th>`).join('')}<th>Total</th></tr><tr>${ts.map(t=>`<td>${tams[t]}</td>`).join('')}<td class="rp2-tt">${tot}</td></tr></table><div class="rp2-cor-sub">${tot} pares${unit?` &middot; <b>${repBRL(csub)}</b>`:''}</div></div></div>`;});
     body+=`<div class="rp2-mod"><div class="rp2-mod-h"><div class="rp2-mod-nome">${escapeHtml(M.nome)}</div><div class="rp2-mod-tot">${modtot} pares${M.custo?' &middot; <b>'+repBRL(modtot*M.custo)+'</b>':''}</div></div>${blocos}</div>`;});
   const area=$('repo-print');
   area.innerHTML=`<div class="rp2"><div class="rp2-head"><div class="rp2-brand"><div class="rp2-leao">${leao}</div><div><div class="rp2-marca">LORETTO SCARPA</div><div class="rp2-pt">Pedido de Reposição</div></div></div><div class="rp2-meta"><div><span>Fornecedor</span>${escapeHtml(fnome)}</div><div><span>Data</span>${new Date().toLocaleDateString('pt-BR')}</div></div></div>${body||'<p>Sem itens.</p>'}<div class="rp2-foot"><div>Total: <b>${F.pares} pares</b></div>${F.valor?`<div>Custo esperado: <b>${repBRL(F.valor)}</b></div>`:''}</div></div>`;
