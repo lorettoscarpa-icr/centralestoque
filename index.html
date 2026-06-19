@@ -601,6 +601,19 @@
   .pe-totl{font-size:9.5px;color:var(--ouro-claro);opacity:.7;text-transform:uppercase;letter-spacing:.5px}
   .pe-status{font-size:12.5px;color:var(--areia);opacity:.8;margin:10px 0;padding:7px 10px;background:rgba(220,189,96,.06);border-radius:8px}
   .pe-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .pe-acesso{margin:10px 0;border:1px solid var(--linha);border-radius:10px;padding:0 12px;background:rgba(0,0,0,.12)}
+  .pe-acesso>summary{cursor:pointer;padding:10px 0;color:var(--ouro);font-weight:600;font-size:13px;list-style:none}
+  .pe-acesso>summary::-webkit-details-marker{display:none}
+  .pe-acesso[open]{padding-bottom:12px}
+  .pe-acesso-link{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .pe-acesso-link input{flex:1;min-width:200px;font-size:12px;font-family:'DM Mono',monospace;padding:7px 9px}
+  .pe-pessoas-h{font-size:12px;color:rgba(251,249,238,.6);text-transform:uppercase;letter-spacing:.04em;margin:6px 0}
+  .pe-pessoas-list{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:4px}
+  .pe-pessoas-list li{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.2);border:1px solid var(--linha);border-radius:7px;padding:6px 10px;font-size:13px;color:var(--areia)}
+  .pe-pessoa-x{background:none;border:none;color:#d98a6a;cursor:pointer;font-size:13px;padding:2px 6px}
+  .pe-pessoas-vazio{font-size:12px;color:rgba(251,249,238,.45);margin-bottom:8px}
+  .pe-pessoa-add{display:flex;gap:6px}
+  .pe-pessoa-add input{flex:1;font-size:13px;padding:7px 9px}
   .pe-det{margin-top:12px}
   .pe-det summary{cursor:pointer;color:var(--ouro-claro);font-size:13px;padding:6px 0}
   .pe-mod{margin:10px 0;padding:10px;background:rgba(255,255,255,.02);border-radius:9px}
@@ -2723,6 +2736,7 @@ function acharModeloCor(modNome,corNome){const mi=catalogo.findIndex(x=>normKey(
 /* ==================== PRONTA-ENTREGA (portal das fábricas) ==================== */
 const PE_BASE='https://lorettoscarpa-icr.github.io/pronta-entrega/';
 let _peTokens=carregar('loretto_pe_tokens',{});
+let _peAcesso=carregar('loretto_pe_acesso',{});
 let _peEstoqueCache={};
 let _pePedidoCache={};
 let _peFotos={};
@@ -2730,6 +2744,23 @@ function peGenToken(){return Math.random().toString(36).slice(2,8)+Math.random()
 function peToken(fid){if(!_peTokens[fid]){_peTokens[fid]=peGenToken();try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens))}catch(e){};if(_db)_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens},{merge:true}).catch(function(){});}return _peTokens[fid];}
 function peDocId(fid){return fid+'_'+peToken(fid);}
 function peLink(fid){return PE_BASE+'?f='+encodeURIComponent(fid)+'&k='+encodeURIComponent(peToken(fid));}
+function peLinkApp(fid){var base=(location.origin||'')+location.pathname;return base+'?fabrica='+encodeURIComponent(fid)+'&chave='+encodeURIComponent(peToken(fid));}
+function peAcessoDe(fid){return Array.isArray(_peAcesso[fid])?_peAcesso[fid]:[];}
+function peSalvarAcesso(){try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({pessoas:_peAcesso},{merge:true}).catch(function(){});}
+function peAcessoBox(fid){
+  var ps=peAcessoDe(fid);
+  var lista=ps.length?('<ul class="pe-pessoas-list">'+ps.map(function(p,i){return '<li><span>'+escapeHtml(p.nome||p)+'</span><button class="pe-pessoa-x" title="Remover" onclick="peRemPessoa(\''+fid+'\','+i+')">&#10005;</button></li>';}).join('')+'</ul>'):'<div class="pe-pessoas-vazio">Ninguem cadastrado ainda.</div>';
+  return '<details class="pe-acesso"><summary>&#128273; Acesso da fabrica &mdash; link e pessoas</summary>'+
+    '<div class="pe-acesso-link"><input id="peLink_'+escapeHtml(fid)+'" readonly value="'+escapeHtml(peLinkApp(fid))+'" onclick="this.select()"><button class="btn sm" onclick="peCopiarAcesso(\''+fid+'\')">Copiar link</button><button class="btn sm" onclick="peWhatsAcesso(\''+fid+'\')">WhatsApp</button></div>'+
+    '<div class="pe-pessoas-h">Pessoas com acesso</div>'+lista+
+    '<div class="pe-pessoa-add"><input id="peNovaPessoa_'+escapeHtml(fid)+'" placeholder="Nome da pessoa" onkeydown="if(event.key===\'Enter\')peAddPessoa(\''+fid+'\')"><button class="btn sm" onclick="peAddPessoa(\''+fid+'\')">+ Adicionar</button></div>'+
+    '<p class="pe-metahint">Mande este link pra fabrica. Ela ve so os modelos dela e atualiza estoque/producao no painel reduzido.</p></details>';
+}
+function peAddPessoa(fid){var el=document.getElementById('peNovaPessoa_'+fid);var nome=((el&&el.value)||'').trim();if(!nome){toast('Digite o nome');return;}if(!Array.isArray(_peAcesso[fid]))_peAcesso[fid]=[];_peAcesso[fid].push({nome:nome,em:Date.now()});peSalvarAcesso();if(typeof peRender==='function')peRender();toast('Pessoa adicionada');}
+function peRemPessoa(fid,i){if(!Array.isArray(_peAcesso[fid]))return;_peAcesso[fid].splice(i,1);peSalvarAcesso();if(typeof peRender==='function')peRender();}
+function peCopiarAcesso(fid){var l=peLinkApp(fid);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(l).then(function(){toast('Link copiado &mdash; mande pra fabrica');}).catch(function(){window.prompt('Copie o link:',l);});}else window.prompt('Copie o link:',l);}
+function peWhatsAcesso(fid){var l=peLinkApp(fid);var msg='Acesso ao painel da pronta-entrega Loretto Scarpa:\n'+l;window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');}
+window.peAddPessoa=peAddPessoa;window.peRemPessoa=peRemPessoa;window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;
 const PE_PREVIA={tchwm:Object.assign({"fabrica": "Tchwm Shoes", "modelos": [{"id": "pv1", "nome": "Paris Mouro", "cod": "7600", "custo": 259.9, "cores": [{"nome": "Mouro", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv2", "nome": "Paris Preto", "cod": "7600", "custo": 259.9, "cores": [{"nome": "Preto", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv3", "nome": "Milano Branco", "cod": "5505", "custo": 199.9, "cores": [{"nome": "Branco", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv4", "nome": "Milano Preto", "cod": "5505", "custo": 199.9, "cores": [{"nome": "Preto", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}], "estoque": {"pv1|Mouro|38": 2, "pv1|Mouro|39": 26, "pv1|Mouro|40": 14, "pv1|Mouro|41": 13, "pv1|Mouro|42": 7, "pv1|Mouro|43": 11, "pv2|Preto|37": 2, "pv2|Preto|38": 3, "pv2|Preto|39": 15, "pv2|Preto|40": 3, "pv2|Preto|41": 3, "pv2|Preto|42": 2, "pv2|Preto|43": 7, "pv3|Branco|38": 2, "pv3|Branco|40": 3, "pv3|Branco|41": 5, "pv3|Branco|43": 5, "pv4|Preto|39": 4, "pv4|Preto|43": 6}, "produzindo": {"pv1|Mouro|37": 1, "pv2|Preto|37": 1, "pv2|Preto|38": 3, "pv2|Preto|40": 2, "pv2|Preto|43": 1}, "pedido": {"pv1|Mouro|37": 4, "pv1|Mouro|38": 4, "pv2|Preto|37": 2, "pv2|Preto|40": 5, "pv2|Preto|41": 7, "pv2|Preto|42": 6, "pv3|Branco|37": 4, "pv3|Branco|38": 6, "pv3|Branco|39": 15, "pv3|Branco|40": 12, "pv3|Branco|41": 10, "pv3|Branco|42": 12, "pv4|Preto|38": 4, "pv4|Preto|39": 11, "pv4|Preto|40": 15, "pv4|Preto|41": 15, "pv4|Preto|42": 8}, "meta": {"pv1|Mouro|37": 3, "pv1|Mouro|38": 6, "pv1|Mouro|39": 15, "pv1|Mouro|40": 12, "pv1|Mouro|41": 10, "pv1|Mouro|42": 8, "pv1|Mouro|43": 4, "pv2|Preto|37": 3, "pv2|Preto|38": 6, "pv2|Preto|39": 15, "pv2|Preto|40": 12, "pv2|Preto|41": 10, "pv2|Preto|42": 8, "pv2|Preto|43": 4, "pv3|Branco|37": 3, "pv3|Branco|38": 6, "pv3|Branco|39": 15, "pv3|Branco|40": 12, "pv3|Branco|41": 10, "pv3|Branco|42": 8, "pv3|Branco|43": 4, "pv4|Preto|37": 3, "pv4|Preto|38": 6, "pv4|Preto|39": 15, "pv4|Preto|40": 12, "pv4|Preto|41": 10, "pv4|Preto|42": 8, "pv4|Preto|43": 4}},{atualizadoEm:Date.now()-2*86400000,publicadoEm:Date.now()-5*86400000,lorettoEm:Date.now()-4*86400000,lorettoPor:"Yuri",historico:[{ts:Date.now()-2*86400000,mudancas:[{label:"Paris Mouro 39",de:30,para:26},{label:"Paris Preto 40",de:6,para:3}]}]})};
 function peModelosDaFabrica(fid){
   const out=[];
@@ -2856,7 +2887,7 @@ function peCarregarEstoques(){
   if(!_db){return;}
   _db.collection('ls_pe_config').doc('loja').get().then(function(cs){if(cs.exists&&cs.data()&&typeof cs.data().critPct==='number')PE_CRIT_PCT=cs.data().critPct;peRender();}).catch(function(){});
   _db.collection('ls_pe_tokens').doc('loja').get().then(function(snp){
-    if(snp.exists&&snp.data()&&snp.data().tokens){_peTokens=Object.assign({},_peTokens,snp.data().tokens);try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens))}catch(e){};}
+    if(snp.exists&&snp.data()){var _td=snp.data();if(_td.tokens){_peTokens=Object.assign({},_peTokens,_td.tokens);try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens))}catch(e){};}if(_td.pessoas){_peAcesso=_td.pessoas;try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso))}catch(e){};}}
   }).catch(function(){}).then(function(){
     peFabricas().forEach(f=>{
       const did=peDocId(f.fid);
@@ -2980,6 +3011,7 @@ function peRenderFabrica(c,fid){
     (totalFalta>0?'<div class="pe-faltar">Faltam repor '+totalFalta+' pares para bater a meta</div>':'')+
     '<div class="pe-actions"><button class="btn btn-ouro sm" onclick="peCadModelo(\''+f.fid+'\')">+ Cadastrar modelo</button>'+
     '<button class="btn sm" onclick="peSalvarMetas(\''+f.fid+'\')">Salvar metas</button></div>'+
+    peAcessoBox(f.fid)+
     pedidoBox+
     peOrdensPainel(f.fid)+
     (hist?'<div class="pe-histbox"><b>Últimas alterações da fábrica:</b>'+hist+'</div>':'')+
@@ -3013,8 +3045,9 @@ function peTrocarFoto(fid,modId,cor){
 }
 function peRefletirPedidoLoja(fid,itens,repoId){
   if(fid==='_sem'||!itens||!itens.length)return;
+  var pmods=(typeof peFornModelos!=='undefined'&&peFornModelos[fid])||[];
   var grade={};
-  itens.forEach(function(it){if(!it.grade)return;Object.keys(it.grade).forEach(function(t){var q=parseInt(it.grade[t])||0;if(q>0){var k=it.mk+'|'+it.cor+'|'+t;grade[k]=(grade[k]||0)+q;}});});
+  itens.forEach(function(it){if(!it.grade)return;if(pmods.indexOf(it.mk)<0)return;Object.keys(it.grade).forEach(function(t){var q=parseInt(it.grade[t])||0;if(q>0){var k=it.mk+'|'+it.cor+'|'+t;grade[k]=(grade[k]||0)+q;}});});
   if(!Object.keys(grade).length)return;
   peNovaOrdem(fid,grade,(typeof userAtual!=='undefined'?userAtual:'')||'Loretto',repoId);
 }
