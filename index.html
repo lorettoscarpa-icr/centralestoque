@@ -614,6 +614,58 @@
   .pe-pessoas-vazio{font-size:12px;color:rgba(251,249,238,.45);margin-bottom:8px}
   .pe-pessoa-add{display:flex;gap:6px}
   .pe-pessoa-add input{flex:1;font-size:13px;padding:7px 9px}
+  .pe-fcardwrap{display:flex;flex-direction:column;gap:0}
+  .pe-fcardkey{align-self:flex-start;margin-top:6px;background:rgba(220,189,96,.10);border:1px solid var(--linha);color:var(--ouro);border-radius:9px;padding:6px 12px;font-size:12px;font-family:'Barlow',sans-serif;cursor:pointer}
+  .pe-fcardkey:hover{border-color:var(--ouro);background:rgba(220,189,96,.18)}
+  .pe-acfld{display:block;font-size:12px;color:rgba(251,249,238,.7);margin:8px 0}
+  .pe-acfld input{display:block;width:100%;margin-top:4px;padding:8px 10px;font-size:14px}
+  .pe-acfld-l{font-size:12px;color:rgba(251,249,238,.7);margin:10px 0 4px}
+  body.modo-fabrica{background:#283e1a}
+  #fabricaMode{min-height:100vh;background:#283e1a;color:var(--areia);font-family:'Barlow',sans-serif}
+  .fab-wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+  .fab-top{text-align:center;padding:14px 0 18px;border-bottom:1px solid var(--linha);margin-bottom:18px}
+  .fab-titulo{font-family:'Playfair Display',serif;font-size:30px;color:var(--ouro-claro,#dcbd60)}
+  .fab-sub{font-family:'DM Mono',monospace;font-size:12px;color:rgba(251,249,238,.55);letter-spacing:.05em;text-transform:uppercase;margin-top:4px}
+  .fab-sec{margin-bottom:24px}
+  .fab-sech{font-size:13px;color:var(--ouro);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;font-weight:600}
+  .fab-mod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-radius:14px;padding:14px;margin-bottom:12px}
+  .fab-modh{font-family:'Playfair Display',serif;font-size:19px;color:var(--areia);margin-bottom:8px}
+  .fab-cor{border-top:1px solid var(--linha);padding-top:10px;margin-top:10px}
+  .fab-cor:first-of-type{border-top:none;margin-top:0;padding-top:0}
+  .fab-corh{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .fab-corh img{width:38px;height:38px;border-radius:8px;object-fit:cover;border:1px solid var(--linha)}
+  .fab-noimg{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.2);color:rgba(220,189,96,.5)}
+  .fab-corn{font-weight:600}
+  .fab-ref{font-family:'DM Mono',monospace;font-size:11px;color:var(--ouro);background:rgba(220,189,96,.12);border-radius:5px;padding:1px 6px}
+  .fab-cells{display:flex;gap:8px;flex-wrap:wrap}
+  .fab-cell{background:rgba(0,0,0,.2);border:1px solid var(--linha);border-radius:10px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:78px}
+  .fab-tam{font-family:'DM Mono',monospace;font-weight:700;color:var(--ouro);font-size:14px}
+  .fab-il{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:rgba(251,249,238,.6)}
+  .fab-il input{width:62px;text-align:center;font-family:'DM Mono',monospace;font-size:15px;padding:6px 4px}
+  .fab-rep{font-size:11px;color:rgba(251,249,238,.45)}
+  .fab-rep.on{color:#e0b07a;font-weight:600}
+  .fab-ped{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid var(--ouro);border-radius:12px;padding:12px;margin-bottom:10px}
+  .fab-pedh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .fab-ped .pe-ordit{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:rgba(251,249,238,.8)}
+  .fab-ped button{margin-top:8px}
+  .fab-vazio{font-size:13px;color:rgba(251,249,238,.45);padding:8px 0}
+  .fab-salvar{width:100%;margin-top:8px;padding:13px}
+  .fab-enviar{width:100%;margin-top:10px;padding:13px}
+  .fab-hist{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid #7fae6b;border-radius:12px;padding:10px 12px;margin-bottom:8px}
+  .fab-histh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:13px}
+  .fab-hist .pe-ordit{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;color:rgba(251,249,238,.75)}
+  .fab-prod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid #d4b45a;border-radius:12px;padding:12px;margin-bottom:10px}
+  .fab-prod .pe-ordit{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:rgba(251,249,238,.8)}
+  .fab-prod button{margin-top:8px}
+  .fab-prodbtn{margin-top:8px}
+  .pe-envpicks{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .pe-envpick{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:10px;padding:12px 14px;color:var(--areia);cursor:pointer;font-family:'Barlow',sans-serif;font-size:14px}
+  .pe-envpick:hover{border-color:var(--ouro);background:rgba(220,189,96,.08)}
+  .fab-card{max-width:420px;margin:60px auto;background:rgba(0,0,0,.2);border:1px solid var(--linha);border-radius:16px;padding:30px 24px;text-align:center}
+  .fab-login input{display:block;width:100%;margin:18px 0;padding:12px;text-align:center;font-size:16px}
+  .fab-login button{width:100%;padding:13px}
+  .fab-erro{color:#e0a86a;margin-top:14px;font-size:14px}
+  .fab-rodape{text-align:center;font-family:'Playfair Display',serif;color:rgba(220,189,96,.4);font-size:13px;padding-top:20px}
   .pe-det{margin-top:12px}
   .pe-det summary{cursor:pointer;color:var(--ouro-claro);font-size:13px;padding:6px 0}
   .pe-mod{margin:10px 0;padding:10px;background:rgba(255,255,255,.02);border-radius:9px}
@@ -1260,6 +1312,15 @@ textarea.cons-field{min-height:80px;resize:vertical}
       <div class="pe-modal-foot"><button class="btn" onclick="peEnvioFechar()">Cancelar</button><button class="btn btn-ouro" id="peEnvioOk">Confirmar envio</button></div>
     </div>
   </div>
+
+  <div id="peAcessoModal" class="modal-bg hide" onclick="if(event.target===this)peAcessoModalFechar()">
+    <div class="modal">
+      <button class="modal-x" type="button" onclick="peAcessoModalFechar()" aria-label="Fechar">&times;</button>
+      <div id="peAcessoBox"></div>
+    </div>
+  </div>
+
+
 
   <div id="tab-financeiro" class="hide">
     <div class="fin2-tabs">
@@ -2745,22 +2806,108 @@ function peToken(fid){if(!_peTokens[fid]){_peTokens[fid]=peGenToken();try{localS
 function peDocId(fid){return fid+'_'+peToken(fid);}
 function peLink(fid){return PE_BASE+'?f='+encodeURIComponent(fid)+'&k='+encodeURIComponent(peToken(fid));}
 function peLinkApp(fid){var base=(location.origin||'')+location.pathname;return base+'?fabrica='+encodeURIComponent(fid)+'&chave='+encodeURIComponent(peToken(fid));}
-function peAcessoDe(fid){return Array.isArray(_peAcesso[fid])?_peAcesso[fid]:[];}
+function peAcessoDe(fid){var a=_peAcesso[fid];if(!a)return {usuario:'',senha:''};if(Array.isArray(a))return {usuario:(a[0]&&(a[0].nome||a[0]))||'',senha:''};return {usuario:a.usuario||'',senha:a.senha||''};}
 function peSalvarAcesso(){try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({pessoas:_peAcesso},{merge:true}).catch(function(){});}
-function peAcessoBox(fid){
-  var ps=peAcessoDe(fid);
-  var lista=ps.length?('<ul class="pe-pessoas-list">'+ps.map(function(p,i){return '<li><span>'+escapeHtml(p.nome||p)+'</span><button class="pe-pessoa-x" title="Remover" onclick="peRemPessoa(\''+fid+'\','+i+')">&#10005;</button></li>';}).join('')+'</ul>'):'<div class="pe-pessoas-vazio">Ninguem cadastrado ainda.</div>';
-  return '<details class="pe-acesso"><summary>&#128273; Acesso da fabrica &mdash; link e pessoas</summary>'+
-    '<div class="pe-acesso-link"><input id="peLink_'+escapeHtml(fid)+'" readonly value="'+escapeHtml(peLinkApp(fid))+'" onclick="this.select()"><button class="btn sm" onclick="peCopiarAcesso(\''+fid+'\')">Copiar link</button><button class="btn sm" onclick="peWhatsAcesso(\''+fid+'\')">WhatsApp</button></div>'+
-    '<div class="pe-pessoas-h">Pessoas com acesso</div>'+lista+
-    '<div class="pe-pessoa-add"><input id="peNovaPessoa_'+escapeHtml(fid)+'" placeholder="Nome da pessoa" onkeydown="if(event.key===\'Enter\')peAddPessoa(\''+fid+'\')"><button class="btn sm" onclick="peAddPessoa(\''+fid+'\')">+ Adicionar</button></div>'+
-    '<p class="pe-metahint">Mande este link pra fabrica. Ela ve so os modelos dela e atualiza estoque/producao no painel reduzido.</p></details>';
+function peCopiarAcesso(fid){var l=peLinkApp(fid);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(l).then(function(){toast('Link copiado — mande pra fábrica');}).catch(function(){window.prompt('Copie o link:',l);});}else window.prompt('Copie o link:',l);}
+function peWhatsAcesso(fid){var ac=peAcessoDe(fid);var l=peLinkApp(fid);var msg='Acesso ao painel da pronta-entrega Loretto Scarpa ('+((peFabricas().find(function(x){return x.fid===fid;})||{}).nome||fid)+'):\n'+l+(ac.senha?('\nSenha: '+ac.senha):'');window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');}
+function peAcessoModalAbrir(fid){
+  var ac=peAcessoDe(fid);var nomeF=(peFabricas().find(function(x){return x.fid===fid;})||{}).nome||fid;
+  var box=document.getElementById('peAcessoBox');if(!box)return;
+  box.innerHTML='<div class="pe-modal-h">Acesso da fábrica — '+escapeHtml(nomeF)+'</div>'+
+    '<label class="pe-acfld">Usuário (nome de quem usa)<input id="peAcUser" value="'+escapeHtml(ac.usuario)+'" placeholder="ex.: Diego"></label>'+
+    '<label class="pe-acfld">Senha<input id="peAcSenha" value="'+escapeHtml(ac.senha)+'" placeholder="defina uma senha"></label>'+
+    '<div class="pe-acfld-l">Link de acesso</div><div class="pe-acesso-link"><input id="peLink_'+escapeHtml(fid)+'" readonly value="'+escapeHtml(peLinkApp(fid))+'" onclick="this.select()"><button class="btn sm" onclick="peCopiarAcesso(\''+fid+'\')">Copiar</button><button class="btn sm" onclick="peWhatsAcesso(\''+fid+'\')">WhatsApp</button></div>'+
+    '<p class="pe-metahint">A fábrica abre esse link, digita a senha e vê só o painel dela (modelos, estoque, produção e os pedidos).</p>'+
+    '<div class="pe-modal-foot"><button class="btn" onclick="peAcessoModalFechar()">Fechar</button><button class="btn btn-ouro" onclick="peAcessoSalvar(\''+fid+'\')">Salvar acesso</button></div>';
+  document.getElementById('peAcessoModal').classList.remove('hide');
 }
-function peAddPessoa(fid){var el=document.getElementById('peNovaPessoa_'+fid);var nome=((el&&el.value)||'').trim();if(!nome){toast('Digite o nome');return;}if(!Array.isArray(_peAcesso[fid]))_peAcesso[fid]=[];_peAcesso[fid].push({nome:nome,em:Date.now()});peSalvarAcesso();if(typeof peRender==='function')peRender();toast('Pessoa adicionada');}
-function peRemPessoa(fid,i){if(!Array.isArray(_peAcesso[fid]))return;_peAcesso[fid].splice(i,1);peSalvarAcesso();if(typeof peRender==='function')peRender();}
-function peCopiarAcesso(fid){var l=peLinkApp(fid);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(l).then(function(){toast('Link copiado &mdash; mande pra fabrica');}).catch(function(){window.prompt('Copie o link:',l);});}else window.prompt('Copie o link:',l);}
-function peWhatsAcesso(fid){var l=peLinkApp(fid);var msg='Acesso ao painel da pronta-entrega Loretto Scarpa:\n'+l;window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');}
-window.peAddPessoa=peAddPessoa;window.peRemPessoa=peRemPessoa;window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;
+function peAcessoModalFechar(){var m=document.getElementById('peAcessoModal');if(m)m.classList.add('hide');}
+function peAcessoSalvar(fid){
+  var u=((document.getElementById('peAcUser')||{}).value||'').trim();
+  var s=((document.getElementById('peAcSenha')||{}).value||'').trim();
+  _peAcesso[fid]={usuario:u,senha:s,em:Date.now()};
+  peSalvarAcesso();peAcessoModalFechar();if(typeof peRender==='function')peRender();toast('Acesso salvo');
+}
+window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.peAcessoModalAbrir=peAcessoModalAbrir;window.peAcessoModalFechar=peAcessoModalFechar;window.peAcessoSalvar=peAcessoSalvar;
+
+/* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
+var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
+function iniciarModoFabrica(fid,chave){
+  MODO_FABRICA=fid;_MODO_FAB_CHAVE=chave||'';
+  try{_MODO_FAB_OK=sessionStorage.getItem('fab_ok_'+fid)==='1';}catch(e){_MODO_FAB_OK=false;}
+  document.body.classList.add('modo-fabrica');
+  var ls=document.getElementById('loginScreen');if(ls)ls.classList.add('hide');
+  var sh=document.getElementById('appShell');if(sh)sh.classList.add('hide');
+  var fm=document.getElementById('fabricaMode');if(!fm){fm=document.createElement('div');fm.id='fabricaMode';document.body.appendChild(fm);}fm.classList.remove('hide');
+  var em=document.getElementById('peEnvioModal');if(em)document.body.appendChild(em);
+  // conecta o sync para ler/escrever os dados desta fábrica
+  if(!userAtual){userAtual='fabrica-'+fid;}
+  syncCfg.on=true;try{localStorage.setItem('loretto_sync',JSON.stringify(syncCfg));}catch(e){}
+  if(typeof conectarSync==='function'){try{conectarSync();}catch(e){}}
+  try{if(typeof peCarregarEstoques==='function')peCarregarEstoques();}catch(e){}
+  renderModoFabrica(fid);
+  setTimeout(function(){renderModoFabrica(fid);},1200);
+}
+function peFabEntrar(fid){
+  var el=document.getElementById('fabSenha');var s=((el&&el.value)||'').trim();var ac=peAcessoDe(fid);
+  if(ac.senha&&s!==ac.senha){toast('Senha incorreta');return;}
+  _MODO_FAB_OK=true;try{sessionStorage.setItem('fab_ok_'+fid,'1');}catch(e){}
+  renderModoFabrica(fid);
+}
+function renderModoFabrica(fid){
+  var host=document.getElementById('fabricaMode');if(!host)return;
+  var f=peFabricas().find(function(x){return x.fid===fid;});
+  var nomeF=(f&&f.nome)||((typeof repForn!=='undefined'&&repForn[fid]&&repForn[fid].nome))||fid;
+  if(_MODO_FAB_CHAVE&&_peTokens[fid]&&_MODO_FAB_CHAVE!==_peTokens[fid]){
+    host.innerHTML='<div class="fab-wrap"><div class="fab-card"><div class="fab-titulo">Loretto Scarpa</div><div class="fab-erro">Link inválido ou expirado. Peça um novo link à Loretto Scarpa.</div></div></div>';return;
+  }
+  var ac=peAcessoDe(fid);
+  if(ac.senha&&!_MODO_FAB_OK){
+    host.innerHTML='<div class="fab-wrap"><div class="fab-card fab-login"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · acesso da fábrica</div><input id="fabSenha" type="password" placeholder="Senha" onkeydown="if(event.key===\'Enter\')peFabEntrar(\''+fid+'\')"><button class="btn btn-ouro" onclick="peFabEntrar(\''+fid+'\')">Entrar</button></div></div>';return;
+  }
+  var cache=_peEstoqueCache[fid]||{};var est=cache.estoque||{},prod=cache.produzindo||{},meta=cache.meta||{},ped=cache.pedido||{};
+  var mods=(typeof peModelosDaFabrica==='function')?peModelosDaFabrica(fid):[];
+  var modosHTML=mods.length?mods.map(function(m){
+    var cores=m.cores.map(function(co){
+      var tams=co.tams;
+      var cref=repRefDe(m.id,co.nome);var cfoto=repFotoDe(m.id,co.nome);
+      var head='<tr><th class="pe-glbl">'+escapeHtml(co.nome)+'</th>'+tams.map(function(t){return '<th>'+escapeHtml(t)+'</th>';}).join('')+'</tr>';
+      var estRow='<tr><td class="pe-glbl e">Estoque</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0;return '<td><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="e" value="'+(e||'')+'"></td>';}).join('')+'</tr>';
+      var prodRow='<tr><td class="pe-glbl p">Produzindo</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var pz=parseInt(prod[k])||0;return '<td><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="p" value="'+(pz||'')+'"></td>';}).join('')+'</tr>';
+      var pedRow='<tr><td class="pe-glbl pe">Pedido</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var pd=parseInt(ped[k])||0;return '<td class="pe-gc'+(pd>0?' tem pe':'')+'">'+(pd||'\u00b7')+'</td>';}).join('')+'</tr>';
+      var repRow='<tr><td class="pe-glbl rep">Repor</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var mv=meta[k]||0;var tem=(parseInt(est[k])||0)+(parseInt(prod[k])||0)-(parseInt(ped[k])||0);var fa=Math.max(0,mv-tem);return '<td class="pe-gc'+(fa>0?' falta':(mv?' okmeta':''))+'">'+(fa>0?'+'+fa:(mv?'ok':'\u00b7'))+'</td>';}).join('')+'</tr>';
+      var refb=cref?'<span class="fab-ref">ref '+escapeHtml(cref)+'</span>':'';
+      var fotob=cfoto?'<img src="'+cfoto+'">':'<span class="fab-noimg">&#128095;</span>';
+      return '<div class="fab-cor"><div class="fab-corh">'+fotob+'<span class="fab-corn">'+escapeHtml(co.nome)+'</span>'+refb+'</div><div class="pe-gtbl"><table class="pe-grade">'+head+estRow+prodRow+pedRow+repRow+'</table></div></div>';
+    }).join('');
+    return '<div class="fab-mod"><div class="fab-modh">'+escapeHtml(m.nome)+'</div>'+cores+'</div>';
+  }).join(''):'<div class="fab-vazio">Nenhum modelo cadastrado ainda para a sua fábrica.</div>';
+  var ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
+  var pedHTML=peds.length?peds.map(function(o){var r=_peOrdemResumo(fid,o.grade);return '<div class="fab-ped"><div class="fab-pedh"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span>'+r.tot+' pares</span></div>'+r.html+'<button class="btn sm fab-prodbtn" onclick="peColocarProducao(\''+fid+'\',\''+o.id+'\')">Colocar em produção</button></div>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
+  var prods=(cache.ordens||[]).filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||0)-(b.producaoEm||0);});
+  var prodHTML=prods.length?prods.map(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;return '<div class="fab-prod"><div class="fab-pedh"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span>'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto (entra no estoque)</button></div>';}).join(''):'<div class="fab-vazio">Nada em produção.</div>';
+  var envBtn=peds.length?'<button class="btn btn-ouro fab-enviar" onclick="peEnvioSelecionar(\''+fid+'\')">Enviar para a loja</button>':'';
+  var envs=(cache.ordens||[]).filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});
+  var histHTML=envs.length?envs.map(function(o){var rm=_peOrdemResumo(fid,o.enviado||{});return '<div class="fab-hist"><div class="fab-histh"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b><span>'+rm.tot+' pares</span></div>'+rm.html+'</div>';}).join(''):'<div class="fab-vazio">Nada enviado ainda.</div>';
+  host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div></div>'+
+    '<div class="fab-sec"><div class="fab-sech">Pedidos da loja</div>'+pedHTML+envBtn+'</div>'+
+    '<div class="fab-sec"><div class="fab-sech">Em produção</div>'+prodHTML+'</div>'+
+    '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
+    '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<button class="btn btn-ouro fab-salvar" onclick="peFabSalvar(\''+fid+'\')">Salvar estoque e produção</button>':'')+'</div>'+
+    '<div class="fab-rodape">Loretto Scarpa</div></div>';
+}
+function peFabSalvar(fid){
+  var est={},prod={};
+  document.querySelectorAll('#fabricaMode input[data-fk]').forEach(function(i){var k=i.getAttribute('data-fk');var q=parseInt(i.value)||0;if(q>0){if(i.getAttribute('data-tp')==='e')est[k]=q;else prod[k]=q;}});
+  var did=peDocId(fid);var quem=(peAcessoDe(fid).usuario)||'Fábrica';
+  function aplica(exists){
+    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].atualizadoEm=Date.now();}
+    _pePersistir(did,fid,{estoque:est,produzindo:prod,atualizadoEm:Date.now(),lorettoEm:Date.now(),lorettoPor:quem},exists,'Atualizado — a Loretto já vê');
+  }
+  if(!_db){aplica(false);return;}
+  _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists);}).catch(function(){aplica(false);});
+}
+window.peFabEntrar=peFabEntrar;window.peFabSalvar=peFabSalvar;window.renderModoFabrica=renderModoFabrica;
 const PE_PREVIA={tchwm:Object.assign({"fabrica": "Tchwm Shoes", "modelos": [{"id": "pv1", "nome": "Paris Mouro", "cod": "7600", "custo": 259.9, "cores": [{"nome": "Mouro", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv2", "nome": "Paris Preto", "cod": "7600", "custo": 259.9, "cores": [{"nome": "Preto", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv3", "nome": "Milano Branco", "cod": "5505", "custo": 199.9, "cores": [{"nome": "Branco", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}, {"id": "pv4", "nome": "Milano Preto", "cod": "5505", "custo": 199.9, "cores": [{"nome": "Preto", "tams": ["37", "38", "39", "40", "41", "42", "43"]}]}], "estoque": {"pv1|Mouro|38": 2, "pv1|Mouro|39": 26, "pv1|Mouro|40": 14, "pv1|Mouro|41": 13, "pv1|Mouro|42": 7, "pv1|Mouro|43": 11, "pv2|Preto|37": 2, "pv2|Preto|38": 3, "pv2|Preto|39": 15, "pv2|Preto|40": 3, "pv2|Preto|41": 3, "pv2|Preto|42": 2, "pv2|Preto|43": 7, "pv3|Branco|38": 2, "pv3|Branco|40": 3, "pv3|Branco|41": 5, "pv3|Branco|43": 5, "pv4|Preto|39": 4, "pv4|Preto|43": 6}, "produzindo": {"pv1|Mouro|37": 1, "pv2|Preto|37": 1, "pv2|Preto|38": 3, "pv2|Preto|40": 2, "pv2|Preto|43": 1}, "pedido": {"pv1|Mouro|37": 4, "pv1|Mouro|38": 4, "pv2|Preto|37": 2, "pv2|Preto|40": 5, "pv2|Preto|41": 7, "pv2|Preto|42": 6, "pv3|Branco|37": 4, "pv3|Branco|38": 6, "pv3|Branco|39": 15, "pv3|Branco|40": 12, "pv3|Branco|41": 10, "pv3|Branco|42": 12, "pv4|Preto|38": 4, "pv4|Preto|39": 11, "pv4|Preto|40": 15, "pv4|Preto|41": 15, "pv4|Preto|42": 8}, "meta": {"pv1|Mouro|37": 3, "pv1|Mouro|38": 6, "pv1|Mouro|39": 15, "pv1|Mouro|40": 12, "pv1|Mouro|41": 10, "pv1|Mouro|42": 8, "pv1|Mouro|43": 4, "pv2|Preto|37": 3, "pv2|Preto|38": 6, "pv2|Preto|39": 15, "pv2|Preto|40": 12, "pv2|Preto|41": 10, "pv2|Preto|42": 8, "pv2|Preto|43": 4, "pv3|Branco|37": 3, "pv3|Branco|38": 6, "pv3|Branco|39": 15, "pv3|Branco|40": 12, "pv3|Branco|41": 10, "pv3|Branco|42": 8, "pv3|Branco|43": 4, "pv4|Preto|37": 3, "pv4|Preto|38": 6, "pv4|Preto|39": 15, "pv4|Preto|40": 12, "pv4|Preto|41": 10, "pv4|Preto|42": 8, "pv4|Preto|43": 4}},{atualizadoEm:Date.now()-2*86400000,publicadoEm:Date.now()-5*86400000,lorettoEm:Date.now()-4*86400000,lorettoPor:"Yuri",historico:[{ts:Date.now()-2*86400000,mudancas:[{label:"Paris Mouro 39",de:30,para:26},{label:"Paris Preto 40",de:6,para:3}]}]})};
 function peModelosDaFabrica(fid){
   const out=[];
@@ -2818,7 +2965,7 @@ const PE_PADRAO=[{fid:'manutt',nome:'Manutt'},{fid:'tchwm',nome:'Tchwm Shoes'},{
 let peView='lista';var PE_CRIT_PCT=50;let peFornsOpen=false;let peFornEdit=null;
 let peFornModelos=(function(){try{return JSON.parse(localStorage.getItem('loretto_pe_forn_modelos')||'{}')||{};}catch(e){return {};}})();
 let _peCadFid=null;
-function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}}
+function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({fornModelos:peFornModelos},{merge:true}).catch(function(){});}
 function peEnsureForns(){
   if(!repForn)repInit();
   var changed=false;
@@ -2887,13 +3034,13 @@ function peCarregarEstoques(){
   if(!_db){return;}
   _db.collection('ls_pe_config').doc('loja').get().then(function(cs){if(cs.exists&&cs.data()&&typeof cs.data().critPct==='number')PE_CRIT_PCT=cs.data().critPct;peRender();}).catch(function(){});
   _db.collection('ls_pe_tokens').doc('loja').get().then(function(snp){
-    if(snp.exists&&snp.data()){var _td=snp.data();if(_td.tokens){_peTokens=Object.assign({},_peTokens,_td.tokens);try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens))}catch(e){};}if(_td.pessoas){_peAcesso=_td.pessoas;try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso))}catch(e){};}}
+    if(snp.exists&&snp.data()){var _td=snp.data();if(_td.tokens){_peTokens=Object.assign({},_peTokens,_td.tokens);try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens))}catch(e){};}if(_td.pessoas){_peAcesso=_td.pessoas;try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso))}catch(e){};}if(_td.fornModelos){peFornModelos=_td.fornModelos;try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos))}catch(e){};}}if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
   }).catch(function(){}).then(function(){
     peFabricas().forEach(f=>{
       const did=peDocId(f.fid);
       _db.collection('ls_pe').doc(did).get().then(function(s2){
         const d=s2.exists?s2.data():null;
-        if(d){var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);var t=peTotaisOrdens(ordens);_peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:t.produzindo,pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};}
+        if(d){var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);var t=peTotaisOrdens(ordens);_peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};}
         else if(PE_PREVIA[f.fid])_peEstoqueCache[f.fid]=_peSeed(f.fid);
         else _peEstoqueCache[f.fid]={estoque:{},produzindo:{},pedido:{},ordens:[],meta:{},historico:[],atualizadoEm:0,publicadoEm:0,lorettoEm:0,lorettoPor:''};
         peRender();
@@ -2902,7 +3049,7 @@ function peCarregarEstoques(){
     });
   });
 }
-function peRender(){
+function peRender(){if(MODO_FABRICA){renderModoFabrica(MODO_FABRICA);return;}
   const c=$('peFabricas');if(!c)return;
   if(peView==='lista')return peRenderLista(c);
   peRenderFabrica(c,peView);
@@ -2947,11 +3094,11 @@ function peRenderLista(c){
     const diasSem=fb?Math.floor((Date.now()-fb)/86400000):null;
     const quem=lr>fb?'Loretto':'fábrica';
     const st=cache._previa?'prévia · dados de exemplo':(ultimo?(parada?('parada há '+diasSem+' dias'):('por '+quem+' · '+fmtData(ultimo))):'sem dados ainda');
-    return '<button class="pe-fcard'+(parada?' parada':'')+'" onclick="peAbrir(\''+f.fid+'\')">'+
+    return '<div class="pe-fcardwrap"><button class="pe-fcard'+(parada?' parada':'')+'" onclick="peAbrir(\''+f.fid+'\')">'+
       '<div class="pe-fic">&#128095;</div>'+
       '<div class="pe-finfo"><div class="pe-fnome">'+escapeHtml(f.nome)+(cache._previa?' <span class="pe-badge ex">exemplo</span>':(parada?' <span class="pe-badge">!</span>':''))+'</div><div class="pe-fst">'+escapeHtml(st)+'</div></div>'+
       '<div class="pe-fnums"><div><b>'+f.qtdModelos+'</b> modelos</div><div><b>'+totEst+'</b> em estoque</div></div>'+
-      '<div class="pe-farrow">&#8250;</div></button>';
+      '<div class="pe-farrow">&#8250;</div></button><button class="pe-fcardkey" onclick="peAcessoModalAbrir(\''+f.fid+'\')" title="Acesso da fabrica">&#128273; Acesso</button></div>';
   }).join('')+'</div>';
 }
 function peRenderFabrica(c,fid){
@@ -3011,7 +3158,6 @@ function peRenderFabrica(c,fid){
     (totalFalta>0?'<div class="pe-faltar">Faltam repor '+totalFalta+' pares para bater a meta</div>':'')+
     '<div class="pe-actions"><button class="btn btn-ouro sm" onclick="peCadModelo(\''+f.fid+'\')">+ Cadastrar modelo</button>'+
     '<button class="btn sm" onclick="peSalvarMetas(\''+f.fid+'\')">Salvar metas</button></div>'+
-    peAcessoBox(f.fid)+
     pedidoBox+
     peOrdensPainel(f.fid)+
     (hist?'<div class="pe-histbox"><b>Últimas alterações da fábrica:</b>'+hist+'</div>':'')+
@@ -3090,8 +3236,8 @@ function peMutarOrdens(fid,mut,okMsg){
   function aplica(ordens,exists){
     var novo=mut((ordens||[]).map(function(o){return Object.assign({},o);}))||ordens||[];
     var t=peTotaisOrdens(novo);
-    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=novo;_peEstoqueCache[fid].pedido=t.pedido;_peEstoqueCache[fid].produzindo=t.produzindo;}
-    _pePersistir(did,fid,{ordens:novo,pedido:t.pedido,produzindo:t.produzindo,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,okMsg);
+    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=novo;_peEstoqueCache[fid].pedido=t.pedido;}
+    _pePersistir(did,fid,{ordens:novo,pedido:t.pedido,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,okMsg);
   }
   if(!_db){aplica((_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){var d=s.exists?s.data():{};var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);aplica(ordens,s.exists);}).catch(function(){aplica((_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],false);});
@@ -3107,14 +3253,23 @@ function peOrdemPronta(fid,oid){
     ordens.forEach(function(o){if(o.id===oid&&o.status==='producao'){o.status='recebido';o.recebidoEm=Date.now();alvo=o;}});
     if(alvo&&alvo.grade){Object.keys(alvo.grade).forEach(function(k){var q=parseInt(alvo.grade[k])||0;if(q>0)est[k]=(parseInt(est[k])||0)+q;});}
     var t=peTotaisOrdens(ordens);
-    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].pedido=t.pedido;_peEstoqueCache[fid].produzindo=t.produzindo;_peEstoqueCache[fid].estoque=est;}
-    _pePersistir(did,fid,{ordens:ordens,pedido:t.pedido,produzindo:t.produzindo,estoque:est,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Produção concluída — somada ao estoque');
+    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].pedido=t.pedido;_peEstoqueCache[fid].estoque=est;}
+    _pePersistir(did,fid,{ordens:ordens,pedido:t.pedido,estoque:est,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Produção concluída — somada ao estoque');
   }
   if(!_db){aplica({ordens:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],estoque:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}},false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({ordens:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],estoque:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}},false);});
 }
-function _peOrdemResumo(fid,grade){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={},tot=0;Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'');(byMC[mc]=byMC[mc]||[]).push(p[2]+'\u00d7'+q);tot+=q;});var linhas=Object.keys(byMC).map(function(mc){return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(mc)+'</span><span class="pe-ordn">'+byMC[mc].join('  ')+'</span></div>';}).join('');return {html:linhas,tot:tot};}
-function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');_peEnvio={fid:null,oid:null};}
+function _peOrdemResumo(fid,grade){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={},tot=0;Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');(byMC[mc]=byMC[mc]||[]).push(p[2]+'\u00d7'+q);tot+=q;});var linhas=Object.keys(byMC).map(function(mc){return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(mc)+'</span><span class="pe-ordn">'+byMC[mc].join('  ')+'</span></div>';}).join('');return {html:linhas,tot:tot};}
+function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok)ok.style.display='';_peEnvio={fid:null,oid:null};}
+function peEnvioSelecionar(fid){
+  var cache=_peEstoqueCache[fid]||{};var peds=(cache.ordens||[]).filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
+  if(!peds.length){toast('Nenhum pedido da loja para enviar');return;}
+  if(peds.length===1){peEnvioAbrir(fid,peds[0].id);return;}
+  var box=document.getElementById('peEnvioBox');if(!box)return;
+  box.innerHTML='<div class="pe-modal-h">Enviar para a loja</div><p class="pe-metahint">Qual pedido você está atendendo?</p><div class="pe-envpicks">'+peds.map(function(o){var r=_peOrdemResumo(fid,o.grade);return '<button class="pe-envpick" onclick="peEnvioAbrir(\''+fid+'\',\''+o.id+'\')"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span>'+r.tot+' pares</span></button>';}).join('')+'</div>';
+  var ok=document.getElementById('peEnvioOk');if(ok)ok.style.display='none';
+  document.getElementById('peEnvioModal').classList.remove('hide');
+}
 var _peEnvio={fid:null,oid:null};
 function peEnvioAbrir(fid,oid){
   var cache=_peEstoqueCache[fid]||{};var o=(cache.ordens||[]).find(function(x){return x.id===oid;});if(!o){toast('Pedido nao encontrado');return;}
@@ -3122,11 +3277,11 @@ function peEnvioAbrir(fid,oid){
   var nome={};peModelosDaFabrica(fid).forEach(function(m){nome[m.id]=m.nome;});
   var est=cache.estoque||{};
   var groups={};Object.keys(o.grade||{}).forEach(function(k){var p=k.split('|');var g=p[0]+'|'+p[1];(groups[g]=groups[g]||[]).push({tam:p[2],ped:o.grade[k]});});
-  var rows=Object.keys(groups).map(function(g){var p=g.split('|');var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'');
+  var rows=Object.keys(groups).map(function(g){var p=g.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');
     var cells=groups[g].sort(function(a,b){return parseFloat(a.tam)-parseFloat(b.tam);}).map(function(c){var sk=p[0]+'|'+p[1]+'|'+c.tam;var emEst=parseInt(est[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(c.tam)+'</label><div class="pe-envped">pediu '+c.ped+'</div><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value="'+c.ped+'"><div class="pe-envest">tem '+emEst+'</div></div>';}).join('');
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';}).join('');
   document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Ao confirmar, baixa do estoque da pronta-entrega e vai pro romaneio da conferencia.</p>'+rows;
-  var ok=document.getElementById('peEnvioOk');if(ok)ok.onclick=function(){peConfirmarEnvio();};
+  var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.onclick=function(){peConfirmarEnvio();};}
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
 function peEscreveRomaneio(repoId,sent){
@@ -3147,17 +3302,17 @@ function peConfirmarEnvio(){
     var ord=ordens.find(function(x){return x.id===oid;});var repoId='';
     if(ord){ord.status='enviado';ord.enviado=sent;ord.enviadoEm=Date.now();ord.enviadoPor=(typeof userAtual!=='undefined'?userAtual:'')||'Loretto';repoId=ord.repoId||'';}
     var t=peTotaisOrdens(ordens);
-    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].pedido=t.pedido;_peEstoqueCache[fid].produzindo=t.produzindo;}
+    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].pedido=t.pedido;}
     if(repoId)peEscreveRomaneio(repoId,sent);
-    _pePersistir(did,fid,{ordens:ordens,estoque:est,pedido:t.pedido,produzindo:t.produzindo,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Envio confirmado &mdash; baixado do estoque');
+    _pePersistir(did,fid,{ordens:ordens,estoque:est,pedido:t.pedido,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Envio confirmado &mdash; baixado do estoque');
   }
   if(!_db){aplica({},false);peEnvioFechar();return;}
   _db.collection('ls_pe').doc(did).get().then(function(sp){aplica(sp.exists?sp.data():{},sp.exists);}).catch(function(){aplica({},false);});
   peEnvioFechar();
 }
-function peOrdensPainel(fid){var cache=_peEstoqueCache[fid]||{},ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});var prods=ordens.filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||a.criadoEm||0)-(b.producaoEm||b.criadoEm||0);});var h='<div class="pe-ords">';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot ped"></span>Pedidos enviados <b>'+peds.length+'</b></div>';if(!peds.length)h+='<div class="pe-ordempty">Nenhum pedido aguardando produção.</div>';peds.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);h+='<div class="pe-ordcard ped"><div class="pe-ordtop"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peEnvioAbrir(\''+fid+'\',\''+o.id+'\')">Confirmar envio</button><button class="btn sm" onclick="peColocarProducao(\''+fid+'\',\''+o.id+'\')">Colocar em produção</button><button class="btn sm" onclick="peExcluirOrdem(\''+fid+'\',\''+o.id+'\')">Excluir</button></div></div>';});h+='</div>';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot prod"></span>Em produção <b>'+prods.length+'</b></div>';if(!prods.length)h+='<div class="pe-ordempty">Nada em produção no momento.</div>';prods.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;h+='<div class="pe-ordcard prod"><div class="pe-ordtop"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto</button></div></div>';});h+='</div>';var envs=ordens.filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot env"></span>Enviados / romaneio <b>'+envs.length+'</b></div>';if(!envs.length)h+='<div class="pe-ordempty">Nenhum envio confirmado ainda.</div>';envs.forEach(function(o){var rp=_peOrdemResumo(fid,o.grade);var rm=_peOrdemResumo(fid,o.enviado||{});h+='<div class="pe-ordcard env"><div class="pe-ordtop"><b>Enviado '+fmtData(o.enviadoEm||o.criadoEm)+(o.enviadoPor?' \u00b7 '+escapeHtml(o.enviadoPor):'')+'</b><span class="pe-ordtot">'+rm.tot+' pares</span></div><div class="pe-envres"><div class="pe-envreslbl">Pediu</div>'+rp.html+'<div class="pe-envreslbl">Mandou</div>'+rm.html+'</div></div>';});h+='</div>';h+='</div>';return h;}
+function peOrdensPainel(fid){var cache=_peEstoqueCache[fid]||{},ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});var prods=ordens.filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||a.criadoEm||0)-(b.producaoEm||b.criadoEm||0);});var h='<div class="pe-ords">';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot ped"></span>Pedidos enviados <b>'+peds.length+'</b></div>';if(!peds.length)h+='<div class="pe-ordempty">Nenhum pedido aguardando produção.</div>';peds.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);h+='<div class="pe-ordcard ped"><div class="pe-ordtop"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peEnvioAbrir(\''+fid+'\',\''+o.id+'\')">Confirmar envio</button><button class="btn sm" onclick="peExcluirOrdem(\''+fid+'\',\''+o.id+'\')">Excluir</button></div></div>';});h+='</div>';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot prod"></span>Em produção <b>'+prods.length+'</b></div>';if(!prods.length)h+='<div class="pe-ordempty">Nada em produção no momento.</div>';prods.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;h+='<div class="pe-ordcard prod"><div class="pe-ordtop"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto</button></div></div>';});h+='</div>';var envs=ordens.filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot env"></span>Enviados / romaneio <b>'+envs.length+'</b></div>';if(!envs.length)h+='<div class="pe-ordempty">Nenhum envio confirmado ainda.</div>';envs.forEach(function(o){var rp=_peOrdemResumo(fid,o.grade);var rm=_peOrdemResumo(fid,o.enviado||{});h+='<div class="pe-ordcard env"><div class="pe-ordtop"><b>Enviado '+fmtData(o.enviadoEm||o.criadoEm)+(o.enviadoPor?' \u00b7 '+escapeHtml(o.enviadoPor):'')+'</b><span class="pe-ordtot">'+rm.tot+' pares</span></div><div class="pe-envres"><div class="pe-envreslbl">Pediu</div>'+rp.html+'<div class="pe-envreslbl">Mandou</div>'+rm.html+'</div></div>';});h+='</div>';h+='</div>';return h;}
 function pePedidoLancar(fid){var P=_pePedidoCache[fid];if(!P||!P.itens||!P.itens.length){toast('Nada a lançar');return;}var grade={};P.itens.forEach(function(it){(it.nums||[]).forEach(function(n){if(!it.mid)return;var k=it.mid+'|'+it.cor+'|'+n.tam;grade[k]=(grade[k]||0)+(parseInt(n.qtd)||0);});});peNovaOrdem(fid,grade);pePedidoFechar(fid);}
-window.pePublicar=pePublicar;window.peCopiarLink=peCopiarLink;window.peTrocarFoto=peTrocarFoto;window.peSalvarMetas=peSalvarMetas;window.peAbrir=peAbrir;window.peSalvarCritPct=peSalvarCritPct;window.peVoltar=peVoltar;window.pePedido=pePedido;window.pePedidoFechar=pePedidoFechar;window.pePedidoCopiar=pePedidoCopiar;window.pePedidoWhats=pePedidoWhats;window.peColocarProducao=peColocarProducao;window.peOrdemPronta=peOrdemPronta;window.peExcluirOrdem=peExcluirOrdem;window.peNovaOrdem=peNovaOrdem;window.pePedidoLancar=pePedidoLancar;window.peEnvioAbrir=peEnvioAbrir;window.peEnvioFechar=peEnvioFechar;window.peConfirmarEnvio=peConfirmarEnvio;
+window.pePublicar=pePublicar;window.peCopiarLink=peCopiarLink;window.peTrocarFoto=peTrocarFoto;window.peSalvarMetas=peSalvarMetas;window.peAbrir=peAbrir;window.peSalvarCritPct=peSalvarCritPct;window.peVoltar=peVoltar;window.pePedido=pePedido;window.pePedidoFechar=pePedidoFechar;window.pePedidoCopiar=pePedidoCopiar;window.pePedidoWhats=pePedidoWhats;window.peColocarProducao=peColocarProducao;window.peOrdemPronta=peOrdemPronta;window.peExcluirOrdem=peExcluirOrdem;window.peNovaOrdem=peNovaOrdem;window.pePedidoLancar=pePedidoLancar;window.peEnvioAbrir=peEnvioAbrir;window.peEnvioFechar=peEnvioFechar;window.peConfirmarEnvio=peConfirmarEnvio;window.peEnvioSelecionar=peEnvioSelecionar;
 
 function trocarAba(tab){const b=document.querySelector('.side-item[data-tab="'+tab+'"]');if(b)b.click();}
 let recebId=null;
@@ -3771,7 +3926,7 @@ if($('repSoFixos'))$('repSoFixos').addEventListener('change',repRenderModelos);
 if($('repGerarBtn'))$('repGerarBtn').addEventListener('click',repGerar);
 if($('cfgFornAdd'))$('cfgFornAdd').addEventListener('click',()=>{const n=$('cfgFornNome').value.trim();if(!n){toast('Nome da fábrica');return;}const id='f'+Date.now().toString(36);repForn[id]={nome:n,whatsapp:$('cfgFornWa').value.trim(),off:false};$('cfgFornNome').value='';$('cfgFornWa').value='';repSalvar();repRenderConfig();});
 
-aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();repInit();repRender();renderFinanceiro();iniciarLogin();iniciarSync();
+aplicaTamanho();aplicaLayout();renderLogo();renderLista();renderGerenciar();renderFila();limparForm();repInit();repRender();renderFinanceiro();(function(){try{var qs=new URLSearchParams(location.search);var ff=qs.get('fabrica');if(ff){iniciarModoFabrica(ff,qs.get('chave')||'');return;}}catch(e){}iniciarLogin();iniciarSync();})();
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
 
 /* ===== JS CENTRAL DE SUPRIMENTOS ===== */
