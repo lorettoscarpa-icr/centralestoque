@@ -2838,7 +2838,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v7';
+var PE_FAB_VER='v8 · login sync';
 function iniciarModoFabrica(fid,chave){
   MODO_FABRICA=fid;_MODO_FAB_CHAVE=chave||'';
   try{_MODO_FAB_OK=sessionStorage.getItem('fab_ok_'+fid)==='1';}catch(e){_MODO_FAB_OK=false;}
@@ -3049,7 +3049,13 @@ function peCarregarEstoques(){
   if(!_db){return;}
   _db.collection('ls_pe_config').doc('loja').get().then(function(cs){if(cs.exists&&cs.data()&&typeof cs.data().critPct==='number')PE_CRIT_PCT=cs.data().critPct;peRender();}).catch(function(){});
   _db.collection('ls_pe_tokens').doc('loja').get().then(function(snp){
-    if(snp.exists&&snp.data()){var _td=snp.data();if(_td.tokens){_peTokens=Object.assign({},_peTokens,_td.tokens);try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens))}catch(e){};}if(_td.pessoas){_peAcesso=_td.pessoas;try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso))}catch(e){};}if(_td.fornModelos){peFornModelos=_td.fornModelos;try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos))}catch(e){};}}if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
+    var _td=(snp.exists&&snp.data())||{};
+    _peTokens=Object.assign({},_peTokens,_td.tokens||{});
+    if(MODO_FABRICA){ _peAcesso=_td.pessoas||_peAcesso||{}; peFornModelos=_td.fornModelos||peFornModelos||{}; }
+    else { _peAcesso=Object.assign({},_td.pessoas||{},_peAcesso||{}); peFornModelos=Object.assign({},_td.fornModelos||{},peFornModelos||{}); }
+    try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens));localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}
+    if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_peAcesso,fornModelos:peFornModelos},{merge:true});}catch(e){}}
+    if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
     if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&ae.getAttribute('data-fk')))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}}
   }).catch(function(){}).then(function(){
     peFabricas().forEach(f=>{
