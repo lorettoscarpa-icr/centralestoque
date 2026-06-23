@@ -2838,7 +2838,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v3 · salva sozinho';
+var PE_FAB_VER='v5 · une dados';
 function iniciarModoFabrica(fid,chave){
   MODO_FABRICA=fid;_MODO_FAB_CHAVE=chave||'';
   try{_MODO_FAB_OK=sessionStorage.getItem('fab_ok_'+fid)==='1';}catch(e){_MODO_FAB_OK=false;}
@@ -2913,8 +2913,8 @@ function peFabAuto(fid){peFabStatus('saving');if(_fabSaveTimer)clearTimeout(_fab
 function peFabFlush(fid){if(_fabSaveTimer){clearTimeout(_fabSaveTimer);_fabSaveTimer=null;peFabSalvar(fid,true);}}
 function peFabSalvar(fid,silent){
   if(_fabSaveTimer){clearTimeout(_fabSaveTimer);_fabSaveTimer=null;}
-  var _c=_peEstoqueCache[fid]||{};var est=Object.assign({},_c.estoque||{}),prod=Object.assign({},_c.produzindo||{});
-  document.querySelectorAll('#fabricaMode input[data-fk]').forEach(function(i){var k=i.getAttribute('data-fk');var q=parseInt(i.value)||0;var tgt=(i.getAttribute('data-tp')==='e')?est:prod;if(q>0)tgt[k]=q;else delete tgt[k];});
+  var est={},prod={};
+  document.querySelectorAll('#fabricaMode input[data-fk]').forEach(function(i){var k=i.getAttribute('data-fk');var q=parseInt(i.value)||0;if(q>0){if(i.getAttribute('data-tp')==='e')est[k]=q;else prod[k]=q;}});
   var did=peDocId(fid);var quem=(peAcessoDe(fid).usuario)||'Fábrica';
   if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].atualizadoEm=Date.now();}
   var payload={estoque:est,produzindo:prod,atualizadoEm:Date.now(),lorettoEm:Date.now(),lorettoPor:quem};
@@ -3044,7 +3044,7 @@ function pePublicar(fid){
 function peCopiarLink(fid){const l=peLink(fid);if(navigator.clipboard){navigator.clipboard.writeText(l).then(function(){toast('Link copiado');},function(){prompt('Copie o link da fábrica:',l);});}else{prompt('Copie o link da fábrica:',l);}}
 function _peSeed(fid){const p=PE_PREVIA[fid];var base={estoque:p.estoque||{},produzindo:p.produzindo||{},pedido:p.pedido||{},meta:p.meta||{},historico:p.historico||[],atualizadoEm:p.atualizadoEm||0,publicadoEm:p.publicadoEm||0,lorettoEm:p.lorettoEm||0,lorettoPor:p.lorettoPor||'',_previa:true};var ordens=_peMigraOrdens(base);var t=peTotaisOrdens(ordens);base.ordens=ordens;base.pedido=t.pedido;base.produzindo=t.produzindo;return base;}
 function peCarregarEstoques(){
-  peFabricas().forEach(f=>{if(PE_PREVIA[f.fid]&&!_peEstoqueCache[f.fid])_peEstoqueCache[f.fid]=_peSeed(f.fid);});
+  peFabricas().forEach(f=>{if(!MODO_FABRICA&&PE_PREVIA[f.fid]&&!_peEstoqueCache[f.fid])_peEstoqueCache[f.fid]=_peSeed(f.fid);});
   peRender();                 // render imediato: a lista de fábricas nunca fica em branco, mesmo se o Firestore demorar ou bloquear
   if(!_db){return;}
   _db.collection('ls_pe_config').doc('loja').get().then(function(cs){if(cs.exists&&cs.data()&&typeof cs.data().critPct==='number')PE_CRIT_PCT=cs.data().critPct;peRender();}).catch(function(){});
@@ -3055,18 +3055,31 @@ function peCarregarEstoques(){
     peFabricas().forEach(f=>{
       const did=peDocId(f.fid);
       const legacy=f.fid+'_'+peToken(f.fid);
-      function _useDoc(d,fromLegacy){
-        if(d){var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);var t=peTotaisOrdens(ordens);_peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};
-          if(fromLegacy&&_db){try{_db.collection('ls_pe').doc(did).set(d,{merge:true});}catch(e){}}}
-        else if(PE_PREVIA[f.fid])_peEstoqueCache[f.fid]=_peSeed(f.fid);
-        else _peEstoqueCache[f.fid]={estoque:{},produzindo:{},pedido:{},ordens:[],meta:{},historico:[],atualizadoEm:0,publicadoEm:0,lorettoEm:0,lorettoPor:''};
+      function _temDados(x){return x&&((Object.keys(x.estoque||{}).length)||((x.ordens||[]).length)||(Object.keys(x.meta||{}).length)||(Object.keys(x.produzindo||{}).length));}
+      function _setCache(d){
+        var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);var t=peTotaisOrdens(ordens);
+        _peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};
         peRender();
       }
-      function _temDados(x){return x&&((Object.keys(x.estoque||{}).length)||((x.ordens||[]).length)||(Object.keys(x.meta||{}).length)||(Object.keys(x.produzindo||{}).length));}
+      function _vazio(){ if(!MODO_FABRICA&&PE_PREVIA[f.fid]){_peEstoqueCache[f.fid]=_peSeed(f.fid);peRender();} else _setCache({}); }
       _db.collection('ls_pe').doc(did).get().then(function(s2){
         var d=s2.exists?s2.data():null;
-        if(_temDados(d)||legacy===did){_useDoc(d,false);return;}
-        _db.collection('ls_pe').doc(legacy).get().then(function(sl){var dl=sl.exists?sl.data():null;if(_temDados(dl))_useDoc(dl,true);else _useDoc(d,false);}).catch(function(){_useDoc(d,false);});
+        if(legacy===did){ if(_temDados(d))_setCache(d); else _vazio(); return; }
+        _db.collection('ls_pe').doc(legacy).get().then(function(sl){
+          var dl=sl.exists?sl.data():null;
+          if(!_temDados(d)&&!_temDados(dl)){ _vazio(); return; }
+          d=d||{}; dl=dl||{};
+          var merged={
+            estoque:(Object.keys(d.estoque||{}).length?d.estoque:(dl.estoque||{})),
+            produzindo:(Object.keys(d.produzindo||{}).length?d.produzindo:(dl.produzindo||{})),
+            meta:(Object.keys(d.meta||{}).length?d.meta:(dl.meta||{})),
+            ordens:((Array.isArray(d.ordens)&&d.ordens.length)?d.ordens:(Array.isArray(dl.ordens)?dl.ordens:((dl.estoque||dl.meta||dl.pedido)?_peMigraOrdens(dl):[]))),
+            historico:((d.historico&&d.historico.length)?d.historico:(dl.historico||[])),
+            atualizadoEm:d.atualizadoEm||dl.atualizadoEm||0,publicadoEm:d.publicadoEm||dl.publicadoEm||0,lorettoEm:d.lorettoEm||dl.lorettoEm||0,lorettoPor:d.lorettoPor||dl.lorettoPor||''
+          };
+          _setCache(merged);
+          if(_db&&_temDados(dl)){try{_db.collection('ls_pe').doc(did).set({estoque:merged.estoque,produzindo:merged.produzindo,meta:merged.meta,ordens:merged.ordens,atualizadoEm:merged.atualizadoEm,lorettoEm:merged.lorettoEm,lorettoPor:merged.lorettoPor},{merge:true});}catch(e){}}
+        }).catch(function(){ if(_temDados(d))_setCache(d); else _vazio(); });
       }).catch(function(){});
       _db.collection('ls_pe_fotos').doc(did).get().then(function(s3){_peFotos[f.fid]=(s3.exists&&s3.data()&&s3.data().fotos)||{};peRender();}).catch(function(){});
     });
