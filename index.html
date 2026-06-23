@@ -2803,7 +2803,7 @@ let _pePedidoCache={};
 let _peFotos={};
 function peGenToken(){return Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6);}
 function peToken(fid){if(!_peTokens[fid]){_peTokens[fid]=peGenToken();try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens))}catch(e){};if(_db)_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens},{merge:true}).catch(function(){});}return _peTokens[fid];}
-function peDocId(fid){return fid+'_'+peToken(fid);}
+function peDocId(fid){return String(fid||'').trim().replace(/[^a-zA-Z0-9_-]/g,'_')||'_';}
 function peLink(fid){return PE_BASE+'?f='+encodeURIComponent(fid)+'&k='+encodeURIComponent(peToken(fid));}
 function peLinkApp(fid){var base=(location.origin||'')+location.pathname;return base+'?fabrica='+encodeURIComponent(fid)+'&chave='+encodeURIComponent(peToken(fid));}
 function peAcessoDe(fid){var a=_peAcesso[fid];if(!a)return {usuario:'',senha:''};if(Array.isArray(a))return {usuario:(a[0]&&(a[0].nome||a[0]))||'',senha:''};return {usuario:a.usuario||'',senha:a.senha||''};}
@@ -3043,12 +3043,19 @@ function peCarregarEstoques(){
   }).catch(function(){}).then(function(){
     peFabricas().forEach(f=>{
       const did=peDocId(f.fid);
-      _db.collection('ls_pe').doc(did).get().then(function(s2){
-        const d=s2.exists?s2.data():null;
-        if(d){var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);var t=peTotaisOrdens(ordens);_peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};}
+      const legacy=f.fid+'_'+peToken(f.fid);
+      function _useDoc(d,fromLegacy){
+        if(d){var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);var t=peTotaisOrdens(ordens);_peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};
+          if(fromLegacy&&_db){try{_db.collection('ls_pe').doc(did).set(d,{merge:true});}catch(e){}}}
         else if(PE_PREVIA[f.fid])_peEstoqueCache[f.fid]=_peSeed(f.fid);
         else _peEstoqueCache[f.fid]={estoque:{},produzindo:{},pedido:{},ordens:[],meta:{},historico:[],atualizadoEm:0,publicadoEm:0,lorettoEm:0,lorettoPor:''};
         peRender();
+      }
+      function _temDados(x){return x&&((Object.keys(x.estoque||{}).length)||((x.ordens||[]).length)||(Object.keys(x.meta||{}).length)||(Object.keys(x.produzindo||{}).length));}
+      _db.collection('ls_pe').doc(did).get().then(function(s2){
+        var d=s2.exists?s2.data():null;
+        if(_temDados(d)||legacy===did){_useDoc(d,false);return;}
+        _db.collection('ls_pe').doc(legacy).get().then(function(sl){var dl=sl.exists?sl.data():null;if(_temDados(dl))_useDoc(dl,true);else _useDoc(d,false);}).catch(function(){_useDoc(d,false);});
       }).catch(function(){});
       _db.collection('ls_pe_fotos').doc(did).get().then(function(s3){_peFotos[f.fid]=(s3.exists&&s3.data()&&s3.data().fotos)||{};peRender();}).catch(function(){});
     });
