@@ -2195,7 +2195,7 @@ function conectarSync(){
         if(d.lorettoEm||d.lorettoPor){repCfgStamp={por:d.lorettoPor||'?',em:d.lorettoEm||d.ts||0};try{localStorage.setItem('loretto_rep_cfg_stamp',JSON.stringify(repCfgStamp));}catch(e){}}
         try{localStorage.setItem('loretto_rep_cfg',JSON.stringify(repCfg));localStorage.setItem('loretto_rep_forn',JSON.stringify(repForn||{}));localStorage.setItem('loretto_rep_custo',JSON.stringify(repCusto||{}));localStorage.setItem('loretto_rep_forn_report',JSON.stringify(repFornReport||{}));if(repInfo)localStorage.setItem('loretto_rep_info',JSON.stringify(repInfo));localStorage.setItem('loretto_rep_catalogo',JSON.stringify(repCatalogo||[]));localStorage.setItem('loretto_rep_estoque',JSON.stringify(repEstoque||{}));localStorage.setItem('loretto_rep_cfg_ts',String(repCfgTs));}catch(e){}
         if(typeof repRender==='function'&&$('tab-reposicao')&&!$('tab-reposicao').classList.contains('hide'))repRender();
-        if(typeof peRender==='function'&&$('tab-pronta')&&!$('tab-pronta').classList.contains('hide'))peRender();
+        if(typeof peRender==='function'&&$('tab-pronta')&&!$('tab-pronta').classList.contains('hide'))peRender();if(MODO_FABRICA&&typeof renderModoFabrica==='function')renderModoFabrica(MODO_FABRICA);
       },function(){});
       _rcRef.get().then(function(snp){var d=snp.exists?snp.data():null;if(!d||((d.ts||0)<repCfgTs))repPushCfg();}).catch(function(){});
       _rfRef=_db.collection('ls_rep_fotos').doc('loja');
@@ -2207,7 +2207,7 @@ function conectarSync(){
         repFotos=d.fotos; repFotosTs=d.ts||Date.now();
         try{localStorage.setItem('loretto_rep_fotos',JSON.stringify(repFotos));localStorage.setItem('loretto_rep_fotos_ts',String(repFotosTs));}catch(e){}
         if(typeof repSub!=='undefined'&&repSub==='modelos'&&typeof repRenderModelos==='function')repRenderModelos();
-        if(typeof peRender==='function'&&$('tab-pronta')&&!$('tab-pronta').classList.contains('hide'))peRender();
+        if(typeof peRender==='function'&&$('tab-pronta')&&!$('tab-pronta').classList.contains('hide'))peRender();if(MODO_FABRICA&&typeof renderModoFabrica==='function')renderModoFabrica(MODO_FABRICA);
       },function(){});
       _rfRef.get().then(function(snp){var d=snp.exists?snp.data():null;if(!d||((d.ts||0)<repFotosTs))repPushFotos();}).catch(function(){});
     }catch(e){setSyncStatus('err',e.message);}
@@ -2446,7 +2446,7 @@ function relatorioFabHtml(f,lista,sep){
   const probTop=Object.keys(probs).sort((a,b)=>probs[b]-probs[a]);
   const ord=lista.slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
   return `<div${sep?' style="page-break-after:always"':''}><h1 class="rp2-h1">Defeitos &middot; ${escapeHtml(f)}</h1>`+
-    `<p class="rp2-tot">${tot} par(es) &middot; ${brMoney(totv)} em prejuizo</p>`+
+    `<p class="rp2-tot">${tot} par(es) &middot; ${brMoney(totv)} em cr&eacute;dito</p>`+
     `<h2 class="rp2-h2">Principais problemas</h2><ol class="rp2-ol">${probTop.map(p=>`<li>${escapeHtml(p)} <b>(${probs[p]})</b></li>`).join('')}</ol>`+
     `<h2 class="rp2-h2">Itens (tempo parado)</h2><table class="rp2-grade" style="width:100%"><thead><tr><th style="text-align:left">Modelo</th><th style="text-align:left">Defeito</th><th>Entrada</th><th>Parado</th><th>Custo</th></tr></thead><tbody>${ord.map(d=>`<tr><td style="text-align:left">${escapeHtml(d.nome)}${d.cor?' '+escapeHtml(d.cor):''}</td><td style="text-align:left">${escapeHtml(d.desc||'-')}</td><td>${fmtData(d.ts)}</td><td>${tempoParado(d.ts)}</td><td>${brMoney(avCustoDefeito(d))}</td></tr>`).join('')}</tbody></table></div>`;
 }
@@ -2849,8 +2849,11 @@ function iniciarModoFabrica(fid,chave){
   setTimeout(function(){renderModoFabrica(fid);},1200);
 }
 function peFabEntrar(fid){
-  var el=document.getElementById('fabSenha');var s=((el&&el.value)||'').trim();var ac=peAcessoDe(fid);
-  if(ac.senha&&s!==ac.senha){toast('Senha incorreta');return;}
+  var ac=peAcessoDe(fid);
+  var su=((document.getElementById('fabUser')||{}).value||'').trim();
+  var ss=((document.getElementById('fabSenha')||{}).value||'').trim();
+  if(ac.usuario&&su!==ac.usuario){toast('Usuário ou senha incorretos');return;}
+  if(ac.senha&&ss!==ac.senha){toast('Usuário ou senha incorretos');return;}
   _MODO_FAB_OK=true;try{sessionStorage.setItem('fab_ok_'+fid,'1');}catch(e){}
   renderModoFabrica(fid);
 }
@@ -2862,8 +2865,9 @@ function renderModoFabrica(fid){
     host.innerHTML='<div class="fab-wrap"><div class="fab-card"><div class="fab-titulo">Loretto Scarpa</div><div class="fab-erro">Link inválido ou expirado. Peça um novo link à Loretto Scarpa.</div></div></div>';return;
   }
   var ac=peAcessoDe(fid);
-  if(ac.senha&&!_MODO_FAB_OK){
-    host.innerHTML='<div class="fab-wrap"><div class="fab-card fab-login"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · acesso da fábrica</div><input id="fabSenha" type="password" placeholder="Senha" onkeydown="if(event.key===\'Enter\')peFabEntrar(\''+fid+'\')"><button class="btn btn-ouro" onclick="peFabEntrar(\''+fid+'\')">Entrar</button></div></div>';return;
+  if(!_MODO_FAB_OK){
+    if(!ac.usuario&&!ac.senha){host.innerHTML='<div class="fab-wrap"><div class="fab-card fab-login"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · acesso da fábrica</div><div class="fab-erro">Acesso ainda não liberado pela loja. Peça o login (usuário e senha) à Loretto Scarpa.</div></div></div>';return;}
+    host.innerHTML='<div class="fab-wrap"><div class="fab-card fab-login"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · acesso da fábrica</div>'+(ac.usuario?'<input id="fabUser" placeholder="Usuário" autocomplete="username" onkeydown="if(event.key===\'Enter\')peFabEntrar(\''+fid+'\')">':'')+'<input id="fabSenha" type="password" placeholder="Senha" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')peFabEntrar(\''+fid+'\')"><button class="btn btn-ouro" onclick="peFabEntrar(\''+fid+'\')">Entrar</button></div></div>';return;
   }
   var cache=_peEstoqueCache[fid]||{};var est=cache.estoque||{},prod=cache.produzindo||{},meta=cache.meta||{},ped=cache.pedido||{};
   var mods=(typeof peModelosDaFabrica==='function')?peModelosDaFabrica(fid):[];
@@ -2897,8 +2901,8 @@ function renderModoFabrica(fid){
     '<div class="fab-rodape">Loretto Scarpa</div></div>';
 }
 function peFabSalvar(fid){
-  var est={},prod={};
-  document.querySelectorAll('#fabricaMode input[data-fk]').forEach(function(i){var k=i.getAttribute('data-fk');var q=parseInt(i.value)||0;if(q>0){if(i.getAttribute('data-tp')==='e')est[k]=q;else prod[k]=q;}});
+  var _c=_peEstoqueCache[fid]||{};var est=Object.assign({},_c.estoque||{}),prod=Object.assign({},_c.produzindo||{});
+  document.querySelectorAll('#fabricaMode input[data-fk]').forEach(function(i){var k=i.getAttribute('data-fk');var q=parseInt(i.value)||0;var tgt=(i.getAttribute('data-tp')==='e')?est:prod;if(q>0)tgt[k]=q;else delete tgt[k];});
   var did=peDocId(fid);var quem=(peAcessoDe(fid).usuario)||'Fábrica';
   function aplica(exists){
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].atualizadoEm=Date.now();}
@@ -3035,6 +3039,7 @@ function peCarregarEstoques(){
   _db.collection('ls_pe_config').doc('loja').get().then(function(cs){if(cs.exists&&cs.data()&&typeof cs.data().critPct==='number')PE_CRIT_PCT=cs.data().critPct;peRender();}).catch(function(){});
   _db.collection('ls_pe_tokens').doc('loja').get().then(function(snp){
     if(snp.exists&&snp.data()){var _td=snp.data();if(_td.tokens){_peTokens=Object.assign({},_peTokens,_td.tokens);try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens))}catch(e){};}if(_td.pessoas){_peAcesso=_td.pessoas;try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso))}catch(e){};}if(_td.fornModelos){peFornModelos=_td.fornModelos;try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos))}catch(e){};}}if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
+    if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&ae.getAttribute('data-fk')))renderModoFabrica(MODO_FABRICA);});}catch(e){}}
   }).catch(function(){}).then(function(){
     peFabricas().forEach(f=>{
       const did=peDocId(f.fid);
