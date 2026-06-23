@@ -2838,6 +2838,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
+var PE_FAB_VER='v3 · salva sozinho';
 function iniciarModoFabrica(fid,chave){
   MODO_FABRICA=fid;_MODO_FAB_CHAVE=chave||'';
   try{_MODO_FAB_OK=sessionStorage.getItem('fab_ok_'+fid)==='1';}catch(e){_MODO_FAB_OK=false;}
@@ -2904,7 +2905,7 @@ function renderModoFabrica(fid){
     '<div class="fab-sec"><div class="fab-sech">Em produção</div>'+prodHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">Salva sozinho &middot; preencha que salva automaticamente</span></div>':'')+'</div>'+
-    '<div class="fab-rodape">Loretto Scarpa</div></div>';
+    '<div class="fab-rodape">Loretto Scarpa · '+PE_FAB_VER+'</div></div>';
 }
 var _fabSaveTimer=null;
 function peFabStatus(st){var el=document.getElementById('fabStatus');if(!el)return;if(st==='saving'){el.textContent='Salvando…';el.className='fab-status saving';}else if(st==='err'){el.textContent='Erro ao salvar — toque em Salvar agora';el.className='fab-status err';}else{var d=new Date();el.textContent='Tudo salvo · '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);el.className='fab-status ok';}}
