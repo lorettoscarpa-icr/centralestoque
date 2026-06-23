@@ -2838,7 +2838,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v6 · mostra erro';
+var PE_FAB_VER='v7';
 function iniciarModoFabrica(fid,chave){
   MODO_FABRICA=fid;_MODO_FAB_CHAVE=chave||'';
   try{_MODO_FAB_OK=sessionStorage.getItem('fab_ok_'+fid)==='1';}catch(e){_MODO_FAB_OK=false;}
@@ -3081,7 +3081,7 @@ function peCarregarEstoques(){
           if(_db&&_temDados(dl)){try{_db.collection('ls_pe').doc(did).set({estoque:merged.estoque,produzindo:merged.produzindo,meta:merged.meta,ordens:merged.ordens,atualizadoEm:merged.atualizadoEm,lorettoEm:merged.lorettoEm,lorettoPor:merged.lorettoPor},{merge:true});}catch(e){}}
         }).catch(function(){ if(_temDados(d))_setCache(d); else _vazio(); });
       }).catch(function(){});
-      _db.collection('ls_pe_fotos').doc(did).get().then(function(s3){_peFotos[f.fid]=(s3.exists&&s3.data()&&s3.data().fotos)||{};peRender();}).catch(function(){});
+      if(!MODO_FABRICA){_db.collection('ls_pe_fotos').doc(did).get().then(function(s3){_peFotos[f.fid]=(s3.exists&&s3.data()&&s3.data().fotos)||{};peRender();}).catch(function(){});}
     });
   });
 }
