@@ -664,6 +664,21 @@
   .fab-hist{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid #7fae6b;border-radius:12px;padding:10px 12px;margin-bottom:8px}
   .fab-histh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:13px}
   .fab-hist .pe-ordit{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;color:rgba(251,249,238,.75)}
+  .fab-hist{padding:0}
+  .fab-hist>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;margin:0}
+  .fab-hist>summary::-webkit-details-marker{display:none}
+  .fab-histl{display:flex;align-items:center;gap:6px;font-size:13px}
+  .fab-histl::before{content:'\25B8';color:var(--ouro);display:inline-block;transition:transform .15s;font-size:11px}
+  .fab-hist[open]>summary .fab-histl::before{transform:rotate(90deg)}
+  .fab-histtot{color:var(--ouro);font-family:'DM Mono',monospace;font-size:12.5px;white-space:nowrap}
+  .fab-histbody{padding:2px 12px 12px}
+  .fab-hist-mais{text-align:center;color:rgba(251,249,238,.45);font-size:12px;padding:4px 0 8px}
+  .fab-sech-row{display:flex;align-items:center;justify-content:space-between}
+  .fab-enviar-top{width:auto;padding:6px 18px;font-size:13px;margin:0}
+  .fab-totalgeral{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;background:rgba(201,169,80,.1);border:1px solid var(--ouro);border-radius:12px;padding:14px 18px;color:rgba(251,249,238,.92);font-family:'DM Mono',monospace;font-size:14px;margin-bottom:18px}
+  .fab-totalgeral .fab-tgh{font-family:'Playfair Display',serif;color:var(--ouro);font-size:16px;margin-right:8px}
+  .fab-totalgeral b{color:var(--ouro)}
+  .pe-envpick.avulso{border-style:dashed}
   .fab-prod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid #d4b45a;border-radius:12px;padding:12px;margin-bottom:10px}
   .fab-prod .pe-ordit{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:rgba(251,249,238,.8)}
   .fab-prod button{margin-top:8px}
@@ -1055,6 +1070,7 @@
   .fin2-fchips{display:flex;gap:7px;flex-wrap:wrap;flex:1}
   .fin2-chip{background:rgba(0,0,0,.2);border:1px solid var(--linha);color:rgba(251,249,238,.7);padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit}
   .fin2-chip.on{background:var(--ouro);color:var(--verde-escuro);border-color:var(--ouro);font-weight:700}
+  .df-fabchips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 14px}
   .fin2-fdir{display:flex;gap:8px;flex-wrap:wrap}
   .fin2-fdir select{background:rgba(0,0,0,.25);border:1px solid var(--linha);color:var(--ouro-claro);padding:8px 12px;border-radius:8px;font-family:inherit;font-size:12.5px;cursor:pointer}
   .fin2-resumo{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -1624,6 +1640,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
       </div>
       <div class="rep-card">
         <div class="rep-card-h"><h3>Lancamentos</h3><button class="btn btn-ghost btn-sm" id="dfLimpar">Limpar tudo</button></div>
+        <div id="dfFabChips" class="df-fabchips"></div>
         <div id="dfLista" class="av-lista"></div>
       </div>
     </section>
@@ -2328,6 +2345,7 @@ document.querySelectorAll('[data-filtro]').forEach(ch=>ch.addEventListener('clic
 
 /* ---------- AVARIAS (defeitos e pé trocado) ---------- */
 let defeitos=carregar('loretto_defeitos',[]);
+let dfFabFiltro='';
 let petrocados=carregar('loretto_petrocados',[]);
 let avSub='defeito';
 function salvarDefeitos(){try{localStorage.setItem('loretto_defeitos',JSON.stringify(defeitos));}catch(e){}if(typeof syncPushAvarias==='function')syncPushAvarias();}
@@ -2371,8 +2389,19 @@ function renderDefeitos(){
   const tot=defeitos.length,totv=defeitos.reduce((s,d)=>s+avCustoDefeito(d),0);
   $('dfResumo').innerHTML=tot?(fs.map(f=>`<div class="av-forn-row"><span class="nome">${escapeHtml(f)}</span><span class="qt">${map[f].n} par(es)</span><span class="val">${brMoney(map[f].v)}</span><button class="btn btn-ghost btn-sm pdf-fab" data-fab="${escapeHtml(f)}">PDF</button></div>`).join('')+`<div class="av-forn-row" style="border-color:var(--ouro)"><span class="nome">TOTAL</span><span class="qt">${tot}</span><span class="val">${brMoney(totv)}</span></div>`):'<div class="empty">Nenhum defeito registrado.</div>';
   $('dfResumo').querySelectorAll('.pdf-fab').forEach(b=>b.onclick=()=>avPdfDefeitos(b.dataset.fab));
-  $('dfLista').innerHTML=defeitos.map((d,i)=>`<div class="av-item"><div class="ai-main"><div class="ai-t">${escapeHtml(d.nome)}${d.cor?' &middot; '+escapeHtml(d.cor):''}</div><div class="ai-s">${escapeHtml(d.fab||'-')} &middot; ${escapeHtml(d.desc||'')}${avCustoDefeito(d)?(' &middot; '+brMoney(avCustoDefeito(d))):''} &middot; <span class="tp">parado ${tempoParado(d.ts)}</span></div></div><button class="ai-ed" title="Editar" onclick="avEditarDefeito(${i})">&#9998;</button><button class="ai-du" title="Duplicar" onclick="avDuplicarDefeito(${i})">&#10697;</button><button class="ai-re" title="Reimprimir" onclick="avReimpDefeito(${i})">&#8635;</button><button class="ai-x" onclick="avDelDefeito(${i})">&times;</button></div>`).join('');
+  if(dfFabFiltro&&fs.indexOf(dfFabFiltro)<0)dfFabFiltro='';
+  if($('dfFabChips')){
+    var _ch='<button class="fin2-chip'+(dfFabFiltro===''?' on':'')+'" onclick="dfSetFab(\'\')">Todas as fábricas</button>';
+    fs.forEach(function(f){_ch+='<button class="fin2-chip'+(dfFabFiltro===f?' on':'')+'" onclick="dfSetFab(\''+f.replace(/'/g,"\\'")+'\')">'+escapeHtml(f)+' ('+map[f].n+')</button>';});
+    $('dfFabChips').innerHTML=tot?_ch:'';
+  }
+  $('dfLista').innerHTML=defeitos.map((d,i)=>{
+    const f=((d.fab||'').trim())||'Sem fabricante';
+    if(dfFabFiltro&&f!==dfFabFiltro)return '';
+    return `<div class="av-item"><div class="ai-main"><div class="ai-t">${escapeHtml(d.nome)}${d.cor?' &middot; '+escapeHtml(d.cor):''}</div><div class="ai-s">${escapeHtml(d.fab||'-')} &middot; ${escapeHtml(d.desc||'')}${avCustoDefeito(d)?(' &middot; '+brMoney(avCustoDefeito(d))):''} &middot; <span class="tp">parado ${tempoParado(d.ts)}</span></div></div><button class="ai-ed" title="Editar" onclick="avEditarDefeito(${i})">&#9998;</button><button class="ai-du" title="Duplicar" onclick="avDuplicarDefeito(${i})">&#10697;</button><button class="ai-re" title="Reimprimir" onclick="avReimpDefeito(${i})">&#8635;</button><button class="ai-x" onclick="avDelDefeito(${i})">&times;</button></div>`;
+  }).join('')||'<div class="empty">Nenhum defeito'+(dfFabFiltro?' desta fábrica':' registrado')+'.</div>';
 }
+window.dfSetFab=function(f){dfFabFiltro=f;renderDefeitos();};
 function ptComplementares(){
   const grupos={};
   petrocados.forEach(p=>{
@@ -2859,7 +2888,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v16 · envio avulso';
+var PE_FAB_VER='v17 · total geral e envio';
 function loadFirebaseFab(cb){
   loadFirebase(function(){
     if(window.firebase&&window.firebase.auth){cb();return;}
@@ -2984,17 +3013,20 @@ function renderModoFabrica(fid){
     return '<div class="fab-mod"><div class="fab-modh">'+escapeHtml(m.nome)+'</div>'+cores+resumoMod+'</div>';
   }).join(''):'<div class="fab-vazio">Nenhum modelo cadastrado ainda para a sua fábrica.</div>';
   var ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
-  var pedHTML=peds.length?peds.map(function(o){var r=_peOrdemResumo(fid,o.grade);return '<div class="fab-ped"><div class="fab-pedh"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span>'+r.tot+' pares</span></div>'+r.html+'<button class="btn sm fab-prodbtn" onclick="peColocarProducao(\''+fid+'\',\''+o.id+'\')">Colocar em produção</button></div>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
+  var pedHTML=peds.length?peds.map(function(o){var r=_peOrdemResumo(fid,o.grade);return '<div class="fab-ped"><div class="fab-pedh"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span>'+r.tot+' pares</span></div>'+r.html+'</div>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
   var prods=(cache.ordens||[]).filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||0)-(b.producaoEm||0);});
   var prodHTML=prods.length?prods.map(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;return '<div class="fab-prod"><div class="fab-pedh"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span>'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto (entra no estoque)</button></div>';}).join(''):'<div class="fab-vazio">Nada em produção.</div>';
-  var envBtn=(peds.length?'<button class="btn btn-ouro fab-enviar" onclick="peEnvioSelecionar(\''+fid+'\')">Enviar para a loja</button>':'')+'<button class="btn fab-enviar" onclick="peEnvioAvulsoAbrir(\''+fid+'\')">Enviar avulso (sem pedido)</button>';
+  var custoMap={};mods.forEach(function(m){custoMap[m.id]=m.custo||0;});
+  function envValor(g){var v=0;Object.keys(g||{}).forEach(function(k){v+=(parseInt(g[k])||0)*(custoMap[k.split('|')[0]]||0);});return v;}
+  var gE=0,gP=0,gVE=0,gVP=0;mods.forEach(function(m){var c=m.custo||0;m.cores.forEach(function(co){(co.tams||[]).forEach(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0,pz=parseInt(prod[k])||0;gE+=e;gP+=pz;gVE+=e*c;gVP+=pz*c;});});});
+  var totalGeral='<div class="fab-totalgeral"><span class="fab-tgh">Total geral</span><span>Estoque <b>'+gE+'</b> pares · <b>'+brMoney(gVE)+'</b></span><span>Produção <b>'+gP+'</b> pares · <b>'+brMoney(gVP)+'</b></span></div>';
   var envs=(cache.ordens||[]).filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});
-  var histHTML=envs.length?envs.map(function(o){var rm=_peOrdemResumo(fid,o.enviado||{});return '<div class="fab-hist"><div class="fab-histh"><b>'+fmtData(o.enviadoEm||o.criadoEm)+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+'</b><span>'+rm.tot+' pares</span></div>'+rm.html+'</div>';}).join(''):'<div class="fab-vazio">Nada enviado ainda.</div>';
+  var histHTML=envs.length?envs.slice(0,3).map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+'</div></details>';}).join('')+(envs.length>3?'<div class="fab-hist-mais">+ '+(envs.length-3)+' envios anteriores</div>':''):'<div class="fab-vazio">Nada enviado ainda.</div>';
   host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div>'+(_FAB_PERFIL?'<div class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></div>':'')+'</div>'+
-    '<div class="fab-sec"><div class="fab-sech">Pedidos da loja</div>'+pedHTML+envBtn+'</div>'+
-    '<div class="fab-sec"><div class="fab-sech">Em produção</div>'+prodHTML+'</div>'+
+    '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></div>'+pedHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">Salva sozinho &middot; preencha que salva automaticamente</span></div>':'')+'</div>'+
+    totalGeral+
     '<div class="fab-rodape">Loretto Scarpa · '+PE_FAB_VER+'</div></div>';
 }
 function peFabSair(){try{firebase.auth().signOut();}catch(e){}try{location.reload();}catch(e){}}
@@ -3379,6 +3411,7 @@ function peOrdemPronta(fid,oid){
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({ordens:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],estoque:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}},false);});
 }
 function _peOrdemResumo(fid,grade){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={},tot=0;Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');(byMC[mc]=byMC[mc]||[]).push(p[2]+'\u00d7'+q);tot+=q;});var linhas=Object.keys(byMC).map(function(mc){return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(mc)+'</span><span class="pe-ordn">'+byMC[mc].join('  ')+'</span></div>';}).join('');return {html:linhas,tot:tot};}
+function _peEnvioDetalhe(fid,grade,custoMap){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={};Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var mc=p[0]+'||'+p[1];if(!byMC[mc])byMC[mc]={mid:p[0],cor:p[1],itens:[],val:0};byMC[mc].itens.push(p[2]+'\u00d7'+q);byMC[mc].val+=q*((custoMap&&custoMap[p[0]])||0);});return Object.keys(byMC).map(function(mc){var g=byMC[mc];var _rf=(typeof repRefDe==='function')?repRefDe(g.mid,g.cor):'';var label=(nome[g.mid]||g.mid)+(g.cor?' '+g.cor:'')+(_rf?' \u00b7 ref '+_rf:'');return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(label)+'</span><span class="pe-ordn">'+g.itens.join('  ')+(g.val?'  <b>'+brMoney(g.val)+'</b>':'')+'</span></div>';}).join('');}
 function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok)ok.style.display='';_peEnvio={fid:null,oid:null,avulso:false};}
 function peEnvioSelecionar(fid){
   var cache=_peEstoqueCache[fid]||{};var peds=(cache.ordens||[]).filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
@@ -3401,6 +3434,14 @@ function peEnvioAbrir(fid,oid){
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';}).join('');
   document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Ao confirmar, baixa do estoque da pronta-entrega e vai pro romaneio da conferencia.</p>'+rows;
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.onclick=function(){peConfirmarEnvio();};}
+  document.getElementById('peEnvioModal').classList.remove('hide');
+}
+function peEnviarMenu(fid){
+  var cache=_peEstoqueCache[fid]||{};var peds=(cache.ordens||[]).filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
+  if(!peds.length){peEnvioAvulsoAbrir(fid);return;}
+  var box=document.getElementById('peEnvioBox');if(!box)return;
+  box.innerHTML='<div class="pe-modal-h">Enviar para a loja</div><p class="pe-metahint">Esse envio \u00e9 de um pedido em aberto ou avulso?</p><div class="pe-envpicks">'+peds.map(function(o){var r=_peOrdemResumo(fid,o.grade);return '<button class="pe-envpick" onclick="peEnvioAbrir(\''+fid+'\',\''+o.id+'\')"><b>Atender pedido de '+fmtData(o.criadoEm)+'</b><span>'+r.tot+' pares</span></button>';}).join('')+'<button class="pe-envpick avulso" onclick="peEnvioAvulsoAbrir(\''+fid+'\')"><b>Enviar sem pedido (avulso)</b><span>mando do meu estoque</span></button></div>';
+  var ok=document.getElementById('peEnvioOk');if(ok)ok.style.display='none';
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
 function peEnvioAvulsoAbrir(fid){
