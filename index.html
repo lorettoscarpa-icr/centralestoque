@@ -630,9 +630,13 @@
   .fab-sech{font-size:13px;color:var(--ouro);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;font-weight:600}
   .fab-mod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-radius:14px;padding:14px;margin-bottom:12px}
   .fab-modh{font-family:'Playfair Display',serif;font-size:19px;color:var(--areia);margin-bottom:8px}
-  .fab-cor{border-top:1px solid var(--linha);padding-top:10px;margin-top:10px}
+  .fab-cor{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;border-top:1px solid var(--linha);padding-top:16px;margin-top:16px}
   .fab-cor:first-of-type{border-top:none;margin-top:0;padding-top:0}
-  .fab-corh{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .fab-cor-foto{flex:0 0 240px;width:240px;max-width:100%}
+  .fab-cor-foto img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;border:1px solid var(--linha);display:block}
+  .fab-cor-foto .fab-noimg{width:100%;height:170px;border-radius:12px;font-size:44px}
+  .fab-cor-main{flex:1 1 360px;min-width:0}
+  .fab-corh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
   .fab-corh img{width:38px;height:38px;border-radius:8px;object-fit:cover;border:1px solid var(--linha)}
   .fab-noimg{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.2);color:rgba(220,189,96,.5)}
   .fab-corn{font-weight:600}
@@ -709,6 +713,9 @@
   .pe-stp{display:flex;flex-direction:column;gap:2px}
   .pe-stp button{width:24px;flex:1 1 0;border:1px solid var(--linha);background:rgba(220,189,96,.14);color:var(--ouro-claro);border-radius:5px;cursor:pointer;font-size:9px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center}
   .pe-stp button:hover{background:rgba(220,189,96,.3)}
+  .fab-resumo{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:'DM Mono',monospace;font-size:12.5px;color:rgba(251,249,238,.75);padding:9px 4px 4px;border-top:1px dashed var(--linha);margin-top:8px}
+  .fab-resumo b{color:var(--ouro-claro)}
+  .fab-resumo.mod{margin-top:12px;color:var(--ouro);font-size:13px;border-top:1px solid var(--linha)}
   .pe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px}
   .pe-fcard{display:flex;align-items:center;gap:13px;text-align:left;width:100%;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:14px;padding:15px;cursor:pointer;transition:.15s;color:var(--areia);font-family:'Barlow',sans-serif}
   .pe-fcard:hover{border-color:var(--ouro);background:rgba(220,189,96,.07)}
@@ -758,8 +765,8 @@
   .pe-pedempty{font-size:13px;color:var(--ouro-claro);padding:6px 0}
   .pe-voltar:hover{color:var(--ouro)}
   .pe-metai:focus{outline:none;border-color:var(--ouro)}
-  .pe-glbl.meta{color:var(--ouro-claro)}.pe-glbl.rep{color:#e08a6a}
-  .pe-gc.falta{color:#ff9b7a;font-weight:700;background:rgba(224,138,106,.16);border-radius:6px}
+  .pe-glbl.meta{color:var(--ouro-claro)}.pe-glbl.rep{color:#ff6f61}
+  .pe-gc.falta{color:#ff4d3d;font-weight:700;background:rgba(255,77,61,.18);border-radius:6px}
   .pe-gc.okmeta{color:#9bd58c}
   .pe-card.parada{border-color:rgba(224,138,106,.5)}
   .pe-badge{font-size:10px;background:rgba(224,138,106,.2);color:#ff9b7a;border:1px solid rgba(224,138,106,.5);padding:2px 7px;border-radius:999px;font-family:'Barlow',sans-serif;font-weight:600;vertical-align:middle}
@@ -2851,7 +2858,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v13 · grade ampla';
+var PE_FAB_VER='v15 · foto e layout';
 function loadFirebaseFab(cb){
   loadFirebase(function(){
     if(window.firebase&&window.firebase.auth){cb();return;}
@@ -2959,6 +2966,8 @@ function renderModoFabrica(fid){
   var modosHTML=mods.length?mods.map(function(m){
     var cores=m.cores.map(function(co){
       var tams=co.tams;
+      var _custo=m.custo||0,_totE=0,_totP=0;tams.forEach(function(t){var _k=m.id+'|'+co.nome+'|'+t;_totE+=parseInt(est[_k])||0;_totP+=parseInt(prod[_k])||0;});
+      var resumoCor='<div class="fab-resumo"><span>Estoque: <b>'+_totE+'</b> pares'+(_custo?' · '+brMoney(_totE*_custo):'')+'</span><span>Produção: <b>'+_totP+'</b> pares'+(_custo?' · '+brMoney(_totP*_custo):'')+'</span>'+(_custo?'<span>Custo/par: <b>'+brMoney(_custo)+'</b></span>':'')+'</div>';
       var cref=repRefDe(m.id,co.nome);var cfoto=repFotoDe(m.id,co.nome);
       var head='<tr><th class="pe-glbl">'+escapeHtml(co.nome)+'</th>'+tams.map(function(t){return '<th>'+escapeHtml(t)+'</th>';}).join('')+'</tr>';
       var estRow='<tr><td class="pe-glbl e">Estoque</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0;return '<td><span class="pe-step"><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="e" oninput="peFabAuto(\''+fid+'\')" onblur="peFabFlush(\''+fid+'\')" value="'+(e||'')+'"><span class="pe-stp"><button type="button" tabindex="-1" onclick="peStep(this,1,\''+fid+'\')">&#9650;</button><button type="button" tabindex="-1" onclick="peStep(this,-1,\''+fid+'\')">&#9660;</button></span></span></td>';}).join('')+'</tr>';
@@ -2967,9 +2976,11 @@ function renderModoFabrica(fid){
       var repRow='<tr><td class="pe-glbl rep">Repor</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var mv=meta[k]||0;var tem=(parseInt(est[k])||0)+(parseInt(prod[k])||0)-(parseInt(ped[k])||0);var fa=Math.max(0,mv-tem);return '<td class="pe-gc'+(fa>0?' falta':(mv?' okmeta':''))+'">'+(fa>0?'+'+fa:(mv?'ok':'\u00b7'))+'</td>';}).join('')+'</tr>';
       var refb=cref?'<span class="fab-ref">ref '+escapeHtml(cref)+'</span>':'';
       var fotob=cfoto?'<img src="'+cfoto+'">':'<span class="fab-noimg">&#128095;</span>';
-      return '<div class="fab-cor"><div class="fab-corh">'+fotob+'<span class="fab-corn">'+escapeHtml(co.nome)+'</span>'+refb+'</div><div class="pe-gtbl"><table class="pe-grade">'+head+estRow+prodRow+pedRow+repRow+'</table></div></div>';
+      return '<div class="fab-cor"><div class="fab-cor-foto">'+fotob+'</div><div class="fab-cor-main"><div class="fab-corh"><span class="fab-corn">'+escapeHtml(co.nome)+'</span>'+refb+'</div><div class="pe-gtbl"><table class="pe-grade">'+head+estRow+prodRow+pedRow+repRow+'</table></div>'+resumoCor+'</div></div>';
     }).join('');
-    return '<div class="fab-mod"><div class="fab-modh">'+escapeHtml(m.nome)+'</div>'+cores+'</div>';
+    var _mc=m.custo||0,_mE=0,_mP=0;m.cores.forEach(function(co){(co.tams||[]).forEach(function(t){var _k=m.id+'|'+co.nome+'|'+t;_mE+=parseInt(est[_k])||0;_mP+=parseInt(prod[_k])||0;});});
+    var resumoMod='<div class="fab-resumo mod"><span>Total do modelo &middot; Estoque <b>'+_mE+'</b> pares'+(_mc?' ('+brMoney(_mE*_mc)+')':'')+'</span><span>Produção <b>'+_mP+'</b> pares'+(_mc?' ('+brMoney(_mP*_mc)+')':'')+'</span>'+(_mc?'<span>Custo/par <b>'+brMoney(_mc)+'</b></span>':'')+'</div>';
+    return '<div class="fab-mod"><div class="fab-modh">'+escapeHtml(m.nome)+'</div>'+cores+resumoMod+'</div>';
   }).join(''):'<div class="fab-vazio">Nenhum modelo cadastrado ainda para a sua fábrica.</div>';
   var ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
   var pedHTML=peds.length?peds.map(function(o){var r=_peOrdemResumo(fid,o.grade);return '<div class="fab-ped"><div class="fab-pedh"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span>'+r.tot+' pares</span></div>'+r.html+'<button class="btn sm fab-prodbtn" onclick="peColocarProducao(\''+fid+'\',\''+o.id+'\')">Colocar em produção</button></div>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
