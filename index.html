@@ -679,6 +679,18 @@
   .fab-totalgeral .fab-tgh{font-family:'Playfair Display',serif;color:var(--ouro);font-size:16px;margin-right:8px}
   .fab-totalgeral b{color:var(--ouro)}
   .pe-envpick.avulso{border-style:dashed}
+  .fab-sech-btns{display:flex;gap:8px}
+  .fab-prod-top{width:auto;padding:6px 16px;font-size:13px;margin:0}
+  .fab-lote{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid var(--ouro);border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:13px;color:rgba(251,249,238,.85)}
+  .fab-lote.pronto{border-left-color:#9bd58c}
+  .fab-lote.pronto span{color:#9bd58c}
+  .pe-prazo{display:flex;align-items:center;gap:10px;background:rgba(201,169,80,.1);border:1px solid var(--linha);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+  .pe-prazo input{width:64px;padding:8px;text-align:center;background:rgba(0,0,0,.25);border:1px solid var(--linha);color:var(--areia);border-radius:8px;font-family:'DM Mono',monospace}
+  .pe-romaneio{margin-top:16px;padding-top:14px;border-top:1px dashed var(--linha)}
+  .pe-romlbl{display:block;font-size:13px;color:var(--ouro);margin-bottom:8px}
+  .pe-romaneio input[type=file]{font-size:13px;color:var(--areia)}
+  .pe-rommsg{margin-top:6px;font-size:12px;color:#9bd58c;min-height:14px}
+  .fab-romlink{margin-top:8px;background:rgba(201,169,80,.14);border:1px solid var(--ouro);color:var(--ouro);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}
   .fab-prod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid #d4b45a;border-radius:12px;padding:12px;margin-bottom:10px}
   .fab-prod .pe-ordit{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:rgba(251,249,238,.8)}
   .fab-prod button{margin-top:8px}
@@ -782,7 +794,7 @@
   .pe-voltar:hover{color:var(--ouro)}
   .pe-metai:focus{outline:none;border-color:var(--ouro)}
   .pe-glbl.meta{color:var(--ouro-claro)}.pe-glbl.rep{color:#ff6f61}
-  .pe-gc.falta{color:#ff4d3d;font-weight:700;background:rgba(255,77,61,.18);border-radius:6px}
+  .pe-gc.falta{color:#ff3b2f;font-weight:800;opacity:1;background:rgba(255,45,35,.34);border-radius:6px;text-shadow:0 0 1px rgba(255,59,47,.5)}
   .pe-gc.okmeta{color:#9bd58c}
   .pe-card.parada{border-color:rgba(224,138,106,.5)}
   .pe-badge{font-size:10px;background:rgba(224,138,106,.2);color:#ff9b7a;border:1px solid rgba(224,138,106,.5);padding:2px 7px;border-radius:999px;font-family:'Barlow',sans-serif;font-weight:600;vertical-align:middle}
@@ -2888,7 +2900,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v17 · total geral e envio';
+var PE_FAB_VER='v18 · produzir e romaneio';
 function loadFirebaseFab(cb){
   loadFirebase(function(){
     if(window.firebase&&window.firebase.auth){cb();return;}
@@ -2999,7 +3011,7 @@ function renderModoFabrica(fid){
       var _custo=m.custo||0,_totE=0,_totP=0;tams.forEach(function(t){var _k=m.id+'|'+co.nome+'|'+t;_totE+=parseInt(est[_k])||0;_totP+=parseInt(prod[_k])||0;});
       var resumoCor='<div class="fab-resumo"><span>Estoque: <b>'+_totE+'</b> pares'+(_custo?' · '+brMoney(_totE*_custo):'')+'</span><span>Produção: <b>'+_totP+'</b> pares'+(_custo?' · '+brMoney(_totP*_custo):'')+'</span>'+(_custo?'<span>Custo/par: <b>'+brMoney(_custo)+'</b></span>':'')+'</div>';
       var cref=repRefDe(m.id,co.nome);var cfoto=repFotoDe(m.id,co.nome);
-      var head='<tr><th class="pe-glbl">'+escapeHtml(co.nome)+'</th>'+tams.map(function(t){return '<th>'+escapeHtml(t)+'</th>';}).join('')+'</tr>';
+      var head='<tr><th class="pe-glbl"></th>'+tams.map(function(t){return '<th>'+escapeHtml(t)+'</th>';}).join('')+'</tr>';
       var estRow='<tr><td class="pe-glbl e">Estoque</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0;return '<td><span class="pe-step"><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="e" oninput="peFabAuto(\''+fid+'\')" onblur="peFabFlush(\''+fid+'\')" value="'+(e||'')+'"><span class="pe-stp"><button type="button" tabindex="-1" onclick="peStep(this,1,\''+fid+'\')">&#9650;</button><button type="button" tabindex="-1" onclick="peStep(this,-1,\''+fid+'\')">&#9660;</button></span></span></td>';}).join('')+'</tr>';
       var prodRow='<tr><td class="pe-glbl p">Produzindo</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var pz=parseInt(prod[k])||0;return '<td><span class="pe-step"><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="p" oninput="peFabAuto(\''+fid+'\')" onblur="peFabFlush(\''+fid+'\')" value="'+(pz||'')+'"><span class="pe-stp"><button type="button" tabindex="-1" onclick="peStep(this,1,\''+fid+'\')">&#9650;</button><button type="button" tabindex="-1" onclick="peStep(this,-1,\''+fid+'\')">&#9660;</button></span></span></td>';}).join('')+'</tr>';
       var pedRow='<tr><td class="pe-glbl pe">Pedido</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var pd=parseInt(ped[k])||0;return '<td class="pe-gc'+(pd>0?' tem pe':'')+'">'+(pd||'\u00b7')+'</td>';}).join('')+'</tr>';
@@ -3020,13 +3032,16 @@ function renderModoFabrica(fid){
   function envValor(g){var v=0;Object.keys(g||{}).forEach(function(k){v+=(parseInt(g[k])||0)*(custoMap[k.split('|')[0]]||0);});return v;}
   var gE=0,gP=0,gVE=0,gVP=0;mods.forEach(function(m){var c=m.custo||0;m.cores.forEach(function(co){(co.tams||[]).forEach(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0,pz=parseInt(prod[k])||0;gE+=e;gP+=pz;gVE+=e*c;gVP+=pz*c;});});});
   var totalGeral='<div class="fab-totalgeral"><span class="fab-tgh">Total geral</span><span>Estoque <b>'+gE+'</b> pares · <b>'+brMoney(gVE)+'</b></span><span>Produção <b>'+gP+'</b> pares · <b>'+brMoney(gVP)+'</b></span></div>';
+  var lotesP=(cache.lotesProducao||[]).filter(function(l){return l&&!l.aplicado;}).sort(function(a,b){return (a.prontoEm||0)-(b.prontoEm||0);});
+  var lotesHTML=lotesP.length?('<div class="fab-sec"><div class="fab-sech">Produção a caminho</div>'+lotesP.map(function(l){var tot=0;Object.keys(l.grade||{}).forEach(function(k){tot+=parseInt(l.grade[k])||0;});var atras=(l.prontoEm||0)<=Date.now();return '<div class="fab-lote'+(atras?' pronto':'')+'"><b>'+tot+' pares</b><span>'+(atras?'pronto · entrando no estoque':'fica pronto em '+fmtData(l.prontoEm))+'</span></div>';}).join('')+'</div>'):'';
   var envs=(cache.ordens||[]).filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});
-  var histHTML=envs.length?envs.slice(0,3).map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+'</div></details>';}).join('')+(envs.length>3?'<div class="fab-hist-mais">+ '+(envs.length-3)+' envios anteriores</div>':''):'<div class="fab-vazio">Nada enviado ainda.</div>';
+  var histHTML=envs.length?envs.slice(0,3).map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+(o.romaneio?'<button class="fab-romlink" onclick="event.stopPropagation();peVerRomaneio(\''+o.romaneio.ref+'\')">&#128206; ver romaneio'+(o.romaneio.nome?' ('+escapeHtml(o.romaneio.nome)+')':'')+'</button>':'')+'</div></details>';}).join('')+(envs.length>3?'<div class="fab-hist-mais">+ '+(envs.length-3)+' envios anteriores</div>':''):'<div class="fab-vazio">Nada enviado ainda.</div>';
   host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div>'+(_FAB_PERFIL?'<div class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></div>':'')+'</div>'+
-    '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></div>'+pedHTML+'</div>'+
+    '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><span class="fab-sech-btns"><button class="btn fab-prod-top" onclick="peProduzirAbrir(\''+fid+'\')">Produzir</button><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></span></div>'+pedHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">Salva sozinho &middot; preencha que salva automaticamente</span></div>':'')+'</div>'+
     totalGeral+
+    lotesHTML+
     '<div class="fab-rodape">Loretto Scarpa · '+PE_FAB_VER+'</div></div>';
 }
 function peFabSair(){try{firebase.auth().signOut();}catch(e){}try{location.reload();}catch(e){}}
@@ -3165,7 +3180,7 @@ function peCarregarEstoques(){
     try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens));localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}
     if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_peAcesso,fornModelos:peFornModelos},{merge:true});}catch(e){}}
     if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
-    if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&ae.getAttribute('data-fk')))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}}
+    if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',lotesProducao:(d&&d.lotesProducao)||[],_previa:false};peAplicarLotesProntos(MODO_FABRICA);var ae=document.activeElement;if(!(ae&&ae.getAttribute&&ae.getAttribute('data-fk')))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}}
   }).catch(function(){}).then(function(){
     peFabricas().filter(function(f){return !MODO_FABRICA||f.fid===MODO_FABRICA;}).forEach(f=>{
       const did=peDocId(f.fid);
@@ -3412,7 +3427,22 @@ function peOrdemPronta(fid,oid){
 }
 function _peOrdemResumo(fid,grade){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={},tot=0;Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');(byMC[mc]=byMC[mc]||[]).push(p[2]+'\u00d7'+q);tot+=q;});var linhas=Object.keys(byMC).map(function(mc){return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(mc)+'</span><span class="pe-ordn">'+byMC[mc].join('  ')+'</span></div>';}).join('');return {html:linhas,tot:tot};}
 function _peEnvioDetalhe(fid,grade,custoMap){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={};Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var mc=p[0]+'||'+p[1];if(!byMC[mc])byMC[mc]={mid:p[0],cor:p[1],itens:[],val:0};byMC[mc].itens.push(p[2]+'\u00d7'+q);byMC[mc].val+=q*((custoMap&&custoMap[p[0]])||0);});return Object.keys(byMC).map(function(mc){var g=byMC[mc];var _rf=(typeof repRefDe==='function')?repRefDe(g.mid,g.cor):'';var label=(nome[g.mid]||g.mid)+(g.cor?' '+g.cor:'')+(_rf?' \u00b7 ref '+_rf:'');return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(label)+'</span><span class="pe-ordn">'+g.itens.join('  ')+(g.val?'  <b>'+brMoney(g.val)+'</b>':'')+'</span></div>';}).join('');}
-function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok)ok.style.display='';_peEnvio={fid:null,oid:null,avulso:false};}
+var _peEnvioRomaneio=null;
+function peLerArquivo(file,cb){
+  if(!file){cb(null);return;}
+  if((file.type||'').indexOf('image')===0){
+    var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var mx=1400,w=img.width,h=img.height;if(w>mx||h>mx){if(w>h){h=Math.round(h*mx/w);w=mx;}else{w=Math.round(w*mx/h);h=mx;}}var cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);cb({tipo:'img',nome:file.name||'foto.jpg',data:cv.toDataURL('image/jpeg',0.7)});};img.onerror=function(){cb(null);};img.src=rd.result;};rd.onerror=function(){cb(null);};rd.readAsDataURL(file);
+  }else{
+    var rd2=new FileReader();rd2.onload=function(){cb({tipo:'pdf',nome:file.name||'romaneio.pdf',data:rd2.result});};rd2.onerror=function(){cb(null);};rd2.readAsDataURL(file);
+  }
+}
+function peRomaneioCampo(){
+  var has=_peEnvioRomaneio?('\u2713 '+escapeHtml(_peEnvioRomaneio.nome)):'';
+  return '<div class="pe-romaneio"><label class="pe-romlbl">&#128206; Romaneio (PDF ou foto) &mdash; opcional</label><input type="file" id="peRomFile" accept="image/*,application/pdf" onchange="peRomSelect(this)"><div id="peRomMsg" class="pe-rommsg">'+has+'</div></div>';
+}
+window.peRomSelect=function(inp){var f=inp&&inp.files&&inp.files[0];var msg=document.getElementById('peRomMsg');if(!f){_peEnvioRomaneio=null;if(msg)msg.textContent='';return;}if(msg)msg.textContent='Carregando...';peLerArquivo(f,function(r){if(!r){if(msg)msg.textContent='N\u00e3o consegui ler o arquivo';return;}if(r.data.length>900000){_peEnvioRomaneio=null;if(msg)msg.textContent='Arquivo muito grande. Use foto menor ou PDF mais leve.';return;}_peEnvioRomaneio=r;if(msg)msg.textContent='\u2713 '+r.nome;});};
+window.peVerRomaneio=function(ref){if(!_db){toast('Sem conex\u00e3o');return;}_db.collection('ls_pe_romaneios').doc(ref).get().then(function(s){if(!s.exists){toast('Romaneio n\u00e3o encontrado');return;}var d=s.data();var w=window.open('','_blank');if(!w){toast('Permita pop-up para ver o romaneio');return;}if(d.tipo==='img'){w.document.write('<title>'+(d.nome||'Romaneio')+'</title><img src="'+d.data+'" style="max-width:100%">');}else{w.document.write('<title>'+(d.nome||'Romaneio')+'</title><iframe src="'+d.data+'" style="border:0;width:100%;height:100vh"></iframe>');}w.document.close();}).catch(function(){toast('Erro ao abrir romaneio');});};
+function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';}_peEnvio={fid:null,oid:null,avulso:false};_peEnvioRomaneio=null;}
 function peEnvioSelecionar(fid){
   var cache=_peEstoqueCache[fid]||{};var peds=(cache.ordens||[]).filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
   if(!peds.length){toast('Nenhum pedido da loja para enviar');return;}
@@ -3432,9 +3462,62 @@ function peEnvioAbrir(fid,oid){
   var rows=Object.keys(groups).map(function(g){var p=g.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');
     var cells=groups[g].sort(function(a,b){return parseFloat(a.tam)-parseFloat(b.tam);}).map(function(c){var sk=p[0]+'|'+p[1]+'|'+c.tam;var emEst=parseInt(est[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(c.tam)+'</label><div class="pe-envped">pediu '+c.ped+'</div><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value="'+c.ped+'"><div class="pe-envest">tem '+emEst+'</div></div>';}).join('');
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';}).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Ao confirmar, baixa do estoque da pronta-entrega e vai pro romaneio da conferencia.</p>'+rows;
-  var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.onclick=function(){peConfirmarEnvio();};}
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Ao confirmar, baixa do estoque da pronta-entrega e vai pro romaneio da conferencia.</p>'+rows+peRomaneioCampo();
+  var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';ok.onclick=function(){peConfirmarEnvio();};}
   document.getElementById('peEnvioModal').classList.remove('hide');
+}
+function peProduzirAbrir(fid){
+  _peEnvio={fid:fid,oid:null,avulso:false,produzir:true};
+  var cache=_peEstoqueCache[fid]||{};var prod=cache.produzindo||{};
+  var mods=peModelosDaFabrica(fid);if(!mods.length){toast('Nenhum modelo cadastrado ainda');return;}
+  var rows=mods.map(function(m){return m.cores.map(function(co){
+    var _rf=(typeof repRefDe==='function')?repRefDe(m.id,co.nome):'';
+    var mc=m.nome+(co.nome?' '+co.nome:'')+(_rf?' \u00b7 ref '+_rf:'');
+    var cells=co.tams.slice().sort(function(a,b){return parseFloat(a)-parseFloat(b);}).map(function(t){var sk=m.id+'|'+co.nome+'|'+t;var jp=parseInt(prod[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(t)+'</label><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value=""><div class="pe-envest">produz '+jp+'</div></div>';}).join('');
+    return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
+  }).join('');}).join('');
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Colocar em produ\u00e7\u00e3o</div><p class="pe-metahint">Quanto vai produzir de cada numera\u00e7\u00e3o. Entra no <b>Produzindo</b> e passa pro estoque sozinho quando ficar pronto.</p><div class="pe-prazo"><label>Fica pronto em</label><input type="number" min="0" inputmode="numeric" id="peProdDias" value="7"><span>dias</span></div>'+rows;
+  var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar produção';ok.onclick=function(){peConfirmarProduzir(fid);};}
+  document.getElementById('peEnvioModal').classList.remove('hide');
+}
+function peConfirmarProduzir(fid){
+  var grade={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)grade[i.getAttribute('data-k')]=q;});
+  if(!Object.keys(grade).length){toast('Informe a grade de produção');return;}
+  var dias=parseInt((document.getElementById('peProdDias')||{}).value)||0;
+  var prontoEm=Date.now()+dias*86400000;
+  var did=peDocId(fid);var quem=_FAB_PERFIL||_FAB_EMAIL||'Fábrica';
+  function aplica(d,exists){
+    var prod=Object.assign({},(d&&d.produzindo)||((_peEstoqueCache[fid]&&_peEstoqueCache[fid].produzindo)||{}));
+    Object.keys(grade).forEach(function(k){prod[k]=(parseInt(prod[k])||0)+grade[k];});
+    var lotes=(d&&Array.isArray(d.lotesProducao))?d.lotesProducao.slice():(((_peEstoqueCache[fid]&&_peEstoqueCache[fid].lotesProducao)||[]).slice());
+    lotes.push({id:'lp'+Date.now(),grade:grade,dias:dias,criadoEm:Date.now(),prontoEm:prontoEm,por:quem,aplicado:false});
+    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].lotesProducao=lotes;}
+    var payload={produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now(),lorettoPor:quem};
+    if(!_db){renderModoFabrica(fid);toast('Produção registrada');return;}
+    var ref=_db.collection('ls_pe').doc(did);
+    (exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Produção registrada');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+  }
+  if(!_db){aplica({},false);peEnvioFechar();return;}
+  _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({},false);});
+  peEnvioFechar();
+}
+function peAplicarLotesProntos(fid){
+  var c=_peEstoqueCache[fid];if(!c)return;
+  var lotes=c.lotesProducao||[];
+  var pend=lotes.filter(function(l){return l&&!l.aplicado&&(l.prontoEm||0)<=Date.now();});
+  if(!pend.length)return;
+  var did=peDocId(fid);
+  function move(d){
+    var est=Object.assign({},(d&&d.estoque)||c.estoque||{});
+    var prod=Object.assign({},(d&&d.produzindo)||c.produzindo||{});
+    var ls=((d&&Array.isArray(d.lotesProducao))?d.lotesProducao:lotes).map(function(x){return Object.assign({},x);});
+    ls.forEach(function(l){if(l.aplicado||(l.prontoEm||0)>Date.now())return;Object.keys(l.grade||{}).forEach(function(k){var q=parseInt(l.grade[k])||0;if(q<=0)return;est[k]=(parseInt(est[k])||0)+q;prod[k]=Math.max(0,(parseInt(prod[k])||0)-q);if(!prod[k])delete prod[k];});l.aplicado=true;l.aplicadoEm=Date.now();});
+    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].lotesProducao=ls;}
+    return {estoque:est,produzindo:prod,lotesProducao:ls};
+  }
+  if(!_db){move(null);renderModoFabrica(fid);return;}
+  var ref=_db.collection('ls_pe').doc(did);
+  ref.get().then(function(s){var p=move(s.exists?s.data():{});var pl={estoque:p.estoque,produzindo:p.produzindo,lotesProducao:p.lotesProducao,atualizadoEm:Date.now(),lorettoEm:Date.now()};return s.exists?ref.update(pl):ref.set(pl,{merge:true});}).catch(function(){});
 }
 function peEnviarMenu(fid){
   var cache=_peEstoqueCache[fid]||{};var peds=(cache.ordens||[]).filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
@@ -3457,8 +3540,8 @@ function peEnvioAvulsoAbrir(fid){
       return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
     }).join('');
   }).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Enviar avulso (sem pedido)</div><p class="pe-metahint">Preencha quanto voc\u00ea est\u00e1 mandando de cada numera\u00e7\u00e3o. Baixa do seu estoque e vai pro recebimento da loja.</p>'+rows;
-  var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.onclick=function(){peConfirmarEnvio();};}
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Enviar avulso (sem pedido)</div><p class="pe-metahint">Preencha quanto voc\u00ea est\u00e1 mandando de cada numera\u00e7\u00e3o. Baixa do seu estoque e vai pro recebimento da loja.</p>'+rows+peRomaneioCampo();
+  var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';ok.onclick=function(){peConfirmarEnvio();};}
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
 function peEscreveRomaneio(repoId,sent){
@@ -3471,6 +3554,7 @@ function peConfirmarEnvio(){
   var fid=_peEnvio.fid,oid=_peEnvio.oid;if(!fid)return;
   var sent={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)sent[i.getAttribute('data-k')]=q;});
   if(!Object.keys(sent).length){toast('Informe o que foi enviado');return;}
+  var _rom=_peEnvioRomaneio;
   var did=peDocId(fid);
   function aplica(d,exists){
     var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);ordens=ordens.map(function(o){return Object.assign({},o);});
@@ -3480,6 +3564,7 @@ function peConfirmarEnvio(){
     var _quem=(typeof _FAB_PERFIL!=='undefined'&&_FAB_PERFIL)||(typeof userAtual!=='undefined'?userAtual:'')||'Fábrica';
     if(ord){ord.status='enviado';ord.enviado=sent;ord.enviadoEm=Date.now();ord.enviadoPor=_quem;repoId=ord.repoId||'';}
     else{ord={id:'av'+Date.now(),status:'enviado',avulso:true,enviado:sent,criadoEm:Date.now(),enviadoEm:Date.now(),enviadoPor:_quem};ordens.push(ord);}
+    if(_rom&&ord){var _rid='rom_'+ord.id;ord.romaneio={ref:_rid,tipo:_rom.tipo,nome:_rom.nome};if(_db){try{_db.collection('ls_pe_romaneios').doc(_rid).set({data:_rom.data,tipo:_rom.tipo,nome:_rom.nome,fid:fid,ordemId:ord.id,ts:Date.now()},{merge:true});}catch(e){}}}
     var t=peTotaisOrdens(ordens);
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].pedido=t.pedido;}
     if(repoId)peEscreveRomaneio(repoId,sent);
