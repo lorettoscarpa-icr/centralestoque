@@ -716,6 +716,7 @@
   .fab-resumo{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:'DM Mono',monospace;font-size:12.5px;color:rgba(251,249,238,.75);padding:9px 4px 4px;border-top:1px dashed var(--linha);margin-top:8px}
   .fab-resumo b{color:var(--ouro-claro)}
   .fab-resumo.mod{margin-top:12px;color:var(--ouro);font-size:13px;border-top:1px solid var(--linha)}
+  .fab-avulso{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#9bd58c;background:rgba(155,213,140,.14);border:1px solid rgba(155,213,140,.4);border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle}
   .pe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px}
   .pe-fcard{display:flex;align-items:center;gap:13px;text-align:left;width:100%;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:14px;padding:15px;cursor:pointer;transition:.15s;color:var(--areia);font-family:'Barlow',sans-serif}
   .pe-fcard:hover{border-color:var(--ouro);background:rgba(220,189,96,.07)}
@@ -2789,7 +2790,7 @@ function renderHist(){
   lst.innerHTML=repoHist.slice().reverse().map(p=>{
     const pares=p.itens.reduce((s,it)=>s+Object.values(it.grade).reduce((a,b)=>a+b,0),0);
     const linhas=p.itens.map(it=>{const tams=Object.keys(it.grade).sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0));return `${escapeHtml(it.modelo)} ${escapeHtml(it.cor)}: ${tams.map(t=>t+'x'+it.grade[t]).join(' ')}`;}).join('<br>');
-    return `<div class="hist-item ${p.status}"><div class="hist-h"><span><b>${escapeHtml(p.fornNome)}</b> &middot; ${new Date(p.data).toLocaleDateString('pt-BR')}</span><span>${p.divergente?'<span class="hist-status diverg">divergencia</span> ':''}<span class="hist-status ${p.status}">${p.status==='pendente'?'a caminho':'recebido'}</span></span></div><div class="hist-body">${linhas}<div style="margin-top:6px;color:var(--ouro)">${pares} pares${p.valor?' &middot; '+brl(p.valor):''}</div></div><div class="hist-acts">${p.status==='pendente'?`<button class="btn btn-ouro" onclick="abrirReceb('${p.id}')">Conferir chegada</button>`:`<button class="btn btn-ouro" onclick="copiarFin('${p.id}')">Copiar p/ financeiro</button><button class="btn btn-ghost" onclick="pdfFin('${p.id}')">PDF financeiro</button>${p.divergente?`<button class="btn btn-ghost" onclick="copiarDiverg('${p.id}')">Aviso p/ fábrica</button>${repForn&&repForn[p.fk]&&repForn[p.fk].whatsapp?`<button class="btn btn-ghost" onclick="abrirGrupo('${repForn[p.fk].whatsapp}')">Abrir grupo</button>`:''}`:''}`}<button class="btn btn-ghost" onclick="excluirPedido('${p.id}')">Excluir</button></div></div>`;
+    return `<div class="hist-item ${p.status}"><div class="hist-h"><span><b>${escapeHtml(p.fornNome)}</b> &middot; ${new Date(p.data).toLocaleDateString('pt-BR')}</span><span>${p.divergente?'<span class="hist-status diverg">divergencia</span> ':''}<span class="hist-status ${p.status}">${p.status==='pendente'?'a caminho':'recebido'}</span></span></div><div class="hist-body">${linhas}<div style="margin-top:6px;color:var(--ouro)">${pares} pares${p.valor?' &middot; '+brl(p.valor):''}</div></div><div class="hist-acts">${p.status==='pendente'?`<button class="btn btn-ouro" onclick="abrirReceb('${p.id}')">Conferir chegada</button>`:`${p.lancadoFin?`<button class="btn btn-ghost" onclick="lancarFin('${p.id}')">&#10003; Lançado no Financeiro</button>`:`<button class="btn btn-ouro" onclick="lancarFin('${p.id}')">Lançar no Financeiro</button>`}<button class="btn btn-ghost" onclick="pdfFin('${p.id}')">PDF financeiro</button>${p.divergente?`<button class="btn btn-ghost" onclick="copiarDiverg('${p.id}')">Aviso p/ fábrica</button>${repForn&&repForn[p.fk]&&repForn[p.fk].whatsapp?`<button class="btn btn-ghost" onclick="abrirGrupo('${repForn[p.fk].whatsapp}')">Abrir grupo</button>`:''}`:''}`}<button class="btn btn-ghost" onclick="excluirPedido('${p.id}')">Excluir</button></div></div>`;
   }).join('');
 }
 function repRenderReceb(){renderHist();}
@@ -2858,7 +2859,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v15 · foto e layout';
+var PE_FAB_VER='v16 · envio avulso';
 function loadFirebaseFab(cb){
   loadFirebase(function(){
     if(window.firebase&&window.firebase.auth){cb();return;}
@@ -2986,9 +2987,9 @@ function renderModoFabrica(fid){
   var pedHTML=peds.length?peds.map(function(o){var r=_peOrdemResumo(fid,o.grade);return '<div class="fab-ped"><div class="fab-pedh"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span>'+r.tot+' pares</span></div>'+r.html+'<button class="btn sm fab-prodbtn" onclick="peColocarProducao(\''+fid+'\',\''+o.id+'\')">Colocar em produção</button></div>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
   var prods=(cache.ordens||[]).filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||0)-(b.producaoEm||0);});
   var prodHTML=prods.length?prods.map(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;return '<div class="fab-prod"><div class="fab-pedh"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span>'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto (entra no estoque)</button></div>';}).join(''):'<div class="fab-vazio">Nada em produção.</div>';
-  var envBtn=peds.length?'<button class="btn btn-ouro fab-enviar" onclick="peEnvioSelecionar(\''+fid+'\')">Enviar para a loja</button>':'';
+  var envBtn=(peds.length?'<button class="btn btn-ouro fab-enviar" onclick="peEnvioSelecionar(\''+fid+'\')">Enviar para a loja</button>':'')+'<button class="btn fab-enviar" onclick="peEnvioAvulsoAbrir(\''+fid+'\')">Enviar avulso (sem pedido)</button>';
   var envs=(cache.ordens||[]).filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});
-  var histHTML=envs.length?envs.map(function(o){var rm=_peOrdemResumo(fid,o.enviado||{});return '<div class="fab-hist"><div class="fab-histh"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b><span>'+rm.tot+' pares</span></div>'+rm.html+'</div>';}).join(''):'<div class="fab-vazio">Nada enviado ainda.</div>';
+  var histHTML=envs.length?envs.map(function(o){var rm=_peOrdemResumo(fid,o.enviado||{});return '<div class="fab-hist"><div class="fab-histh"><b>'+fmtData(o.enviadoEm||o.criadoEm)+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+'</b><span>'+rm.tot+' pares</span></div>'+rm.html+'</div>';}).join(''):'<div class="fab-vazio">Nada enviado ainda.</div>';
   host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div>'+(_FAB_PERFIL?'<div class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></div>':'')+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Pedidos da loja</div>'+pedHTML+envBtn+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Em produção</div>'+prodHTML+'</div>'+
@@ -3378,7 +3379,7 @@ function peOrdemPronta(fid,oid){
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({ordens:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],estoque:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}},false);});
 }
 function _peOrdemResumo(fid,grade){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={},tot=0;Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');(byMC[mc]=byMC[mc]||[]).push(p[2]+'\u00d7'+q);tot+=q;});var linhas=Object.keys(byMC).map(function(mc){return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(mc)+'</span><span class="pe-ordn">'+byMC[mc].join('  ')+'</span></div>';}).join('');return {html:linhas,tot:tot};}
-function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok)ok.style.display='';_peEnvio={fid:null,oid:null};}
+function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok)ok.style.display='';_peEnvio={fid:null,oid:null,avulso:false};}
 function peEnvioSelecionar(fid){
   var cache=_peEstoqueCache[fid]||{};var peds=(cache.ordens||[]).filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
   if(!peds.length){toast('Nenhum pedido da loja para enviar');return;}
@@ -3402,6 +3403,23 @@ function peEnvioAbrir(fid,oid){
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.onclick=function(){peConfirmarEnvio();};}
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
+function peEnvioAvulsoAbrir(fid){
+  _peEnvio={fid:fid,oid:null,avulso:true};
+  var cache=_peEstoqueCache[fid]||{};var est=cache.estoque||{};
+  var mods=peModelosDaFabrica(fid);
+  if(!mods.length){toast('Nenhum modelo cadastrado ainda');return;}
+  var rows=mods.map(function(m){
+    return m.cores.map(function(co){
+      var _rf=(typeof repRefDe==='function')?repRefDe(m.id,co.nome):'';
+      var mc=m.nome+(co.nome?' '+co.nome:'')+(_rf?' \u00b7 ref '+_rf:'');
+      var cells=co.tams.slice().sort(function(a,b){return parseFloat(a)-parseFloat(b);}).map(function(t){var sk=m.id+'|'+co.nome+'|'+t;var emEst=parseInt(est[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(t)+'</label><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value=""><div class="pe-envest">tem '+emEst+'</div></div>';}).join('');
+      return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
+    }).join('');
+  }).join('');
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Enviar avulso (sem pedido)</div><p class="pe-metahint">Preencha quanto voc\u00ea est\u00e1 mandando de cada numera\u00e7\u00e3o. Baixa do seu estoque e vai pro recebimento da loja.</p>'+rows;
+  var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.onclick=function(){peConfirmarEnvio();};}
+  document.getElementById('peEnvioModal').classList.remove('hide');
+}
 function peEscreveRomaneio(repoId,sent){
   if(typeof repoHist==='undefined'||!repoId)return;
   var p=repoHist.find(function(x){return x.id===repoId;});if(!p)return;
@@ -3409,7 +3427,7 @@ function peEscreveRomaneio(repoId,sent){
   if(typeof salvaHist==='function')salvaHist();
 }
 function peConfirmarEnvio(){
-  var fid=_peEnvio.fid,oid=_peEnvio.oid;if(!fid||!oid)return;
+  var fid=_peEnvio.fid,oid=_peEnvio.oid;if(!fid)return;
   var sent={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)sent[i.getAttribute('data-k')]=q;});
   if(!Object.keys(sent).length){toast('Informe o que foi enviado');return;}
   var did=peDocId(fid);
@@ -3417,8 +3435,10 @@ function peConfirmarEnvio(){
     var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);ordens=ordens.map(function(o){return Object.assign({},o);});
     var est=Object.assign({},(d&&d.estoque)||((_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}));
     Object.keys(sent).forEach(function(k){est[k]=Math.max(0,(parseInt(est[k])||0)-sent[k]);});
-    var ord=ordens.find(function(x){return x.id===oid;});var repoId='';
-    if(ord){ord.status='enviado';ord.enviado=sent;ord.enviadoEm=Date.now();ord.enviadoPor=(typeof userAtual!=='undefined'?userAtual:'')||'Loretto';repoId=ord.repoId||'';}
+    var ord=oid?ordens.find(function(x){return x.id===oid;}):null;var repoId='';
+    var _quem=(typeof _FAB_PERFIL!=='undefined'&&_FAB_PERFIL)||(typeof userAtual!=='undefined'?userAtual:'')||'Fábrica';
+    if(ord){ord.status='enviado';ord.enviado=sent;ord.enviadoEm=Date.now();ord.enviadoPor=_quem;repoId=ord.repoId||'';}
+    else{ord={id:'av'+Date.now(),status:'enviado',avulso:true,enviado:sent,criadoEm:Date.now(),enviadoEm:Date.now(),enviadoPor:_quem};ordens.push(ord);}
     var t=peTotaisOrdens(ordens);
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].pedido=t.pedido;}
     if(repoId)peEscreveRomaneio(repoId,sent);
@@ -3463,6 +3483,19 @@ function finalizarReceb(gerar){const p=repoHist.find(x=>x.id===recebId);if(!p)re
   if(gerar){if(n){trocarAba('etiquetas');toast(n+' itens na fila'+(div?' - houve divergencia, gere o resumo p/ financeiro':''));}else toast('Baixa dada (nada para etiqueta)');}else toast('Baixa dada'+(div?' - houve divergencia':''));
 }
 window.copiarFin=(id)=>{const p=repoHist.find(x=>x.id===id);if(!p)return;navigator.clipboard.writeText(resumoFinTexto(p)).then(()=>toast('Resumo copiado p/ financeiro')).catch(()=>toast('Copie manualmente'));};
+window.lancarFin=(id)=>{
+  const p=repoHist.find(x=>x.id===id);if(!p)return;
+  if(!_db){toast('Sem conexão com o banco');return;}
+  if(p.lancadoFin&&!confirm('Esse pedido já foi lançado no Financeiro. Lançar de novo?'))return;
+  let parC=0,valC=0;(p.itens||[]).forEach(it=>{const ch=it.chegou||{};const tot=Object.keys(ch).reduce((s,t)=>s+(parseInt(ch[t])||0),0);parC+=tot;valC+=tot*(it.preco||0);});
+  const valor=valC||p.valor||0;
+  const d=new Date(p.recebidoEm||p.data);
+  const dataBR=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear();
+  const fid='fin_'+Date.now();
+  const entrada={id:fid,fabrica:p.fornNome||'(sem fábrica)',fornNome:p.fornNome||'',valor:valor,data:dataBR,pedido:'',tipoProduto:'sapatos',colrep:'reposicao',parcial:'',qtd:parC,temPedido:false,temRomaneio:false,temFoto:false,criadoEm:Date.now(),origem:'recebimento',pedidoId:p.id};
+  toast('Lançando no Financeiro...');
+  _db.collection('ls_fin_entradas').doc(fid).set(entrada).then(()=>{p.lancadoFin=true;p.lancadoFinId=fid;salvaHist();afterHist();toast('Lançado no Financeiro ✓');}).catch(e=>toast('Erro ao lançar: '+((e&&e.message)||'')));
+};
 function resumoFinTexto(p){let parC=0,valC=0,parF=0,valF=0;const linhas=[],diverg=[];
   p.itens.forEach(it=>{const ch=it.chegou||{},fa=it.fabrica||{};const ts=Object.keys(ch).sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0));const tot=ts.reduce((s,t)=>s+ch[t],0);
     const totF=Object.values(fa).reduce((a,b)=>a+b,0);parF+=totF;valF+=totF*(it.preco||0);
