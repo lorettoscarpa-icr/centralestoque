@@ -647,8 +647,8 @@
   .fab-corh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
   .fab-corh img{width:38px;height:38px;border-radius:8px;object-fit:cover;border:1px solid var(--linha)}
   .fab-noimg{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.2);color:rgba(220,189,96,.5)}
-  .fab-corn{font-weight:600}
-  .fab-ref{font-family:'DM Mono',monospace;font-size:11px;color:var(--ouro);background:rgba(220,189,96,.12);border-radius:5px;padding:1px 6px}
+  .fab-corn{font-weight:700;font-size:16px}
+  .fab-ref{font-family:'DM Mono',monospace;font-size:18px;font-weight:600;color:var(--ouro-claro);background:rgba(220,189,96,.2);border:1.5px solid var(--ouro);border-radius:8px;padding:3px 13px;letter-spacing:.5px;line-height:1.2}
   .fab-cells{display:flex;gap:8px;flex-wrap:wrap}
   .fab-cell{background:rgba(0,0,0,.2);border:1px solid var(--linha);border-radius:10px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:78px}
   .fab-tam{font-family:'DM Mono',monospace;font-weight:700;color:var(--ouro);font-size:14px}
@@ -3404,9 +3404,11 @@ function peAbrir(fid){peView=fid;peRender();if(window.scrollTo)window.scrollTo(0
 function peVoltar(){peView='lista';peRender();if(window.scrollTo)window.scrollTo(0,0);}
 function peSalvarMetas(fid){
   if(!_db){toast('Conecte à internet para salvar as metas');return;}
-  const meta={};
-  document.querySelectorAll('#peFabricas input[data-meta][data-fid="'+fid+'"]').forEach(function(inp){const q=parseInt(inp.value)||0;if(q>0)meta[inp.dataset.meta]=q;});
-  _db.collection('ls_pe').doc(peDocId(fid)).set({meta:meta,lorettoEm:Date.now(),lorettoPor:userAtual||'Loretto'},{merge:true}).then(function(){if(_peEstoqueCache[fid]){_peEstoqueCache[fid].meta=meta;_peEstoqueCache[fid].lorettoEm=Date.now();_peEstoqueCache[fid].lorettoPor=userAtual||'Loretto';}toast('Metas salvas — a fábrica já vê o que precisa repor');peRender();}).catch(function(e){toast('Erro ao salvar metas: '+((e&&e.message)||''));});
+  const meta=Object.assign({},(_peEstoqueCache[fid]&&_peEstoqueCache[fid].meta)||{});
+  document.querySelectorAll('#peFabricas input[data-meta][data-fid="'+fid+'"]').forEach(function(inp){const q=parseInt(inp.value)||0;if(q>0)meta[inp.dataset.meta]=q;else delete meta[inp.dataset.meta];});
+  const ref=_db.collection('ls_pe').doc(peDocId(fid));
+  const payload={meta:meta,lorettoEm:Date.now(),lorettoPor:userAtual||'Loretto'};
+  ref.update(payload).catch(function(){return ref.set(payload,{merge:true});}).then(function(){if(_peEstoqueCache[fid]){_peEstoqueCache[fid].meta=meta;_peEstoqueCache[fid].lorettoEm=Date.now();_peEstoqueCache[fid].lorettoPor=userAtual||'Loretto';}toast('Metas salvas — a fábrica já vê o que precisa repor');peRender();}).catch(function(e){toast('Erro ao salvar metas: '+((e&&e.message)||''));});
 }
 function peTrocarFoto(fid,modId,cor){
   if(!_db){toast('Conecte à internet para salvar a foto');return;}
