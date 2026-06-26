@@ -679,6 +679,8 @@
   .fab-histl::before{content:'\25B8';color:var(--ouro);display:inline-block;transition:transform .15s;font-size:11px}
   .fab-hist[open]>summary .fab-histl::before{transform:rotate(90deg)}
   .fab-histtot{color:var(--ouro);font-family:'DM Mono',monospace;font-size:12.5px;white-space:nowrap}
+  .fab-histby{font-size:11.5px;color:var(--ouro-claro);opacity:.8;font-weight:400}
+  .fab-hist-ped{border-left-color:var(--ouro)}
   .fab-histbody{padding:2px 12px 12px}
   .fab-hist-mais{text-align:center;color:rgba(251,249,238,.45);font-size:12px;padding:4px 0 8px}
   .fab-sech-row{display:flex;align-items:center;justify-content:space-between}
@@ -2414,7 +2416,7 @@ function avModeloPorId(id){return catalogo.find(m=>m.id===id);}
 function avModeloPorNome(nome){const n=normKey(nome||'');return n?catalogo.find(m=>normKey(m.nome)===n):null;}
 function avFabricaModelo(nome){const id=normKey(nome);try{if(typeof repCfg!=='undefined'&&repCfg&&repCfg[id]&&repCfg[id].fornId&&typeof repForn!=='undefined'&&repForn&&repForn[repCfg[id].fornId])return repFornNome(repCfg[id].fornId)||'';}catch(e){}return '';}
 function avCustoModelo(nome){const id=normKey(nome);try{if(typeof repCfg!=='undefined'&&repCfg&&repCfg[id]&&repCfg[id].custo)return Number(repCfg[id].custo)||0;}catch(e){}try{if(typeof repCusto!=='undefined'&&repCusto&&repCusto[id])return Number(repCusto[id])||0;}catch(e){}return 0;}
-function avCustoDefeito(d){const c=avCustoModelo(d.nome);return c>0?c:(Number(d.custo)||0);}
+function avCustoDefeito(d){const own=Number(d&&d.custo)||0;if(own>0)return own;const c=avCustoModelo(d.nome);return c>0?c:0;}
 function avOptsModelos(){return '<option value="">Selecione o modelo...</option>'+catalogo.slice().sort((a,b)=>(a.nome||'').localeCompare(b.nome||'')).map(m=>`<option value="${escapeHtml(m.id)}">${escapeHtml(m.nome)}</option>`).join('')+`<option value="${AV_OUTRO}">Outro (digitar)...</option>`;}
 function avOptsCores(m){return '<option value="">Selecione a cor...</option>'+(m?m.cores.map(c=>`<option value="${escapeHtml(c.nome)}">${escapeHtml(c.nome)}</option>`).join(''):'')+`<option value="${AV_OUTRO}">Outra (digitar)...</option>`;}
 function avTamsDe(m,corNome){if(!m)return [];const c=m.cores.find(x=>x.nome===corNome);if(c)return getTamanhos(m,c);const set=new Set();m.cores.forEach(cc=>getTamanhos(m,cc).forEach(t=>set.add(t)));return [...set].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0));}
@@ -3084,12 +3086,12 @@ function renderModoFabrica(fid){
     var resumoMod='<div class="fab-resumo mod"><span>Total do modelo &middot; Estoque <b>'+_mE+'</b> pares'+(_mc?' ('+brMoney(_mE*_mc)+')':'')+'</span><span>Produção <b>'+_mP+'</b> pares'+(_mc?' ('+brMoney(_mP*_mc)+')':'')+'</span>'+(_mc?'<span>Custo/par <b>'+brMoney(_mc)+'</b></span>':'')+'</div>';
     return '<div class="fab-mod"><div class="fab-modh">'+escapeHtml(m.nome)+'</div>'+cores+resumoMod+'</div>';
   }).join(''):'<div class="fab-vazio">Nenhum modelo cadastrado ainda para a sua fábrica.</div>';
-  var ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
-  var pedHTML=peds.length?peds.map(function(o){var r=_peOrdemResumo(fid,o.grade);return '<div class="fab-ped"><div class="fab-pedh"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span>'+r.tot+' pares</span></div>'+r.html+'</div>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
-  var prods=(cache.ordens||[]).filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||0)-(b.producaoEm||0);});
-  var prodHTML=prods.length?prods.map(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;return '<div class="fab-prod"><div class="fab-pedh"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span>'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto (entra no estoque)</button></div>';}).join(''):'<div class="fab-vazio">Nada em produção.</div>';
   var custoMap={};mods.forEach(function(m){custoMap[m.id]=m.custo||0;});
   function envValor(g){var v=0;Object.keys(g||{}).forEach(function(k){v+=(parseInt(g[k])||0)*(custoMap[k.split('|')[0]]||0);});return v;}
+  var ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
+  var pedHTML=peds.length?peds.map(function(o){var _t=0;Object.keys(o.grade||{}).forEach(function(k){_t+=parseInt(o.grade[k])||0;});var _v=envValor(o.grade);var quem=(o.por&&o.por!=='(migrado)')?'<span class="fab-histby">'+escapeHtml(o.por)+'</span>':'';return '<details class="fab-hist fab-hist-ped"><summary class="fab-histh"><span class="fab-histl"><b>Pedido de '+fmtData(o.criadoEm)+'</b>'+quem+'</span><span class="fab-histtot">'+_t+' pares'+(_v?' \u00b7 '+brMoney(_v):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,o.grade||{},custoMap)+'</div></details>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
+  var prods=(cache.ordens||[]).filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||0)-(b.producaoEm||0);});
+  var prodHTML=prods.length?prods.map(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;return '<div class="fab-prod"><div class="fab-pedh"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span>'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto (entra no estoque)</button></div>';}).join(''):'<div class="fab-vazio">Nada em produção.</div>';
   var gE=0,gP=0,gVE=0,gVP=0;mods.forEach(function(m){var c=m.custo||0;m.cores.forEach(function(co){(co.tams||[]).forEach(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0,pz=parseInt(prod[k])||0;gE+=e;gP+=pz;gVE+=e*c;gVP+=pz*c;});});});
   var totalGeral='<div class="fab-totalgeral"><span class="fab-tgh">Total geral</span><span>Estoque <b>'+gE+'</b> pares · <b>'+brMoney(gVE)+'</b></span><span>Produção <b>'+gP+'</b> pares · <b>'+brMoney(gVP)+'</b></span></div>';
   var lotesAll=(cache.lotesProducao||[]).slice().sort(function(a,b){return (b.inicioEm||b.criadoEm||0)-(a.inicioEm||a.criadoEm||0);});
