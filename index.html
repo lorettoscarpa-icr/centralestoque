@@ -1145,7 +1145,7 @@
   .anexo{font-size:11px;padding:5px 11px;border-radius:8px;border:1px solid var(--linha);color:rgba(251,249,238,.5)}
   .anexo.ok{color:#bfe6b2;border-color:rgba(126,180,90,.4);cursor:pointer}
   .anexo.falta{border-style:dashed}
-  .lanc-acts{display:flex;justify-content:flex-end;margin-top:10px}
+  .lanc-acts{display:flex;justify-content:flex-end;margin-top:10px;gap:8px}
   .lanc-acts .btn{padding:6px 14px;font-size:11px}
   .fin-step label,#finCampos label{display:block;font-size:12px;color:var(--ouro-claro);margin-bottom:6px;font-weight:600}
   .fin-step input[type=file],#finCampos input[type=file]{width:100%;background:rgba(0,0,0,.25);border:1px solid var(--linha);border-radius:8px;color:var(--areia);padding:9px;font-size:12px;margin-bottom:6px}
@@ -1807,7 +1807,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
   <div class="modal modal-lg">
     <div class="modal-head"><div class="modal-title">Novo lançamento de entrada</div><button class="modal-x" type="button" onclick="finFecharModal()" aria-label="Fechar">&times;</button></div>
     <div class="fin-step">
-      <label>1. Romaneio do Kigi (PDF) — o sistema lê sozinho</label>
+      <label id="finStep1Lbl">1. Romaneio do Kigi (PDF) — o sistema lê sozinho</label>
       <input type="file" id="finFilePedido" accept="application/pdf" onchange="finLerPedido(this.files[0])">
       <div id="finLido" class="fin-lido hide"></div>
     </div>
@@ -3840,6 +3840,7 @@ $('repoGerar')&&$('repoGerar').addEventListener('click',()=>{
 // ===================== FINANCEIRO 2.0 — entradas via romaneio =====================
 let finEntradas=[],finInit=false,finAba='sapatos',finFabFiltro='',finTipoFiltro='todos',finMesFiltro='all';
 let _finTmp={};
+let _finEdit=null;
 const FIN_TIPO_KW={tchwm:'sapatos',manutt:'sapatos',urbana:'sapatos',tarragona:'sapatos','murilo mendes':'sapatos',ferrero:'acessorios',gabriel:'acessorios',milton:'acessorios',bonton:'acessorios',prime:'acessorios'};
 function finBRL(v){return 'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function finBRLnum(s){return parseFloat(String(s).replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.'))||0;}
@@ -3899,9 +3900,27 @@ async function finAnexar(tipo,file){
     toast((tipo==='foto'?'Foto':'Romaneio da f\u00e1brica')+' anexado');
   }catch(e){toast('Erro no anexo');}
 }
-function finAbrirModal(){_finTmp={};['finFilePedido','finFileRomaneio','finFileFoto'].forEach(i=>{if($(i))$(i).value='';});if($('finLido'))$('finLido').classList.add('hide');if($('finCampos'))$('finCampos').classList.add('hide');['finFabrica','finValor','finData','finPedidoNum'].forEach(i=>{if($(i))$(i).value='';});$('finModal').classList.remove('hide');}
-function finFecharModal(){$('finModal').classList.add('hide');}
+function finAbrirModal(){_finEdit=null;_finTmp={};var _t=document.querySelector('#finModal .modal-title');if(_t)_t.textContent='Novo lançamento de entrada';var _l=$('finStep1Lbl');if(_l)_l.textContent='1. Romaneio do Kigi (PDF) — o sistema lê sozinho';['finFilePedido','finFileRomaneio','finFileFoto'].forEach(i=>{if($(i))$(i).value='';});if($('finLido'))$('finLido').classList.add('hide');if($('finCampos'))$('finCampos').classList.add('hide');['finFabrica','finValor','finData','finPedidoNum'].forEach(i=>{if($(i))$(i).value='';});$('finModal').classList.remove('hide');}
+function finEditarModal(id){
+  var e=finEntradas.find(function(x){return x.id===id;});if(!e){toast('Lançamento não encontrado');return;}
+  _finEdit=id;_finTmp={};
+  ['finFilePedido','finFileRomaneio','finFileFoto'].forEach(i=>{if($(i))$(i).value='';});
+  var _t=document.querySelector('#finModal .modal-title');if(_t)_t.textContent='Editar lançamento';
+  var _l=$('finStep1Lbl');if(_l)_l.textContent='1. Pedido do Kigi (PDF) — opcional, só se quiser anexar/trocar';
+  if($('finLido'))$('finLido').classList.add('hide');
+  if($('finCampos'))$('finCampos').classList.remove('hide');
+  if($('finFabrica'))$('finFabrica').value=(e.fabrica&&e.fabrica!=='(sem fábrica)')?e.fabrica:'';
+  if($('finValor'))$('finValor').value=e.valor?finBRL(e.valor):'';
+  if($('finData'))$('finData').value=e.data||'';
+  if($('finPedidoNum'))$('finPedidoNum').value=e.pedido||'';
+  if($('finTipoSapAce'))$('finTipoSapAce').value=e.tipoProduto||'sapatos';
+  if($('finColRep'))$('finColRep').value=e.colrep||'';
+  if($('finParcial'))$('finParcial').value=(e.parcial==='parcial')?'parcial':'total';
+  $('finModal').classList.remove('hide');
+}
+function finFecharModal(){_finEdit=null;$('finModal').classList.add('hide');}
 async function finSalvar(){
+  if(_finEdit){return finSalvarEdicao();}
   if(!_finTmp.pedido){toast('Suba o romaneio do Kigi primeiro');return;}
   if(!$('finColRep').value){toast('Escolha se \u00e9 cole\u00e7\u00e3o nova ou reposi\u00e7\u00e3o');return;}
   if(!_db){toast('Sem conex\u00e3o com o banco');return;}
@@ -3916,6 +3935,25 @@ async function finSalvar(){
     if(_finTmp.foto)ps.push(_db.collection('ls_fin_arquivos').doc(id+'__foto').set(_finTmp.foto));
     await Promise.all(ps);
     finFecharModal();toast('Lan\u00e7amento salvo!');
+  }catch(e){toast('Erro ao salvar: '+e.message);}
+}
+async function finSalvarEdicao(){
+  var id=_finEdit;if(!id){toast('Nada para editar');return;}
+  if(!$('finColRep').value){toast('Escolha se \u00e9 cole\u00e7\u00e3o nova ou reposi\u00e7\u00e3o');return;}
+  if(!_db){toast('Sem conex\u00e3o com o banco');return;}
+  var patch={fabrica:$('finFabrica').value.trim()||'(sem f\u00e1brica)',valor:finBRLnum($('finValor').value),data:$('finData').value.trim(),pedido:$('finPedidoNum').value.trim(),tipoProduto:$('finTipoSapAce').value,colrep:$('finColRep').value,parcial:$('finParcial').value};
+  if(_finTmp.pedido)patch.temPedido=true;
+  if(_finTmp.romaneio)patch.temRomaneio=true;
+  if(_finTmp.foto)patch.temFoto=true;
+  try{
+    toast('Salvando...');
+    await _db.collection('ls_fin_entradas').doc(id).set(patch,{merge:true});
+    var ps=[];
+    if(_finTmp.pedido)ps.push(_db.collection('ls_fin_arquivos').doc(id+'__pedido').set(_finTmp.pedido));
+    if(_finTmp.romaneio)ps.push(_db.collection('ls_fin_arquivos').doc(id+'__romaneio').set(_finTmp.romaneio));
+    if(_finTmp.foto)ps.push(_db.collection('ls_fin_arquivos').doc(id+'__foto').set(_finTmp.foto));
+    await Promise.all(ps);
+    finFecharModal();toast('Lan\u00e7amento atualizado!');
   }catch(e){toast('Erro ao salvar: '+e.message);}
 }
 function renderFinanceiro(){
@@ -3949,7 +3987,7 @@ function finCard(e){
   const cr=e.colrep==='colecao'?'<span class="bdg colecao">Cole\u00e7\u00e3o nova</span>':'<span class="bdg repo">Reposi\u00e7\u00e3o</span>';
   const pc='<span class="bdg neutra">Entrada '+(e.parcial==='parcial'?'parcial':'total')+'</span>';
   const ax=[['Pedido (Kigi)',e.temPedido,'pedido'],['Romaneio f\u00e1brica',e.temRomaneio,'romaneio'],['Confer\u00eancia',e.temFoto,'foto']].map(a=>'<span class="anexo '+(a[1]?'ok':'falta')+'"'+(a[1]?(' onclick="finVerArquivo(\''+e.id+'\',\''+a[2]+'\')"'):'')+'>'+a[0]+'</span>').join('');
-  return '<div class="lanc"><div class="lanc-top"><div><b>Pedido '+escapeHtml(e.pedido||'\u2014')+'</b><div class="lanc-sub">entrada '+escapeHtml(e.data||'')+(e.qtd?(' &middot; '+e.qtd+' pares'):'')+'</div></div><div class="lanc-val">'+finBRL(e.valor||0)+'</div></div><div class="badges">'+cr+pc+'</div><div class="anexos">'+ax+'</div><div class="lanc-acts"><button class="btn btn-ghost" onclick="finExcluir(\''+e.id+'\')">Excluir</button></div></div>';
+  return '<div class="lanc"><div class="lanc-top"><div><b>Pedido '+escapeHtml(e.pedido||'\u2014')+'</b><div class="lanc-sub">entrada '+escapeHtml(e.data||'')+(e.qtd?(' &middot; '+e.qtd+' pares'):'')+'</div></div><div class="lanc-val">'+finBRL(e.valor||0)+'</div></div><div class="badges">'+cr+pc+'</div><div class="anexos">'+ax+'</div><div class="lanc-acts"><button class="btn btn-ghost" onclick="finEditarModal(\''+e.id+'\')">Editar</button><button class="btn btn-ghost" onclick="finExcluir(\''+e.id+'\')">Excluir</button></div></div>';
 }
 async function finVerArquivo(id,tipo){
   if(!_db)return;
@@ -3957,7 +3995,7 @@ async function finVerArquivo(id,tipo){
 }
 function finExcluir(id){if(!confirm('Excluir este lan\u00e7amento?'))return;if(!_db)return;_db.collection('ls_fin_entradas').doc(id).delete();['pedido','romaneio','foto'].forEach(t=>_db.collection('ls_fin_arquivos').doc(id+'__'+t).delete().catch(function(){}));toast('Exclu\u00eddo');}
 function finCopiarLinkFinanceiro(){toast('O link de leitura pro financeiro vem na pr\u00f3xima etapa');}
-window.finAbrirModal=finAbrirModal;window.finFecharModal=finFecharModal;window.finLerPedido=finLerPedido;window.finAnexar=finAnexar;window.finSalvar=finSalvar;window.finSetFiltroTipo=finSetFiltroTipo;window.finSetFiltroMes=finSetFiltroMes;window.finSetFab=finSetFab;window.finVerArquivo=finVerArquivo;window.finExcluir=finExcluir;window.finCopiarLinkFinanceiro=finCopiarLinkFinanceiro;
+window.finAbrirModal=finAbrirModal;window.finEditarModal=finEditarModal;window.finFecharModal=finFecharModal;window.finLerPedido=finLerPedido;window.finAnexar=finAnexar;window.finSalvar=finSalvar;window.finSetFiltroTipo=finSetFiltroTipo;window.finSetFiltroMes=finSetFiltroMes;window.finSetFab=finSetFab;window.finVerArquivo=finVerArquivo;window.finExcluir=finExcluir;window.finCopiarLinkFinanceiro=finCopiarLinkFinanceiro;
 setTimeout(function(){document.querySelectorAll('.fin2-tab').forEach(function(b){b.addEventListener('click',function(){finAba=b.dataset.fintipo;document.querySelectorAll('.fin2-tab').forEach(x=>x.classList.toggle('on',x===b));finFabFiltro='';finRenderLista();});});},0);
 
 
