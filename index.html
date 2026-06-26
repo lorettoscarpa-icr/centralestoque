@@ -3265,7 +3265,7 @@ function peCarregarEstoques(){
           var merged={
             estoque:(Object.keys(d.estoque||{}).length?d.estoque:(dl.estoque||{})),
             produzindo:(Object.keys(d.produzindo||{}).length?d.produzindo:(dl.produzindo||{})),
-            meta:(Object.keys(d.meta||{}).length?d.meta:(dl.meta||{})),
+            meta:(('meta' in d)?(d.meta||{}):(dl.meta||{})),
             ordens:((Array.isArray(d.ordens)&&d.ordens.length)?d.ordens:(Array.isArray(dl.ordens)?dl.ordens:((dl.estoque||dl.meta||dl.pedido)?_peMigraOrdens(dl):[]))),
             historico:((d.historico&&d.historico.length)?d.historico:(dl.historico||[])),
             atualizadoEm:d.atualizadoEm||dl.atualizadoEm||0,publicadoEm:d.publicadoEm||dl.publicadoEm||0,lorettoEm:d.lorettoEm||dl.lorettoEm||0,lorettoPor:d.lorettoPor||dl.lorettoPor||''
