@@ -614,12 +614,20 @@
   .pe-pessoas-vazio{font-size:12px;color:rgba(251,249,238,.45);margin-bottom:8px}
   .pe-pessoa-add{display:flex;gap:6px}
   .pe-pessoa-add input{flex:1;font-size:13px;padding:7px 9px}
-  .pe-fcardwrap{display:flex;flex-direction:column;gap:0}
-  .pe-fcardkey{align-self:flex-start;margin-top:6px;background:rgba(220,189,96,.10);border:1px solid var(--linha);color:var(--ouro);border-radius:9px;padding:6px 12px;font-size:12px;font-family:'Barlow',sans-serif;cursor:pointer}
-  .pe-fcardkey:hover{border-color:var(--ouro);background:rgba(220,189,96,.18)}
+  .pe-fcardkey{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:rgba(220,189,96,.07);border:none;border-top:1px solid var(--linha);color:var(--ouro);padding:9px;font-size:12px;font-weight:600;letter-spacing:.3px;font-family:'Barlow',sans-serif;cursor:pointer;transition:.15s}
+  .pe-fcardkey:hover{background:rgba(220,189,96,.18)}
   .pe-acfld{display:block;font-size:12px;color:rgba(251,249,238,.7);margin:8px 0}
   .pe-acfld input{display:block;width:100%;margin-top:4px;padding:8px 10px;font-size:14px}
   .pe-acfld-l{font-size:12px;color:rgba(251,249,238,.7);margin:10px 0 4px}
+  .pe-acfld-of{font-size:11px;font-weight:400;color:rgba(251,249,238,.45);margin-left:5px}
+  .pe-chips{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 0;min-height:8px}
+  .pe-chips-empty{font-size:12.5px;color:rgba(251,249,238,.45);padding:2px 0}
+  .pe-chip{display:inline-flex;align-items:center;gap:7px;background:rgba(220,189,96,.1);border:1px solid var(--linha);color:var(--areia);border-radius:999px;padding:5px 6px 5px 14px;font-size:13.5px;font-weight:600}
+  .pe-chip-x{background:rgba(255,255,255,.06);border:none;color:var(--areia);opacity:.7;width:19px;height:19px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .pe-chip-x:hover{opacity:1;background:rgba(224,138,106,.3);color:#ffb59c}
+  .pe-chip-add{display:flex;gap:8px;margin-top:11px}
+  .pe-chip-add input{flex:1}
+  .pe-chip-add .btn{flex:0 0 auto;white-space:nowrap}
   body.modo-fabrica{background:#283e1a}
   #fabricaMode{min-height:100vh;background:#283e1a;color:var(--areia);font-family:'Barlow',sans-serif}
   .fab-wrap{max-width:min(1500px,98vw);margin:0 auto;padding:20px 10px 60px}
@@ -703,6 +711,9 @@
   .fab-atraso-cnt{font-family:'DM Mono',monospace;font-size:11px;color:#ff3b2f;background:rgba(255,45,35,.16);border:1px solid rgba(255,59,47,.5);border-radius:6px;padding:2px 8px;margin-left:10px;text-transform:none;letter-spacing:0}
   .fab-hist.lote-atraso{border-left:3px solid #ff3b2f}
   .fab-pronto-btn{display:block;width:100%;margin-top:10px;background:#9bd58c;color:#1d2b12;border:0;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  .fab-loteacts{display:flex;gap:8px;margin-top:8px}
+  .fab-loteacts .fab-romlink{margin-top:0}
+  .fab-dellote{background:rgba(255,45,35,.12);border:1px solid rgba(255,59,47,.45);color:#ff6f61;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}
   .fab-prod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid #d4b45a;border-radius:12px;padding:12px;margin-bottom:10px}
   .fab-prod .pe-ordit{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:rgba(251,249,238,.8)}
   .fab-prod button{margin-top:8px}
@@ -756,17 +767,23 @@
   .fab-resumo b{color:var(--ouro-claro)}
   .fab-resumo.mod{margin-top:12px;color:var(--ouro);font-size:13px;border-top:1px solid var(--linha)}
   .fab-avulso{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#9bd58c;background:rgba(155,213,140,.14);border:1px solid rgba(155,213,140,.4);border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle}
-  .pe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px}
-  .pe-fcard{display:flex;align-items:center;gap:13px;text-align:left;width:100%;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:14px;padding:15px;cursor:pointer;transition:.15s;color:var(--areia);font-family:'Barlow',sans-serif}
-  .pe-fcard:hover{border-color:var(--ouro);background:rgba(220,189,96,.07)}
-  .pe-fcard.parada{border-color:rgba(224,138,106,.5)}
-  .pe-fic{width:46px;height:46px;border-radius:12px;border:1px solid var(--linha);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-  .pe-finfo{flex:1;min-width:0}
-  .pe-fnome{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--areia)}
-  .pe-fst{font-size:12px;color:var(--ouro-claro);opacity:.85;margin-top:2px}
-  .pe-fnums{text-align:right;font-size:11.5px;color:var(--areia);opacity:.8;font-family:'DM Mono',monospace;line-height:1.5}
-  .pe-fnums b{color:var(--ouro-claro);font-size:13px}
-  .pe-farrow{font-size:26px;color:var(--ouro);opacity:.6;margin-left:4px}
+  .pe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(264px,1fr));gap:14px}
+  /* === Cartão de fábrica — estrutura fixa, mesma altura sempre === */
+  .pe-fcardwrap{display:flex;flex-direction:column;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:14px;overflow:hidden;transition:.15s;height:100%}
+  .pe-fcardwrap:hover{border-color:var(--ouro)}
+  .pe-fcardwrap.parada{border-color:rgba(224,138,106,.5)}
+  .pe-fcard{flex:1;display:flex;flex-direction:column;text-align:left;width:100%;background:none;border:none;color:var(--areia);font-family:'Barlow',sans-serif;cursor:pointer;padding:15px 15px 14px;transition:.15s}
+  .pe-fcard:hover{background:rgba(220,189,96,.05)}
+  .pe-ftop{display:flex;align-items:center;gap:12px}
+  .pe-fic{width:44px;height:44px;border-radius:12px;border:1px solid var(--linha);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+  .pe-fnamewrap{flex:1;min-width:0;display:flex;align-items:center;gap:7px;overflow:hidden}
+  .pe-fnome{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--areia);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .pe-farrow{font-size:24px;color:var(--ouro);opacity:.55;flex-shrink:0;line-height:1}
+  .pe-fst{font-size:11.5px;color:var(--ouro-claro);opacity:.85;margin:10px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pe-fstats{display:flex;gap:9px;margin-top:12px}
+  .pe-fstat{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--linha);border-radius:9px;padding:8px 6px;text-align:center}
+  .pe-fstat b{display:block;font-family:'DM Mono',monospace;font-size:19px;font-weight:500;color:var(--ouro-claro);line-height:1}
+  .pe-fstat span{display:block;font-size:9.5px;color:var(--areia);opacity:.6;text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
   .pe-voltar{background:none;border:none;color:var(--ouro-claro);font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;cursor:pointer;padding:6px 0;margin-bottom:12px}
   .pe-badge.ex{background:rgba(220,189,96,.18);color:var(--ouro-claro);border-color:rgba(220,189,96,.5)}
   .pe-previa-aviso{background:rgba(220,189,96,.12);border:1px solid rgba(220,189,96,.4);color:var(--ouro-claro);border-radius:10px;padding:10px 13px;font-size:12.5px;margin-bottom:12px;line-height:1.45}
@@ -2889,14 +2906,31 @@ function peAcessoDe(fid){var a=_peAcesso[fid];if(!a)return {usuario:'',senha:'',
 function peSalvarAcesso(){try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({pessoas:_peAcesso},{merge:true}).catch(function(){});}
 function peCopiarAcesso(fid){var l=peLinkApp(fid);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(l).then(function(){toast('Link copiado — mande pra fábrica');}).catch(function(){window.prompt('Copie o link:',l);});}else window.prompt('Copie o link:',l);}
 function peWhatsAcesso(fid){var ac=peAcessoDe(fid);var l=peLinkApp(fid);var msg='Acesso ao painel da pronta-entrega Loretto Scarpa ('+((peFabricas().find(function(x){return x.fid===fid;})||{}).nome||fid)+'):\n'+l+(ac.email?('\nE-mail: '+ac.email):'')+'\nSenha: 123456789';window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');}
+let _peAcEdit={fid:'',perfis:[]};
+function peAcChipsHTML(){
+  if(!_peAcEdit.perfis.length)return '<div class="pe-chips-empty">Nenhuma pessoa adicionada ainda.</div>';
+  return _peAcEdit.perfis.map(function(n,i){return '<span class="pe-chip">'+escapeHtml(n)+'<button class="pe-chip-x" type="button" onclick="peAcRemPessoa('+i+')" title="Remover">&times;</button></span>';}).join('');
+}
+function peAcRenderChips(){var c=document.getElementById('peAcChips');if(c)c.innerHTML=peAcChipsHTML();}
+function peAcAddPessoa(){
+  var inp=document.getElementById('peAcNovaPessoa');if(!inp)return;
+  (inp.value||'').split(/[,\n]/).map(function(x){return x.trim();}).filter(Boolean).forEach(function(nome){
+    var jah=_peAcEdit.perfis.map(function(p){return p.toLowerCase();}).indexOf(nome.toLowerCase())>=0;
+    if(!jah)_peAcEdit.perfis.push(nome);
+  });
+  inp.value='';peAcRenderChips();inp.focus();
+}
+function peAcRemPessoa(i){_peAcEdit.perfis.splice(i,1);peAcRenderChips();}
 function peAcessoModalAbrir(fid){
   var ac=peAcessoDe(fid);var nomeF=(peFabricas().find(function(x){return x.fid===fid;})||{}).nome||fid;
   var box=document.getElementById('peAcessoBox');if(!box)return;
+  _peAcEdit={fid:fid,perfis:(ac.perfis||[]).slice()};
   box.innerHTML='<div class="pe-modal-h">Acesso da fábrica — '+escapeHtml(nomeF)+'</div>'+
     '<label class="pe-acfld">E-mail da fábrica (login no Firebase)<input id="peAcEmail" value="'+escapeHtml(ac.email)+'" placeholder="ex.: manutt@lorettoscarpa.com.br" autocapitalize="off" spellcheck="false"></label>'+
-    '<p class="pe-metahint" style="margin:6px 0 10px">Senha: a que você cadastrou no Firebase (padrão 123456789). Pra trocar a senha, é lá no Firebase &rarr; Authentication.</p>'+
-    '<label class="pe-acfld">Pessoas desta fábrica (uma por linha) — aparecem no "Quem está usando?"<textarea id="peAcPerfis" rows="3" placeholder="ex.:&#10;Diego&#10;Ana Flora">'+escapeHtml((ac.perfis||[]).join('\n'))+'</textarea></label>'+
-    '<div class="pe-acfld-l">Link de acesso</div><div class="pe-acesso-link"><input id="peLink_'+escapeHtml(fid)+'" readonly value="'+escapeHtml(peLinkApp(fid))+'" onclick="this.select()"><button class="btn sm" onclick="peCopiarAcesso(\''+fid+'\')">Copiar</button><button class="btn sm" onclick="peWhatsAcesso(\''+fid+'\')">WhatsApp</button></div>'+
+    '<div class="pe-acfld-l" style="margin-top:14px">Pessoas desta fábrica <span class="pe-acfld-of">aparecem no "Quem está usando?"</span></div>'+
+    '<div id="peAcChips" class="pe-chips">'+peAcChipsHTML()+'</div>'+
+    '<div class="pe-chip-add"><input id="peAcNovaPessoa" placeholder="Digite um nome e tecle Enter" autocapitalize="words" spellcheck="false" onkeydown="if(event.key===\'Enter\'){event.preventDefault();peAcAddPessoa();}"><button type="button" class="btn sm" onclick="peAcAddPessoa()">+ Adicionar</button></div>'+
+    '<div class="pe-acfld-l" style="margin-top:16px">Link de acesso</div><div class="pe-acesso-link"><input id="peLink_'+escapeHtml(fid)+'" readonly value="'+escapeHtml(peLinkApp(fid))+'" onclick="this.select()"><button class="btn sm" onclick="peCopiarAcesso(\''+fid+'\')">Copiar link</button></div>'+
     '<p class="pe-metahint">A fábrica abre o link e entra com esse e-mail + a senha do Firebase. Ela vê só o painel dela (modelos, estoque, produção e pedidos).</p>'+
     '<div class="pe-modal-foot"><button class="btn" onclick="peAcessoModalFechar()">Fechar</button><button class="btn btn-ouro" onclick="peAcessoSalvar(\''+fid+'\')">Salvar acesso</button></div>';
   document.getElementById('peAcessoModal').classList.remove('hide');
@@ -2904,15 +2938,17 @@ function peAcessoModalAbrir(fid){
 function peAcessoModalFechar(){var m=document.getElementById('peAcessoModal');if(m)m.classList.add('hide');}
 function peAcessoSalvar(fid){
   var em=((document.getElementById('peAcEmail')||{}).value||'').trim();
-  var pf=((document.getElementById('peAcPerfis')||{}).value||'').split('\n').map(function(x){return x.trim();}).filter(Boolean);
+  var pendente=((document.getElementById('peAcNovaPessoa')||{}).value||'').trim();
+  if(pendente)peAcAddPessoa();
+  var pf=(_peAcEdit.perfis||[]).slice();
   _peAcesso[fid]={email:em,usuario:em,perfis:pf,em:Date.now()};
   peSalvarAcesso();peAcessoModalFechar();if(typeof peRender==='function')peRender();toast('Acesso salvo');
 }
-window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.peAcessoModalAbrir=peAcessoModalAbrir;window.peAcessoModalFechar=peAcessoModalFechar;window.peAcessoSalvar=peAcessoSalvar;
+window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.peAcessoModalAbrir=peAcessoModalAbrir;window.peAcessoModalFechar=peAcessoModalFechar;window.peAcessoSalvar=peAcessoSalvar;window.peAcAddPessoa=peAcAddPessoa;window.peAcRemPessoa=peAcRemPessoa;
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v20 · lotes com prazo e atraso';
+var PE_FAB_VER='v21 · excluir lote';
 function loadFirebaseFab(cb){
   loadFirebase(function(){
     if(window.firebase&&window.firebase.auth){cb();return;}
@@ -3047,7 +3083,7 @@ function renderModoFabrica(fid){
   var lotesAll=(cache.lotesProducao||[]).slice().sort(function(a,b){return (b.inicioEm||b.criadoEm||0)-(a.inicioEm||a.criadoEm||0);});
   var atrasados=lotesAll.filter(function(l){return l&&!l.aplicado&&(l.prontoEm||0)<Date.now();}).length;
   var lotesShow=_peVerMaisProd?lotesAll:lotesAll.slice(0,3);
-  var emProdHTML=lotesAll.length?(lotesShow.map(function(l){var tot=0;Object.keys(l.grade||{}).forEach(function(k){tot+=parseInt(l.grade[k])||0;});var val=envValor(l.grade);var pronto=!!l.aplicado;var atras=!pronto&&(l.prontoEm||0)<Date.now();var stat=pronto?'<span class="fab-lotestatus ok">produzido · no estoque</span>':(atras?'<span class="fab-lotestatus atraso">&#9888; em atraso</span>':'<span class="fab-lotestatus">em produção</span>');var datas='Colocado '+fmtData(l.inicioEm||l.criadoEm)+' · '+(pronto?('pronto '+fmtData(l.aplicadoEm||l.prontoEm)):('previsão '+fmtData(l.prontoEm)));var btns=pronto?'<button class="fab-romlink" onclick="event.stopPropagation();peEditarLote(\''+fid+'\',\''+l.id+'\')">&#9998; corrigir</button>':('<button class="fab-pronto-btn" onclick="event.stopPropagation();peLotePronto(\''+fid+'\',\''+l.id+'\')">&#10003; confirmar pronto (entra no estoque)</button><button class="fab-romlink" onclick="event.stopPropagation();peEditarLote(\''+fid+'\',\''+l.id+'\')">&#9998; corrigir</button>');return '<details class="fab-hist'+(atras?' lote-atraso':'')+'"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(l.inicioEm||l.criadoEm)+'</b> '+stat+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody"><div class="fab-lotedatas">'+datas+'</div>'+_peEnvioDetalhe(fid,l.grade||{},custoMap)+btns+'</div></details>';}).join('')+(lotesAll.length>3?'<button class="fab-vermais" onclick="peVerMais(\'prod\')">'+(_peVerMaisProd?'ver menos':'ver mais ('+(lotesAll.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada em produção.</div>';
+  var emProdHTML=lotesAll.length?(lotesShow.map(function(l){var tot=0;Object.keys(l.grade||{}).forEach(function(k){tot+=parseInt(l.grade[k])||0;});var val=envValor(l.grade);var pronto=!!l.aplicado;var atras=!pronto&&(l.prontoEm||0)<Date.now();var stat=pronto?'<span class="fab-lotestatus ok">produzido · no estoque</span>':(atras?'<span class="fab-lotestatus atraso">&#9888; em atraso</span>':'<span class="fab-lotestatus">em produção</span>');var datas='Colocado '+fmtData(l.inicioEm||l.criadoEm)+' · '+(pronto?('pronto '+fmtData(l.aplicadoEm||l.prontoEm)):('previsão '+fmtData(l.prontoEm)));var btns=(pronto?'':'<button class="fab-pronto-btn" onclick="event.stopPropagation();peLotePronto(\''+fid+'\',\''+l.id+'\')">&#10003; confirmar pronto (entra no estoque)</button>')+'<div class="fab-loteacts"><button class="fab-romlink" onclick="event.stopPropagation();peEditarLote(\''+fid+'\',\''+l.id+'\')">&#9998; corrigir</button><button class="fab-dellote" onclick="event.stopPropagation();peExcluirLote(\''+fid+'\',\''+l.id+'\')">&times; excluir</button></div>';return '<details class="fab-hist'+(atras?' lote-atraso':'')+'"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(l.inicioEm||l.criadoEm)+'</b> '+stat+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody"><div class="fab-lotedatas">'+datas+'</div>'+_peEnvioDetalhe(fid,l.grade||{},custoMap)+btns+'</div></details>';}).join('')+(lotesAll.length>3?'<button class="fab-vermais" onclick="peVerMais(\'prod\')">'+(_peVerMaisProd?'ver menos':'ver mais ('+(lotesAll.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada em produção.</div>';
   var envs=(cache.ordens||[]).filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});
   var envsShow=_peVerMaisHist?envs:envs.slice(0,3);
   var histHTML=envs.length?(envsShow.map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+(o.romaneio?'<button class="fab-romlink" onclick="event.stopPropagation();peVerRomaneio(\''+o.romaneio.ref+'\')">&#128206; ver romaneio'+(o.romaneio.nome?' ('+escapeHtml(o.romaneio.nome)+')':'')+'</button>':'')+'</div></details>';}).join('')+(envs.length>3?'<button class="fab-vermais" onclick="peVerMais(\'hist\')">'+(_peVerMaisHist?'ver menos':'ver mais ('+(envs.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada enviado ainda.</div>';
@@ -3275,11 +3311,13 @@ function peRenderLista(c){
     const diasSem=fb?Math.floor((Date.now()-fb)/86400000):null;
     const quem=lr>fb?'Loretto':'fábrica';
     const st=cache._previa?'prévia · dados de exemplo':(ultimo?(parada?('parada há '+diasSem+' dias'):('por '+quem+' · '+fmtData(ultimo))):'sem dados ainda');
-    return '<div class="pe-fcardwrap"><button class="pe-fcard'+(parada?' parada':'')+'" onclick="peAbrir(\''+f.fid+'\')">'+
-      '<div class="pe-fic">&#128095;</div>'+
-      '<div class="pe-finfo"><div class="pe-fnome">'+escapeHtml(f.nome)+(cache._previa?' <span class="pe-badge ex">exemplo</span>':(parada?' <span class="pe-badge">!</span>':''))+'</div><div class="pe-fst">'+escapeHtml(st)+'</div></div>'+
-      '<div class="pe-fnums"><div><b>'+f.qtdModelos+'</b> modelos</div><div><b>'+totEst+'</b> em estoque</div></div>'+
-      '<div class="pe-farrow">&#8250;</div></button><button class="pe-fcardkey" onclick="peAcessoModalAbrir(\''+f.fid+'\')" title="Acesso da fabrica">&#128273; Acesso</button></div>';
+    return '<div class="pe-fcardwrap'+(parada?' parada':'')+'"><button class="pe-fcard" onclick="peAbrir(\''+f.fid+'\')">'+
+      '<div class="pe-ftop"><div class="pe-fic">&#128095;</div>'+
+      '<div class="pe-fnamewrap"><span class="pe-fnome">'+escapeHtml(f.nome)+'</span>'+(cache._previa?'<span class="pe-badge ex">exemplo</span>':(parada?'<span class="pe-badge">!</span>':''))+'</div>'+
+      '<span class="pe-farrow">&#8250;</span></div>'+
+      '<div class="pe-fst">'+escapeHtml(st)+'</div>'+
+      '<div class="pe-fstats"><div class="pe-fstat"><b>'+f.qtdModelos+'</b><span>modelos</span></div><div class="pe-fstat"><b>'+totEst+'</b><span>em estoque</span></div></div>'+
+      '</button><button class="pe-fcardkey" onclick="peAcessoModalAbrir(\''+f.fid+'\')" title="Acesso da fabrica">&#128273; Acesso</button></div>';
   }).join('')+'</div>';
 }
 function peRenderFabrica(c,fid){
@@ -3446,6 +3484,27 @@ var _peEnvioRomaneio=null;
 var _peVerMaisHist=false,_peVerMaisProd=false,_peEditLote=null;
 window.peVerMais=function(qual){if(qual==='hist')_peVerMaisHist=!_peVerMaisHist;else _peVerMaisProd=!_peVerMaisProd;if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);};
 function peYMD(ts){var d=new Date(ts);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function peExcluirLote(fid,loteId){
+  var cache=_peEstoqueCache[fid]||{};var l=(cache.lotesProducao||[]).find(function(x){return x.id===loteId;});if(!l){return;}
+  var tot=0;Object.keys(l.grade||{}).forEach(function(k){tot+=parseInt(l.grade[k])||0;});
+  if(!confirm('Excluir este lote de '+tot+' pares? Vai sair '+(l.aplicado?'do estoque':'da produção')+'.'))return;
+  var did=peDocId(fid);
+  function aplica(d,exists){
+    var est=Object.assign({},(d&&d.estoque)||(cache.estoque||{}));
+    var prod=Object.assign({},(d&&d.produzindo)||(cache.produzindo||{}));
+    var lotes=((d&&Array.isArray(d.lotesProducao))?d.lotesProducao:(cache.lotesProducao||[])).map(function(x){return Object.assign({},x);});
+    var lo=lotes.find(function(x){return x.id===loteId;});if(!lo){return;}
+    var tgt=lo.aplicado?est:prod;
+    Object.keys(lo.grade||{}).forEach(function(k){var q=parseInt(lo.grade[k])||0;if(q<=0)return;tgt[k]=Math.max(0,(parseInt(tgt[k])||0)-q);if(!tgt[k])delete tgt[k];});
+    lotes=lotes.filter(function(x){return x.id!==loteId;});
+    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].lotesProducao=lotes;}
+    var payload={estoque:est,produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now()};
+    if(!_db){renderModoFabrica(fid);toast('Lote excluído');return;}
+    var ref=_db.collection('ls_pe').doc(did);(exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Lote excluído');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+  }
+  if(!_db){aplica({},false);return;}
+  _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){});
+}
 function peLotePronto(fid,loteId){
   var did=peDocId(fid);
   function aplica(d,exists){
