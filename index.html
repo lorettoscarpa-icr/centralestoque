@@ -691,6 +691,11 @@
   .pe-romaneio input[type=file]{font-size:13px;color:var(--areia)}
   .pe-rommsg{margin-top:6px;font-size:12px;color:#9bd58c;min-height:14px}
   .fab-romlink{margin-top:8px;background:rgba(201,169,80,.14);border:1px solid var(--ouro);color:var(--ouro);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+  .fab-vermais{display:block;width:100%;text-align:center;background:none;border:1px dashed var(--linha);color:rgba(251,249,238,.6);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;font-family:inherit;margin-top:4px}
+  .fab-lotestatus{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#dcbd60;background:rgba(220,189,96,.14);border:1px solid rgba(220,189,96,.4);border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+  .fab-lotestatus.ok{color:#9bd58c;background:rgba(155,213,140,.14);border-color:rgba(155,213,140,.4)}
+  .fab-lotedatas{font-size:12px;color:rgba(251,249,238,.55);margin-bottom:8px}
+  .pe-prazo input[type=date]{width:auto;padding:8px 10px;background:rgba(0,0,0,.25);border:1px solid var(--linha);color:var(--areia);border-radius:8px;font-family:'DM Mono',monospace}
   .fab-prod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid #d4b45a;border-radius:12px;padding:12px;margin-bottom:10px}
   .fab-prod .pe-ordit{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:rgba(251,249,238,.8)}
   .fab-prod button{margin-top:8px}
@@ -2900,7 +2905,7 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v18 · produzir e romaneio';
+var PE_FAB_VER='v19 · em produção e datas';
 function loadFirebaseFab(cb){
   loadFirebase(function(){
     if(window.firebase&&window.firebase.auth){cb();return;}
@@ -3032,16 +3037,18 @@ function renderModoFabrica(fid){
   function envValor(g){var v=0;Object.keys(g||{}).forEach(function(k){v+=(parseInt(g[k])||0)*(custoMap[k.split('|')[0]]||0);});return v;}
   var gE=0,gP=0,gVE=0,gVP=0;mods.forEach(function(m){var c=m.custo||0;m.cores.forEach(function(co){(co.tams||[]).forEach(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0,pz=parseInt(prod[k])||0;gE+=e;gP+=pz;gVE+=e*c;gVP+=pz*c;});});});
   var totalGeral='<div class="fab-totalgeral"><span class="fab-tgh">Total geral</span><span>Estoque <b>'+gE+'</b> pares · <b>'+brMoney(gVE)+'</b></span><span>Produção <b>'+gP+'</b> pares · <b>'+brMoney(gVP)+'</b></span></div>';
-  var lotesP=(cache.lotesProducao||[]).filter(function(l){return l&&!l.aplicado;}).sort(function(a,b){return (a.prontoEm||0)-(b.prontoEm||0);});
-  var lotesHTML=lotesP.length?('<div class="fab-sec"><div class="fab-sech">Produção a caminho</div>'+lotesP.map(function(l){var tot=0;Object.keys(l.grade||{}).forEach(function(k){tot+=parseInt(l.grade[k])||0;});var atras=(l.prontoEm||0)<=Date.now();return '<div class="fab-lote'+(atras?' pronto':'')+'"><b>'+tot+' pares</b><span>'+(atras?'pronto · entrando no estoque':'fica pronto em '+fmtData(l.prontoEm))+'</span></div>';}).join('')+'</div>'):'';
+  var lotesAll=(cache.lotesProducao||[]).slice().sort(function(a,b){return (b.criadoEm||0)-(a.criadoEm||0);});
+  var lotesShow=_peVerMaisProd?lotesAll:lotesAll.slice(0,3);
+  var emProdHTML=lotesAll.length?(lotesShow.map(function(l){var tot=0;Object.keys(l.grade||{}).forEach(function(k){tot+=parseInt(l.grade[k])||0;});var val=envValor(l.grade);var pronto=!!l.aplicado;var stat=pronto?'<span class="fab-lotestatus ok">produzido · no estoque</span>':'<span class="fab-lotestatus">em produção</span>';var datas='Colocado '+fmtData(l.criadoEm)+' · '+(pronto?('pronto '+fmtData(l.aplicadoEm||l.prontoEm)):('fica pronto '+fmtData(l.prontoEm)));return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(l.criadoEm)+'</b> '+stat+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody"><div class="fab-lotedatas">'+datas+'</div>'+_peEnvioDetalhe(fid,l.grade||{},custoMap)+'<button class="fab-romlink" onclick="event.stopPropagation();peEditarLote(\''+fid+'\',\''+l.id+'\')">&#9998; corrigir</button></div></details>';}).join('')+(lotesAll.length>3?'<button class="fab-vermais" onclick="peVerMais(\'prod\')">'+(_peVerMaisProd?'ver menos':'ver mais ('+(lotesAll.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada em produção.</div>';
   var envs=(cache.ordens||[]).filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});
-  var histHTML=envs.length?envs.slice(0,3).map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+(o.romaneio?'<button class="fab-romlink" onclick="event.stopPropagation();peVerRomaneio(\''+o.romaneio.ref+'\')">&#128206; ver romaneio'+(o.romaneio.nome?' ('+escapeHtml(o.romaneio.nome)+')':'')+'</button>':'')+'</div></details>';}).join('')+(envs.length>3?'<div class="fab-hist-mais">+ '+(envs.length-3)+' envios anteriores</div>':''):'<div class="fab-vazio">Nada enviado ainda.</div>';
+  var envsShow=_peVerMaisHist?envs:envs.slice(0,3);
+  var histHTML=envs.length?(envsShow.map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+(o.romaneio?'<button class="fab-romlink" onclick="event.stopPropagation();peVerRomaneio(\''+o.romaneio.ref+'\')">&#128206; ver romaneio'+(o.romaneio.nome?' ('+escapeHtml(o.romaneio.nome)+')':'')+'</button>':'')+'</div></details>';}).join('')+(envs.length>3?'<button class="fab-vermais" onclick="peVerMais(\'hist\')">'+(_peVerMaisHist?'ver menos':'ver mais ('+(envs.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada enviado ainda.</div>';
   host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div>'+(_FAB_PERFIL?'<div class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></div>':'')+'</div>'+
     '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><span class="fab-sech-btns"><button class="btn fab-prod-top" onclick="peProduzirAbrir(\''+fid+'\')">Produzir</button><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></span></div>'+pedHTML+'</div>'+
+    '<div class="fab-sec"><div class="fab-sech">Em produção</div>'+emProdHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">Salva sozinho &middot; preencha que salva automaticamente</span></div>':'')+'</div>'+
     totalGeral+
-    lotesHTML+
     '<div class="fab-rodape">Loretto Scarpa · '+PE_FAB_VER+'</div></div>';
 }
 function peFabSair(){try{firebase.auth().signOut();}catch(e){}try{location.reload();}catch(e){}}
@@ -3428,6 +3435,46 @@ function peOrdemPronta(fid,oid){
 function _peOrdemResumo(fid,grade){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={},tot=0;Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');(byMC[mc]=byMC[mc]||[]).push(p[2]+'\u00d7'+q);tot+=q;});var linhas=Object.keys(byMC).map(function(mc){return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(mc)+'</span><span class="pe-ordn">'+byMC[mc].join('  ')+'</span></div>';}).join('');return {html:linhas,tot:tot};}
 function _peEnvioDetalhe(fid,grade,custoMap){var mods=peModelosDaFabrica(fid),nome={};mods.forEach(function(m){nome[m.id]=m.nome;});var byMC={};Object.keys(grade||{}).forEach(function(k){var q=parseInt(grade[k])||0;if(q<=0)return;var p=k.split('|');var mc=p[0]+'||'+p[1];if(!byMC[mc])byMC[mc]={mid:p[0],cor:p[1],itens:[],val:0};byMC[mc].itens.push(p[2]+'\u00d7'+q);byMC[mc].val+=q*((custoMap&&custoMap[p[0]])||0);});return Object.keys(byMC).map(function(mc){var g=byMC[mc];var _rf=(typeof repRefDe==='function')?repRefDe(g.mid,g.cor):'';var label=(nome[g.mid]||g.mid)+(g.cor?' '+g.cor:'')+(_rf?' \u00b7 ref '+_rf:'');return '<div class="pe-ordit"><span class="pe-ordm">'+escapeHtml(label)+'</span><span class="pe-ordn">'+g.itens.join('  ')+(g.val?'  <b>'+brMoney(g.val)+'</b>':'')+'</span></div>';}).join('');}
 var _peEnvioRomaneio=null;
+var _peVerMaisHist=false,_peVerMaisProd=false,_peEditLote=null;
+window.peVerMais=function(qual){if(qual==='hist')_peVerMaisHist=!_peVerMaisHist;else _peVerMaisProd=!_peVerMaisProd;if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);};
+function peYMD(ts){var d=new Date(ts);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function peEditarLote(fid,loteId){
+  var cache=_peEstoqueCache[fid]||{};var l=(cache.lotesProducao||[]).find(function(x){return x.id===loteId;});if(!l){toast('Lote n\u00e3o encontrado');return;}
+  _peEnvio={fid:fid,oid:null,avulso:false};_peEditLote={fid:fid,loteId:loteId};
+  var mods=peModelosDaFabrica(fid);
+  var rows=mods.map(function(m){return m.cores.map(function(co){
+    var _rf=(typeof repRefDe==='function')?repRefDe(m.id,co.nome):'';
+    var mc=m.nome+(co.nome?' '+co.nome:'')+(_rf?' \u00b7 ref '+_rf:'');
+    var cells=co.tams.slice().sort(function(a,b){return parseFloat(a)-parseFloat(b);}).map(function(t){var sk=m.id+'|'+co.nome+'|'+t;var v=parseInt((l.grade||{})[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(t)+'</label><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value="'+(v||'')+'"></div>';}).join('');
+    return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
+  }).join('');}).join('');
+  var hoje=peYMD(Date.now());var dataCampo=l.aplicado?'':'<div class="pe-prazo"><label>Fica pronto em</label><input type="date" id="peProdData" min="'+hoje+'" value="'+(l.prontoEm?peYMD(l.prontoEm):'')+'"></div>';
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Corrigir produ\u00e7\u00e3o</div><p class="pe-metahint">Ajuste a grade do que foi colocado em produ\u00e7\u00e3o.'+(l.aplicado?' Esse lote j\u00e1 entrou no estoque \u2014 a corre\u00e7\u00e3o ajusta o estoque.':'')+'</p>'+dataCampo+rows;
+  var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Salvar correção';ok.onclick=function(){peSalvarLote();};}
+  document.getElementById('peEnvioModal').classList.remove('hide');
+}
+function peSalvarLote(){
+  if(!_peEditLote)return;var fid=_peEditLote.fid,loteId=_peEditLote.loteId;
+  var nova={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)nova[i.getAttribute('data-k')]=q;});
+  var dataInp=document.getElementById('peProdData');var novoPronto=null;if(dataInp&&dataInp.value){var pp=dataInp.value.split('-');novoPronto=new Date(parseInt(pp[0]),parseInt(pp[1])-1,parseInt(pp[2]),0,0,0).getTime();}
+  var did=peDocId(fid);
+  function aplica(d,exists){
+    var est=Object.assign({},(d&&d.estoque)||((_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}));
+    var prod=Object.assign({},(d&&d.produzindo)||((_peEstoqueCache[fid]&&_peEstoqueCache[fid].produzindo)||{}));
+    var lotes=((d&&Array.isArray(d.lotesProducao))?d.lotesProducao:((_peEstoqueCache[fid]&&_peEstoqueCache[fid].lotesProducao)||[])).map(function(x){return Object.assign({},x);});
+    var l=lotes.find(function(x){return x.id===loteId;});if(!l){return;}
+    var tgt=l.aplicado?est:prod;var old=l.grade||{};var keys={};Object.keys(old).forEach(function(k){keys[k]=1;});Object.keys(nova).forEach(function(k){keys[k]=1;});
+    Object.keys(keys).forEach(function(k){var delta=(parseInt(nova[k])||0)-(parseInt(old[k])||0);if(delta!==0){tgt[k]=Math.max(0,(parseInt(tgt[k])||0)+delta);if(!tgt[k])delete tgt[k];}});
+    l.grade=nova;if(!l.aplicado&&novoPronto)l.prontoEm=novoPronto;l.editadoEm=Date.now();
+    if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].lotesProducao=lotes;}
+    var payload={estoque:est,produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now()};
+    if(!_db){renderModoFabrica(fid);toast('Corrigido');return;}
+    var ref=_db.collection('ls_pe').doc(did);(exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Corrigido');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+  }
+  if(!_db){aplica({},false);_peEditLote=null;peEnvioFechar();return;}
+  _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({},false);});
+  _peEditLote=null;peEnvioFechar();
+}
 function peLerArquivo(file,cb){
   if(!file){cb(null);return;}
   if((file.type||'').indexOf('image')===0){
@@ -3476,21 +3523,22 @@ function peProduzirAbrir(fid){
     var cells=co.tams.slice().sort(function(a,b){return parseFloat(a)-parseFloat(b);}).map(function(t){var sk=m.id+'|'+co.nome+'|'+t;var jp=parseInt(prod[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(t)+'</label><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value=""><div class="pe-envest">produz '+jp+'</div></div>';}).join('');
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
   }).join('');}).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Colocar em produ\u00e7\u00e3o</div><p class="pe-metahint">Quanto vai produzir de cada numera\u00e7\u00e3o. Entra no <b>Produzindo</b> e passa pro estoque sozinho quando ficar pronto.</p><div class="pe-prazo"><label>Fica pronto em</label><input type="number" min="0" inputmode="numeric" id="peProdDias" value="7"><span>dias</span></div>'+rows;
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Colocar em produ\u00e7\u00e3o</div><p class="pe-metahint">Quanto vai produzir de cada numera\u00e7\u00e3o. Entra no <b>Produzindo</b> e passa pro estoque sozinho na data que ficar pronto.</p><div class="pe-prazo"><label>Fica pronto em</label><input type="date" id="peProdData" min="'+peYMD(Date.now())+'" value="'+peYMD(Date.now()+7*86400000)+'"></div>'+rows;
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar produção';ok.onclick=function(){peConfirmarProduzir(fid);};}
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
 function peConfirmarProduzir(fid){
   var grade={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)grade[i.getAttribute('data-k')]=q;});
   if(!Object.keys(grade).length){toast('Informe a grade de produção');return;}
-  var dias=parseInt((document.getElementById('peProdDias')||{}).value)||0;
-  var prontoEm=Date.now()+dias*86400000;
+  var dataInp=document.getElementById('peProdData');var prontoEm;
+  if(dataInp&&dataInp.value){var pp=dataInp.value.split('-');prontoEm=new Date(parseInt(pp[0]),parseInt(pp[1])-1,parseInt(pp[2]),0,0,0).getTime();}else{prontoEm=Date.now()+7*86400000;}
+  if(prontoEm<Date.now())prontoEm=Date.now()+86400000;
   var did=peDocId(fid);var quem=_FAB_PERFIL||_FAB_EMAIL||'Fábrica';
   function aplica(d,exists){
     var prod=Object.assign({},(d&&d.produzindo)||((_peEstoqueCache[fid]&&_peEstoqueCache[fid].produzindo)||{}));
     Object.keys(grade).forEach(function(k){prod[k]=(parseInt(prod[k])||0)+grade[k];});
     var lotes=(d&&Array.isArray(d.lotesProducao))?d.lotesProducao.slice():(((_peEstoqueCache[fid]&&_peEstoqueCache[fid].lotesProducao)||[]).slice());
-    lotes.push({id:'lp'+Date.now(),grade:grade,dias:dias,criadoEm:Date.now(),prontoEm:prontoEm,por:quem,aplicado:false});
+    lotes.push({id:'lp'+Date.now(),grade:grade,criadoEm:Date.now(),prontoEm:prontoEm,por:quem,aplicado:false});
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].lotesProducao=lotes;}
     var payload={produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now(),lorettoPor:quem};
     if(!_db){renderModoFabrica(fid);toast('Produção registrada');return;}
