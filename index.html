@@ -727,6 +727,15 @@
   .fab-hist.lote-atraso{border-left:3px solid #ff3b2f}
   .fab-pronto-btn{display:inline-flex;align-items:center;gap:5px;width:auto;margin-top:10px;background:#9bd58c;color:#1d2b12;border:0;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
   .fab-loteacts{display:flex;gap:8px;margin-top:8px}
+  /* === Linha de ações padronizada (pedidos / produção / histórico) === */
+  .fab-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid rgba(220,189,96,.13)}
+  .fab-act{display:inline-flex;align-items:center;gap:5px;border:1px solid transparent;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:600;line-height:1;cursor:pointer;font-family:'Barlow',sans-serif;transition:.15s}
+  .fab-act:hover{filter:brightness(1.08)}
+  .fab-act.ok{background:#9bd58c;color:#1d2b12;border-color:#9bd58c}
+  .fab-act.parcial{background:rgba(220,189,96,.12);color:var(--ouro-claro);border-color:var(--ouro)}
+  .fab-act.ghost{background:rgba(201,169,80,.1);color:var(--ouro);border-color:rgba(201,169,80,.4)}
+  .fab-act.danger{background:rgba(255,45,35,.1);color:#ff6f61;border-color:rgba(255,59,47,.4)}
+  .fab-act.push{margin-left:auto}
   .fab-loteacts .fab-romlink{margin-top:0}
   .fab-dellote{background:rgba(255,45,35,.12);border:1px solid rgba(255,59,47,.45);color:#ff6f61;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}
   .fab-prod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-left:3px solid #d4b45a;border-radius:12px;padding:12px;margin-bottom:10px}
@@ -1260,7 +1269,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
-      <div class="side-build">build 26/06 · editar financeiro</div>
+      <div class="side-build">build 27/06 · produção parcial</div>
     </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
@@ -3111,10 +3120,10 @@ function renderModoFabrica(fid){
   var lotesAll=(cache.lotesProducao||[]).slice().sort(function(a,b){return (b.inicioEm||b.criadoEm||0)-(a.inicioEm||a.criadoEm||0);});
   var atrasados=lotesAll.filter(function(l){return l&&!l.aplicado&&(l.prontoEm||0)<Date.now();}).length;
   var lotesShow=_peVerMaisProd?lotesAll:lotesAll.slice(0,3);
-  var emProdHTML=lotesAll.length?(lotesShow.map(function(l){var grade=l.grade||{};var rcv=l.recebido||{};var tot=0;Object.keys(grade).forEach(function(k){tot+=parseInt(grade[k])||0;});var totRcv=0;Object.keys(grade).forEach(function(k){totRcv+=Math.min(parseInt(rcv[k])||0,parseInt(grade[k])||0);});var falta=Math.max(0,tot-totRcv);var val=envValor(grade);var pronto=!!l.aplicado;var atras=!pronto&&(l.prontoEm||0)<Date.now();var stat=pronto?('<span class="fab-lotestatus ok">'+(l.finalizadoParcial?'fechado parcial · no estoque':'produzido · no estoque')+'</span>'):(totRcv>0?('<span class="fab-lotestatus parcial">parcial · '+totRcv+' no estoque · falta '+falta+'</span>'):(atras?'<span class="fab-lotestatus atraso">&#9888; em atraso</span>':'<span class="fab-lotestatus">em produção</span>'));var datas='Colocado '+fmtData(l.inicioEm||l.criadoEm)+' · '+(pronto?('pronto '+fmtData(l.aplicadoEm||l.prontoEm)):('previsão '+fmtData(l.prontoEm)));var btns=(pronto?'':'<button class="fab-pronto-btn" onclick="event.stopPropagation();peReceberLote(\''+fid+'\',\''+l.id+'\')">&#10003; receber pronto</button>')+'<div class="fab-loteacts"><button class="fab-romlink" onclick="event.stopPropagation();peEditarLote(\''+fid+'\',\''+l.id+'\')">&#9998; corrigir</button><button class="fab-dellote" onclick="event.stopPropagation();peExcluirLote(\''+fid+'\',\''+l.id+'\')">&times; excluir</button></div>';return '<details class="fab-hist'+(atras?' lote-atraso':'')+'"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(l.inicioEm||l.criadoEm)+'</b> '+stat+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody"><div class="fab-lotedatas">'+datas+'</div>'+_peEnvioDetalhe(fid,grade,custoMap)+_peRecebHTML(l)+btns+'</div></details>';}).join('')+(lotesAll.length>3?'<button class="fab-vermais" onclick="peVerMais(\'prod\')">'+(_peVerMaisProd?'ver menos':'ver mais ('+(lotesAll.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada em produção.</div>';
+  var emProdHTML=lotesAll.length?(lotesShow.map(function(l){var grade=l.grade||{};var rcv=l.recebido||{};var tot=0;Object.keys(grade).forEach(function(k){tot+=parseInt(grade[k])||0;});var totRcv=0;Object.keys(grade).forEach(function(k){totRcv+=Math.min(parseInt(rcv[k])||0,parseInt(grade[k])||0);});var falta=Math.max(0,tot-totRcv);var val=envValor(grade);var pronto=!!l.aplicado;var atras=!pronto&&(l.prontoEm||0)<Date.now();var stat=pronto?('<span class="fab-lotestatus ok">'+(l.finalizadoParcial?'fechado parcial · no estoque':'produzido · no estoque')+'</span>'):(totRcv>0?('<span class="fab-lotestatus parcial">parcial · '+totRcv+' no estoque · falta '+falta+'</span>'):(atras?'<span class="fab-lotestatus atraso">&#9888; em atraso</span>':'<span class="fab-lotestatus">em produção</span>'));var datas='Colocado '+fmtData(l.inicioEm||l.criadoEm)+' · '+(pronto?('pronto '+fmtData(l.aplicadoEm||l.prontoEm)):('previsão '+fmtData(l.prontoEm)));var btns='<div class="fab-acts">'+(pronto?'':'<button class="fab-act ok" onclick="event.stopPropagation();peReceberTudo(\''+fid+'\',\''+l.id+'\')">&#10003; recebi tudo</button><button class="fab-act parcial" onclick="event.stopPropagation();peReceberLote(\''+fid+'\',\''+l.id+'\')">recebimento parcial</button>')+'<button class="fab-act ghost" onclick="event.stopPropagation();peEditarLote(\''+fid+'\',\''+l.id+'\')">&#9998; corrigir</button><button class="fab-act danger push" onclick="event.stopPropagation();peExcluirLote(\''+fid+'\',\''+l.id+'\')">&times; excluir</button></div>';return '<details class="fab-hist'+(atras?' lote-atraso':'')+'"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(l.inicioEm||l.criadoEm)+'</b> '+stat+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody"><div class="fab-lotedatas">'+datas+'</div>'+_peEnvioDetalhe(fid,grade,custoMap)+_peRecebHTML(l)+btns+'</div></details>';}).join('')+(lotesAll.length>3?'<button class="fab-vermais" onclick="peVerMais(\'prod\')">'+(_peVerMaisProd?'ver menos':'ver mais ('+(lotesAll.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada em produção.</div>';
   var envs=(cache.ordens||[]).filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});
   var envsShow=_peVerMaisHist?envs:envs.slice(0,3);
-  var histHTML=envs.length?(envsShow.map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+((o.correcoes&&o.correcoes.length)?' <span class="fab-corrbadge">corrigido</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+_peCorrecoesHTML(o)+'<div class="fab-loteacts">'+(o.romaneio?'<button class="fab-romlink" onclick="event.stopPropagation();peVerRomaneio(\''+o.romaneio.ref+'\')">&#128206; ver romaneio'+(o.romaneio.nome?' ('+escapeHtml(o.romaneio.nome)+')':'')+'</button>':'')+'<button class="fab-romlink" onclick="event.stopPropagation();peCorrigirEnvio(\''+fid+'\',\''+o.id+'\')">&#9998; corrigir envio</button></div></div></details>';}).join('')+(envs.length>3?'<button class="fab-vermais" onclick="peVerMais(\'hist\')">'+(_peVerMaisHist?'ver menos':'ver mais ('+(envs.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada enviado ainda.</div>';
+  var histHTML=envs.length?(envsShow.map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+((o.correcoes&&o.correcoes.length)?' <span class="fab-corrbadge">corrigido</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+_peCorrecoesHTML(o)+'<div class="fab-acts">'+(o.romaneio?'<button class="fab-act ghost" onclick="event.stopPropagation();peVerRomaneio(\''+o.romaneio.ref+'\')">&#128206; ver romaneio'+(o.romaneio.nome?' ('+escapeHtml(o.romaneio.nome)+')':'')+'</button>':'')+'<button class="fab-act ghost" onclick="event.stopPropagation();peCorrigirEnvio(\''+fid+'\',\''+o.id+'\')">&#9998; corrigir envio</button></div></div></details>';}).join('')+(envs.length>3?'<button class="fab-vermais" onclick="peVerMais(\'hist\')">'+(_peVerMaisHist?'ver menos':'ver mais ('+(envs.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada enviado ainda.</div>';
   host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div>'+(_FAB_PERFIL?'<div class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></div>':'')+'</div>'+
     '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><span class="fab-sech-btns"><button class="btn fab-prod-top" onclick="peProduzirAbrir(\''+fid+'\')">Produzir</button><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></span></div>'+pedHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Em produção'+(atrasados?' <span class="fab-atraso-cnt">&#9888; '+atrasados+' em atraso</span>':'')+'</div>'+emProdHTML+'</div>'+
@@ -3581,6 +3590,18 @@ function peReceberLoteSalvar(modo){
   if(!_peRecebLote)return;var fid=_peRecebLote.fid,loteId=_peRecebLote.loteId;
   var receb={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var pend=parseInt(i.getAttribute('data-pend'))||0;var q=Math.min(pend,Math.max(0,parseInt(i.value)||0));if(q>0)receb[i.getAttribute('data-k')]=q;});
   if(modo!=='fechar'&&!Object.keys(receb).length){toast('Informe o que ficou pronto');return;}
+  _peRecebLote=null;peEnvioFechar();
+  _peReceberAplicar(fid,loteId,receb,modo);
+}
+function peReceberTudo(fid,loteId){
+  var cache=_peEstoqueCache[fid]||{};var l=(cache.lotesProducao||[]).find(function(x){return x.id===loteId;});if(!l){toast('Lote n\u00e3o encontrado');return;}
+  if(l.aplicado){toast('Esse lote já foi recebido');return;}
+  var grade=l.grade||{},rcv=l.recebido||{},pend={},tot=0;
+  Object.keys(grade).forEach(function(k){var p=(parseInt(grade[k])||0)-(parseInt(rcv[k])||0);if(p>0){pend[k]=p;tot+=p;}});
+  if(!tot){toast('Nada pendente nesse lote');return;}
+  _peReceberAplicar(fid,loteId,pend,'entrada');
+}
+function _peReceberAplicar(fid,loteId,receb,modo){
   var quem=(typeof _FAB_PERFIL!=='undefined'&&_FAB_PERFIL)||(typeof userAtual!=='undefined'?userAtual:'')||'Fábrica';
   var did=peDocId(fid);
   function aplica(d,exists){
@@ -3603,11 +3624,10 @@ function peReceberLoteSalvar(modo){
     if(!_db){renderModoFabrica(fid);toast(msg);return;}
     var ref=_db.collection('ls_pe').doc(did);(exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast(msg);}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
   }
-  if(!_db){aplica({},false);_peRecebLote=null;peEnvioFechar();return;}
+  if(!_db){aplica({},false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({},false);});
-  _peRecebLote=null;peEnvioFechar();
 }
-window.peReceberLote=peReceberLote;window.peReceberLoteSalvar=peReceberLoteSalvar;
+window.peReceberLote=peReceberLote;window.peReceberLoteSalvar=peReceberLoteSalvar;window.peReceberTudo=peReceberTudo;
 function peEditarLote(fid,loteId){
   var cache=_peEstoqueCache[fid]||{};var l=(cache.lotesProducao||[]).find(function(x){return x.id===loteId;});if(!l){toast('Lote n\u00e3o encontrado');return;}
   _peEnvio={fid:fid,oid:null,avulso:false};_peEditLote={fid:fid,loteId:loteId};
