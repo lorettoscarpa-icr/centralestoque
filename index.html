@@ -585,6 +585,10 @@
   .etimg-add-fila:hover{background:rgba(220,189,96,.26)}
   .etimg-del{background:rgba(255,45,35,.1);border:1px solid rgba(255,59,47,.4);color:#ff6f61;border-radius:7px;padding:6px 9px;font-size:13px;cursor:pointer;line-height:1}
   .etimg-empty{grid-column:1/-1;font-size:12.5px;color:rgba(251,249,238,.4);padding:10px 0}
+  .entrada-conf-panel{background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:14px;padding:16px;margin-bottom:20px}
+  .ecp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .ecp-open{white-space:nowrap;flex-shrink:0}
+  .entrada-conf-frame{width:100%;height:78vh;min-height:520px;border:1px solid var(--linha);border-radius:12px;background:#4a5c2a;display:block}
   .et-titulo{font-weight:800;font-size:calc(var(--lh)*.14);text-align:center;text-transform:uppercase;letter-spacing:.5px;line-height:1;border-bottom:2px solid #000;padding-bottom:calc(var(--lh)*.03);margin-bottom:calc(var(--lh)*.045)}
   .et-linha{font-size:calc(var(--lh)*.084);line-height:1.28;margin-bottom:calc(var(--lh)*.012);word-break:break-word}
   .et-linha b{font-weight:800}
@@ -1275,7 +1279,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </div>
     <nav class="side-nav">
       <button class="side-item active" data-tab="etiquetas" data-title="Etiquetas"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.3V5A1.5 1.5 0 0 1 5 3.5h6.3a2 2 0 0 1 1.4.6l7.2 7.2a1.8 1.8 0 0 1 0 2.5l-6.3 6.3a1.8 1.8 0 0 1-2.5 0L4.1 12.7a2 2 0 0 1-.6-1.4z"/><circle cx="7.8" cy="7.8" r="1.25"/></svg></span> Etiquetas</button>
-      <button class="side-item" data-tab="entrada" data-title="Entrada de mercadoria" style="display:none"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 2.5h5L21 13"/><path d="M3 13l3-8h12l3 8v5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18z"/></svg></span> Entrada</button>
+      <button class="side-item" data-tab="entrada" data-title="Entrada em estoque"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 2.5h5L21 13"/><path d="M3 13l3-8h12l3 8v5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18z"/></svg></span> Entrada em estoque</button>
       <button class="side-item" data-tab="reposicao" data-title="Reposição"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6 6.3L3.5 8.5"/><path d="M3.5 4v4.5H8"/><path d="M4 13a8 8 0 0 0 14 4.7l2.5-2.2"/><path d="M20.5 20v-4.5H16"/></svg></span> Reposição</button>
       <button class="side-item" data-tab="pronta" data-title="Pronta-entrega (fábricas)"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9 5 4.6h14L20.5 9"/><path d="M4 9v9.4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M3.5 9a2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0"/><path d="M9.3 19.4V14.5h5.4v4.9"/></svg></span> Pronta-entrega</button>
       <button class="side-item" data-tab="financeiro" data-title="Financeiro"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 6.3v11.4"/><path d="M14.7 9c0-1.2-1.2-1.9-2.7-1.9s-2.7.7-2.7 2 1.2 1.7 2.7 1.7 2.7.6 2.7 1.9-1.2 2-2.7 2-2.7-.7-2.7-1.9"/></svg></span> Financeiro</button>
@@ -1286,7 +1290,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
-      <div class="side-build">build 01/07 · etiquetas de imagem</div>
+      <div class="side-build">build 01/07 · entrada em estoque</div>
     </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
@@ -1341,6 +1345,16 @@ textarea.cons-field{min-height:80px;resize:vertical}
   </div>
 
   <div id="tab-entrada" class="hide">
+    <div class="entrada-conf-panel">
+      <div class="ecp-head">
+        <div>
+          <h2 style="margin:0">Conferência de fábrica &rarr; CSV de entrada</h2>
+          <p class="hint" style="margin:4px 0 0">Bipe os códigos da fábrica, confira a grade e gere o <b>CSV (código;quantidade)</b> pra dar entrada no estoque / importar no Kigi.</p>
+        </div>
+        <button class="btn btn-ghost ecp-open" id="entradaConfAbrir" type="button" title="Abrir em tela cheia">Abrir em nova aba &#8599;</button>
+      </div>
+      <iframe id="entradaConfFrame" class="entrada-conf-frame" src="conferencia-fabrica.html" title="Conferência de fábrica" loading="lazy"></iframe>
+    </div>
     <div class="twocol">
       <div class="panel">
         <h2>Entrada de mercadoria</h2>
@@ -2285,6 +2299,7 @@ document.querySelectorAll('.et-subtab').forEach(function(b){b.addEventListener('
   else{if(iv)iv.classList.add('hide');if(sv)sv.classList.remove('hide');}
 });});
 renderEtImgs();
+if($('entradaConfAbrir'))$('entradaConfAbrir').addEventListener('click',function(){window.open('conferencia-fabrica.html','_blank');});
 $('clearBtn').addEventListener('click',()=>{if(fila.length&&confirm('Limpar toda a fila?')){fila=[];refreshFila();}});
 
 /* ---------- SINCRONIZACAO (por usuario; Firebase embutido) ---------- */
