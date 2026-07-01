@@ -568,6 +568,23 @@
   .av-opt{font-size:11px;opacity:.5;font-weight:400;text-transform:none;letter-spacing:0}
   /* etiquetas especiais */
   .etiqueta.tipo-defeito,.etiqueta.tipo-petrocado,.etiqueta.tipo-encomenda{justify-content:flex-start}
+  .etiqueta.tipo-imagem{padding:0;background:#fff}
+  .et-img-full{width:100%;height:100%;object-fit:contain;display:block}
+  .et-subtabs{display:flex;gap:8px;margin-bottom:14px}
+  .et-subtab{flex:1;background:rgba(0,0,0,.18);border:1px solid var(--linha);color:rgba(251,249,238,.7);border-radius:10px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:.15s}
+  .et-subtab:hover{border-color:var(--ouro)}
+  .et-subtab.on{background:var(--ouro);color:#1d2b12;border-color:var(--ouro)}
+  .etimg-intro{font-size:13px;color:rgba(251,249,238,.6);line-height:1.5;margin-bottom:14px}
+  .etimg-add{display:inline-block;cursor:pointer;width:auto}
+  .etimg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:16px}
+  .etimg-card{background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .etimg-thumb{width:100%;height:110px;object-fit:contain;background:#fff;display:block}
+  .etimg-nome{font-size:11px;color:rgba(251,249,238,.6);padding:6px 8px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .etimg-acts{display:flex;gap:6px;padding:8px}
+  .etimg-add-fila{flex:1;background:rgba(220,189,96,.14);border:1px solid var(--ouro);color:var(--ouro);border-radius:7px;padding:6px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif}
+  .etimg-add-fila:hover{background:rgba(220,189,96,.26)}
+  .etimg-del{background:rgba(255,45,35,.1);border:1px solid rgba(255,59,47,.4);color:#ff6f61;border-radius:7px;padding:6px 9px;font-size:13px;cursor:pointer;line-height:1}
+  .etimg-empty{grid-column:1/-1;font-size:12.5px;color:rgba(251,249,238,.4);padding:10px 0}
   .et-titulo{font-weight:800;font-size:calc(var(--lh)*.14);text-align:center;text-transform:uppercase;letter-spacing:.5px;line-height:1;border-bottom:2px solid #000;padding-bottom:calc(var(--lh)*.03);margin-bottom:calc(var(--lh)*.045)}
   .et-linha{font-size:calc(var(--lh)*.084);line-height:1.28;margin-bottom:calc(var(--lh)*.012);word-break:break-word}
   .et-linha b{font-weight:800}
@@ -649,7 +666,7 @@
   .fab-corh img{width:38px;height:38px;border-radius:8px;object-fit:cover;border:1px solid var(--linha)}
   .fab-noimg{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.2);color:rgba(220,189,96,.5)}
   .fab-corn{font-weight:700;font-size:16px}
-  .fab-ref{font-family:'DM Mono',monospace;font-size:18px;font-weight:600;color:var(--ouro-claro);background:rgba(220,189,96,.2);border:1.5px solid var(--ouro);border-radius:8px;padding:3px 13px;letter-spacing:.5px;line-height:1.2}
+  .fab-ref{font-family:'DM Mono',monospace;font-size:18px;font-weight:600;color:var(--ouro-claro);background:rgba(220,189,96,.2);border:1.5px solid var(--ouro);border-radius:8px;padding:3px 13px;letter-spacing:.5px;line-height:1.2;text-transform:uppercase}
   .fab-cells{display:flex;gap:8px;flex-wrap:wrap}
   .fab-cell{background:rgba(0,0,0,.2);border:1px solid var(--linha);border-radius:10px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:78px}
   .fab-tam{font-family:'DM Mono',monospace;font-weight:700;color:var(--ouro);font-size:14px}
@@ -936,7 +953,7 @@
   .pe-corfoto{width:42px;height:42px;border-radius:8px;object-fit:cover;border:1px solid var(--linha);flex:0 0 auto}
   .pe-corfoto.ph{display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(0,0,0,.2);color:rgba(220,189,96,.5)}
   .pe-cornome{font-weight:600;color:var(--areia);font-size:14px;margin-right:auto}
-  .pe-corref{font-family:'DM Mono',monospace;font-size:13.5px;color:var(--ouro);background:rgba(220,189,96,.14);border:1px solid var(--linha);border-radius:6px;padding:2px 9px;font-weight:500;margin-left:8px;letter-spacing:.3px}
+  .pe-corref{font-family:'DM Mono',monospace;font-size:13.5px;color:var(--ouro);background:rgba(220,189,96,.14);border:1px solid var(--linha);border-radius:6px;padding:2px 9px;font-weight:500;margin-left:8px;letter-spacing:.3px;text-transform:uppercase}
   .pe-corhide{color:#e08a8a !important;border-color:rgba(224,138,138,.35) !important}
   .pe-corhidden{margin-top:12px;font-size:12px;color:rgba(251,249,238,.55);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
   .pe-corchip{background:rgba(0,0,0,.2);border:1px dashed var(--linha);border-radius:20px;padding:3px 11px;font-size:12px;color:var(--ouro-claro);cursor:pointer;font-family:'Barlow',sans-serif}
@@ -1269,7 +1286,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
-      <div class="side-build">build 27/06 · produção parcial</div>
+      <div class="side-build">build 01/07 · etiquetas de imagem</div>
     </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
@@ -1280,6 +1297,8 @@ textarea.cons-field{min-height:80px;resize:vertical}
   <div id="tab-etiquetas">
     <div class="grid">
       <div>
+        <div class="et-subtabs"><button type="button" class="et-subtab on" data-etsub="sapatos">Sapatos</button><button type="button" class="et-subtab" data-etsub="imagens">&#128247; Etiquetas de imagem</button></div>
+        <div id="etSapatosView">
         <div class="search-bar">
           <div class="search-inner">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -1299,6 +1318,12 @@ textarea.cons-field{min-height:80px;resize:vertical}
         </div>
         <div class="cont-info" id="contInfo"></div>
         <div id="listaAcc"></div>
+        </div>
+        <div id="etImagensView" class="hide">
+          <div class="etimg-intro">Adicione imagens já no formato de etiqueta (avisos, promoções, cuidados, etc.). Elas entram na fila de impressão e imprimem junto com as outras etiquetas.</div>
+          <label class="btn btn-ouro etimg-add">&#128247; Adicionar imagem(ns)<input type="file" id="etImgFile" accept="image/*" multiple class="hide"></label>
+          <div class="etimg-grid" id="etImgGrid"></div>
+        </div>
       </div>
 
       <div class="fila-panel">
@@ -2016,6 +2041,11 @@ if($('layoutModal'))$('layoutModal').addEventListener('click',e=>{if(e.target.id
 
 function montaEtiqueta(container,d,barId){
   const leao=logoData?`<img src="${logoData}">`:LEAO_SVG;
+  if(d.tipo==='imagem'){
+    container.classList.add('tipo-imagem');
+    container.innerHTML=`<img class="et-img-full" src="${d.img||''}" alt="">`;
+    return;
+  }
   if(d.tipo==='defeito'){
     container.classList.add('tipo-defeito');
     container.innerHTML=`<div class="et-titulo">Defeito</div>`+
@@ -2029,7 +2059,8 @@ function montaEtiqueta(container,d,barId){
     container.classList.add('tipo-petrocado');
     container.innerHTML=`<div class="et-titulo">Pé trocado</div>`+
       `<div class="et-linha"><b>Modelo:</b> ${escapeHtml(d.nome||'')}${d.cor?' '+escapeHtml(d.cor):''}</div>`+
-      `<div class="et-pares"><div class="et-par"><div class="pe">Direito</div><div class="nn">${escapeHtml(d.n1||'')}</div></div><div class="et-par"><div class="pe">Esquerdo</div><div class="nn">${escapeHtml(d.n2||'')}</div></div></div>`+
+      `<div class="et-pares"><div class="et-par"><div class="pe">Esquerdo</div><div class="nn">${escapeHtml(d.n2||'')}</div></div><div class="et-par"><div class="pe">Direito</div><div class="nn">${escapeHtml(d.n1||'')}</div></div></div>`+
+      `<div class="et-linha" style="text-align:center;font-size:calc(var(--lh)*.07);opacity:.8"><b>Entrada:</b> ${fmtData(d.ts)}</div>`+
       `<div class="et-foot"><div class="et-assin"><div class="et-leao">${leao}</div><div class="marca">Loretto Scarpa</div></div></div>`;
     return;
   }
@@ -2197,7 +2228,8 @@ function renderFila(){
   if(!fila.length){lst.innerHTML='<div class="empty">Abra um sapato e clique na numeração.</div>';return;}
   lst.innerHTML=fila.map((e,i)=>{
     let nome,meta;
-    if(e.tipo==='defeito'){nome='&#9888; DEFEITO &middot; '+escapeHtml(e.nome);meta=escapeHtml(e.fab||'-')+' &middot; '+escapeHtml(e.desc||'');}
+    if(e.tipo==='imagem'){nome='&#128247; IMAGEM';meta=escapeHtml(e.nome||'etiqueta de imagem');}
+    else if(e.tipo==='defeito'){nome='&#9888; DEFEITO &middot; '+escapeHtml(e.nome);meta=escapeHtml(e.fab||'-')+' &middot; '+escapeHtml(e.desc||'');}
     else if(e.tipo==='petrocado'){nome='&#128095; PÉ TROCADO &middot; '+escapeHtml(e.nome);meta='Dir '+escapeHtml(e.n1||'')+' &middot; Esq '+escapeHtml(e.n2||'');}
     else if(e.tipo==='encomenda'){nome='&#128230; ENCOMENDA &middot; '+escapeHtml(e.cliente||'');meta=escapeHtml(e.modelo||'')+(e.vendedora?' &middot; '+escapeHtml(e.vendedora):'');}
     else {nome=escapeHtml(e.nome)+' &middot; '+escapeHtml(e.cor);meta=escapeHtml(e.codigo)+' &middot; no '+escapeHtml(e.numero);}
@@ -2208,6 +2240,51 @@ window.qtd=(i,d)=>{fila[i].qtd=Math.max(1,fila[i].qtd+d);refreshFila();};
 window.setQtd=(i,v)=>{const n=parseInt(v);fila[i].qtd=isNaN(n)||n<1?1:n;refreshFila();};
 window.remover=(i)=>{fila.splice(i,1);refreshFila();};
 function refreshFila(){renderFila();renderLista();persistFila();}
+/* ---------- ETIQUETAS DE IMAGEM (extras) ---------- */
+let etImgs=[];try{etImgs=carregar('loretto_etimgs',[])||[];}catch(e){etImgs=[];}
+function salvaEtImgs(){try{localStorage.setItem('loretto_etimgs',JSON.stringify(etImgs));}catch(e){}}
+function renderEtImgs(){
+  const g=$('etImgGrid');if(!g)return;
+  if(!etImgs.length){g.innerHTML='<div class="etimg-empty">Nenhuma imagem ainda. Toque em "Adicionar imagem(ns)".</div>';return;}
+  g.innerHTML=etImgs.map(function(im){return '<div class="etimg-card"><img class="etimg-thumb" src="'+im.data+'" alt=""><div class="etimg-nome">'+escapeHtml(im.nome||'imagem')+'</div><div class="etimg-acts"><button class="etimg-add-fila" onclick="etImgFila(\''+im.id+'\')">+ fila</button><button class="etimg-del" onclick="etImgDel(\''+im.id+'\')" title="Excluir">&times;</button></div></div>';}).join('');
+}
+function _etImgResize(file,cb){
+  const rd=new FileReader();
+  rd.onload=function(){
+    const img=new Image();
+    img.onload=function(){
+      const max=480;let w=img.width||max,h=img.height||max;
+      if(w>max||h>max){const r=Math.min(max/w,max/h);w=Math.round(w*r);h=Math.round(h*r);}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      const cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,w,h);cx.drawImage(img,0,0,w,h);
+      let out;try{out=cv.toDataURL('image/jpeg',0.8);}catch(e){out=rd.result;}
+      cb(out);
+    };
+    img.onerror=function(){cb(null);};img.src=rd.result;
+  };
+  rd.onerror=function(){cb(null);};rd.readAsDataURL(file);
+}
+function etImgUpload(files){
+  const arr=Array.prototype.slice.call(files||[]);if(!arr.length)return;
+  let pend=arr.length,ok=0;
+  arr.forEach(function(f){
+    if(!/^image\//.test(f.type)){pend--;if(pend<=0){salvaEtImgs();renderEtImgs();}return;}
+    _etImgResize(f,function(data){
+      if(data){etImgs.unshift({id:'im'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),nome:(f.name||'imagem').replace(/\.[^.]+$/,''),data:data});ok++;}
+      pend--;if(pend<=0){salvaEtImgs();renderEtImgs();if(ok)toast(ok>1?ok+' imagens adicionadas':'Imagem adicionada');}
+    });
+  });
+}
+window.etImgFila=function(id){const im=etImgs.find(function(x){return x.id===id;});if(!im)return;fila.push({key:'img-'+Date.now(),tipo:'imagem',modId:'',img:im.data,nome:im.nome,qtd:1});refreshFila();toast('Etiqueta de imagem na fila');};
+window.etImgDel=function(id){if(!confirm('Excluir esta imagem da lista?'))return;etImgs=etImgs.filter(function(x){return x.id!==id;});salvaEtImgs();renderEtImgs();};
+if($('etImgFile'))$('etImgFile').addEventListener('change',function(){etImgUpload(this.files);this.value='';});
+document.querySelectorAll('.et-subtab').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.et-subtab').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+  const sub=b.getAttribute('data-etsub'),sv=$('etSapatosView'),iv=$('etImagensView');
+  if(sub==='imagens'){if(sv)sv.classList.add('hide');if(iv)iv.classList.remove('hide');renderEtImgs();}
+  else{if(iv)iv.classList.add('hide');if(sv)sv.classList.remove('hide');}
+});});
+renderEtImgs();
 $('clearBtn').addEventListener('click',()=>{if(fila.length&&confirm('Limpar toda a fila?')){fila=[];refreshFila();}});
 
 /* ---------- SINCRONIZACAO (por usuario; Firebase embutido) ---------- */
