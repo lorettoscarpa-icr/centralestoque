@@ -1351,7 +1351,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
-      <div class="side-build">build 02/07 · conferência: fábrica, pedido, histórico</div>
+      <div class="side-build">build 02/07 · código maiúsculo + import sem duplicar</div>
     </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
@@ -2095,7 +2095,7 @@ function getTamanhos(m,c){
   if(c.skus)return Object.keys(c.skus).sort((a,b)=>{const A=tamSort(a),B=tamSort(b);return A[0]-B[0]||(A[0]?(''+A[1]).localeCompare(''+B[1]):A[1]-B[1]);});
   const r=[];for(let n=m.ini;n<=m.fim;n++)r.push(String(n));return r;
 }
-function getCodigo(m,c,tam){if(c.skus&&c.skus[tam])return c.skus[tam];return (m.prefixo||'')+(c.sigla||'')+tam;}
+function getCodigo(m,c,tam){var v=(c.skus&&c.skus[tam])?c.skus[tam]:((m.prefixo||'')+(c.sigla||'')+tam);return String(v).toUpperCase();}
 window.LS_getCodigo=getCodigo;window.LS_catalogo=function(){return catalogo;};
 window.LS_fornecedores=function(){try{return Object.keys(repForn||{}).filter(function(k){return !(repForn[k]&&repForn[k].off);}).map(function(k){return {fid:k,nome:(repForn[k].apelido||repForn[k].nome||k)};}).sort(function(a,b){return a.nome.localeCompare(b.nome);});}catch(e){return [];}};
 window.LS_pedidosDaFabrica=function(fid){try{return (repoHist||[]).filter(function(p){return p&&p.fk===fid;}).sort(function(a,b){return (b.data||0)-(a.data||0);}).map(function(p){return {id:p.id,rot:new Date(p.data).toLocaleDateString('pt-BR')+' \u00b7 '+(p.status==='pendente'?'a caminho':'recebido')};});}catch(e){return [];}};
@@ -2779,11 +2779,17 @@ $('kigiFile').addEventListener('change',ev=>{
       const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
       const novo=processarKigi(rows);
       if(!novo.length){toast('Nenhum calcado valido no arquivo');return;}
-      if(!confirm('Importar '+novo.length+' modelos de calcado? Substitui o catalogo atual (mantem favoritos).'))return;
-      const favNomes=new Set(catalogo.filter(m=>favoritos.has(m.id)).map(m=>m.nome));
-      catalogo=novo;favoritos=new Set(catalogo.filter(m=>favNomes.has(m.nome)).map(m=>m.id));
+      const res=mergeKigi(catalogo, novo);
+      const resumo='Importar do Kigi (mesclar sem duplicar):\n\n'+
+        '• Modelos novos: '+res.novosMod+'\n'+
+        '• Cores novas: '+res.coresAdd+'\n'+
+        '• Códigos novos adicionados: '+res.codigosAdd+'\n'+
+        '• Códigos que já existiam (mantidos como estão): '+res.jaExistiam+'\n\n'+
+        'Nada do que você já tem é apagado ou duplicado. Continuar?';
+      if(!confirm(resumo))return;
+      catalogo=res.catalogo;
       marcarUser();salvarCatalogo();salvarFav();abertos.clear();renderLista();renderGerenciar();
-      toast(novo.length+' calcados importados');
+      toast('Importado: +'+res.codigosAdd+' códigos · '+res.jaExistiam+' já existiam');
     }catch(err){console.error(err);toast('Erro ao ler o relatório');}
   };
   r.readAsArrayBuffer(f);ev.target.value='';
@@ -2814,6 +2820,31 @@ function processarKigi(rows){
   }
   modelos.sort((a,b)=>a.nome.localeCompare(b.nome));
   return modelos;
+}
+// Mescla import do Kigi no catálogo atual, sem duplicar: código que já existe é mantido (o do sistema vence)
+function mergeKigi(atual, novo){
+  const base = atual ? JSON.parse(JSON.stringify(atual)) : [];
+  const codeLoc = {}; // CÓDIGO(maiúsc) -> true (já existe em algum lugar)
+  base.forEach(m=>(m.cores||[]).forEach(c=>{const sk=c.skus||{};Object.keys(sk).forEach(t=>{codeLoc[String(sk[t]).toUpperCase()]=true;});}));
+  const nameIdx = {}; base.forEach((m,mi)=>{nameIdx[normKey(m.nome)]=mi;});
+  let novosMod=0, coresAdd=0, codigosAdd=0, jaExistiam=0;
+  (novo||[]).forEach(nm=>{
+    const nk = normKey(nm.nome);
+    let mi = nameIdx[nk];
+    if(mi==null){ base.push({id:'u'+Date.now()+Math.floor(Math.random()*9999), nome:nm.nome, prefixo:nm.prefixo||'', cat:nm.cat||'calcado', cores:[]}); mi=base.length-1; nameIdx[nk]=mi; novosMod++; }
+    const m = base[mi];
+    const corIdx = {}; (m.cores||[]).forEach((c,ci)=>{corIdx[normKey(c.nome)]=ci;});
+    (nm.cores||[]).forEach(nc=>{
+      const nck = normKey(nc.nome);
+      const skus = nc.skus||{};
+      const inedito = {};
+      Object.keys(skus).forEach(t=>{const up=String(skus[t]).toUpperCase(); if(codeLoc[up]){ jaExistiam++; } else { inedito[t]=up; codeLoc[up]=true; codigosAdd++; }});
+      if(!Object.keys(inedito).length) return; // toda essa cor já existe pelos códigos
+      if(corIdx[nck]!=null){ const c=m.cores[corIdx[nck]]; c.skus=c.skus||{}; Object.assign(c.skus, inedito); }
+      else { m.cores.push({nome:nc.nome, sigla:(nc.sigla||'').toUpperCase(), hex:nc.hex||corHex(nc.nome), skus:inedito}); corIdx[nck]=m.cores.length-1; coresAdd++; }
+    });
+  });
+  return { catalogo: base.filter(m=>m.cores&&m.cores.length), novosMod, coresAdd, codigosAdd, jaExistiam };
 }
 
 // ===================== EDITOR MANUAL =====================
@@ -2858,7 +2889,7 @@ function lerCoresEditor(){
       if(inputs.length){
         const tinha=r.dataset.tinhaskus==='1';
         const skus={};let dif=false;
-        inputs.forEach(inp=>{const tam=inp.dataset.tam;const formula=pref+sigla+tam;const cod=inp.value.trim()||formula;skus[tam]=cod;if(cod!==formula)dif=true;});
+        inputs.forEach(inp=>{const tam=inp.dataset.tam;const formula=(pref+sigla+tam).toUpperCase();const cod=(inp.value.trim()||formula).toUpperCase();skus[tam]=cod;if(cod!==formula)dif=true;});
         if(Object.keys(skus).length&&(tinha||dif))o.skus=skus;
       }
     }
