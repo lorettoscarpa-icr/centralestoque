@@ -554,6 +554,21 @@
   .av-forn-row .val{color:var(--ouro);font-family:'DM Mono',monospace;font-size:13px;min-width:92px;text-align:right}
   .av-lista{display:flex;flex-direction:column;gap:8px}
   .av-item{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;background:rgba(0,0,0,.2);border:1px solid var(--linha);border-radius:10px}
+  .av-item .ai-chk{margin-top:2px;width:18px;height:18px;flex-shrink:0;accent-color:var(--ouro);cursor:pointer}
+  .av-item.sel{border-color:var(--ouro);background:rgba(220,189,96,.08)}
+  .df-selbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 13px;margin-bottom:12px;background:rgba(220,189,96,.1);border:1px solid var(--ouro);border-radius:10px}
+  .df-selbar .sb-count{font-weight:700;color:var(--ouro-claro);font-size:14px}
+  .df-selbar .sb-spacer{flex:1}
+  .df-selbar .btn-sm{padding:7px 13px;font-size:12.5px}
+  .df-devct{font-family:'DM Mono',monospace;font-size:12px;color:rgba(251,249,238,.5);font-weight:400;margin-left:4px}
+  .df-devlista{margin-top:6px}
+  .df-devlote{border:1px solid var(--linha);border-radius:10px;margin-bottom:12px;overflow:hidden}
+  .df-devlote-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:11px 13px;background:rgba(0,0,0,.18)}
+  .df-devlote-t{font-weight:700;font-size:14px}
+  .df-devlote-s{font-size:12px;color:rgba(251,249,238,.6);margin-top:2px;font-family:'DM Mono',monospace}
+  .df-devlote-acts{display:flex;gap:7px;flex-wrap:wrap}
+  .df-devitem{font-size:12.5px;color:rgba(251,249,238,.7);padding:6px 13px;border-top:1px solid rgba(220,189,96,.1)}
+  .df-devitem b{color:var(--areia)}
   .av-item .ai-main{flex:1;min-width:0}
   .av-item .ai-t{font-weight:700;font-size:14px}
   .av-item .ai-s{font-size:12px;color:rgba(251,249,238,.6);margin-top:2px;line-height:1.35}
@@ -1351,7 +1366,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
-      <div class="side-build">build 02/07 · código maiúsculo + import sem duplicar</div>
+      <div class="side-build">build 02/07 · devolução de defeitos em lote</div>
     </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
@@ -1828,7 +1843,12 @@ textarea.cons-field{min-height:80px;resize:vertical}
       <div class="rep-card">
         <div class="rep-card-h"><h3>Lancamentos</h3><button class="btn btn-ghost btn-sm" id="dfLimpar">Limpar tudo</button></div>
         <div id="dfFabChips" class="df-fabchips"></div>
+        <div id="dfSelBar" class="df-selbar hide"></div>
         <div id="dfLista" class="av-lista"></div>
+      </div>
+      <div class="rep-card">
+        <div class="rep-card-h" id="dfDevHead" style="cursor:pointer"><h3>&#128230; Devolvidos para a fábrica <span id="dfDevCt" class="df-devct"></span></h3><span id="dfDevCar" style="color:var(--ouro)">&#9660;</span></div>
+        <div id="dfDevLista" class="df-devlista hide"></div>
       </div>
     </section>
 
@@ -2623,13 +2643,16 @@ function avDatalists(){
   if($('avForns'))$('avForns').innerHTML=fs.map(n=>'<option value="'+escapeHtml(n)+'">').join('');
 }
 function renderAvarias(){avDatalists();dfRenderForm();ptRenderForm();renderDefeitos();renderPetroca();}
+let dfSel=new Set();
+function dfVisiveis(){var v=[];defeitos.forEach(function(d){if(d.devolvido)return;var f=((d.fab||'').trim())||'Sem fabricante';if(dfFabFiltro&&f!==dfFabFiltro)return;v.push(d.id);});return v;}
 function renderDefeitos(){
   if(!$('dfResumo'))return;
+  const ativos=defeitos.filter(d=>!d.devolvido);
   const map={};
-  defeitos.forEach(d=>{const f=((d.fab||'').trim())||'Sem fabricante';map[f]=map[f]||{n:0,v:0};map[f].n++;map[f].v+=avCustoDefeito(d);});
+  ativos.forEach(d=>{const f=((d.fab||'').trim())||'Sem fabricante';map[f]=map[f]||{n:0,v:0};map[f].n++;map[f].v+=avCustoDefeito(d);});
   const fs=Object.keys(map).sort((a,b)=>map[b].n-map[a].n);
-  const tot=defeitos.length,totv=defeitos.reduce((s,d)=>s+avCustoDefeito(d),0);
-  $('dfResumo').innerHTML=tot?(fs.map(f=>`<div class="av-forn-row"><span class="nome">${escapeHtml(f)}</span><span class="qt">${map[f].n} par(es)</span><span class="val">${brMoney(map[f].v)}</span><button class="btn btn-ghost btn-sm pdf-fab" data-fab="${escapeHtml(f)}">PDF</button></div>`).join('')+`<div class="av-forn-row" style="border-color:var(--ouro)"><span class="nome">TOTAL</span><span class="qt">${tot}</span><span class="val">${brMoney(totv)}</span></div>`):'<div class="empty">Nenhum defeito registrado.</div>';
+  const tot=ativos.length,totv=ativos.reduce((s,d)=>s+avCustoDefeito(d),0);
+  $('dfResumo').innerHTML=tot?(fs.map(f=>`<div class="av-forn-row"><span class="nome">${escapeHtml(f)}</span><span class="qt">${map[f].n} par(es)</span><span class="val">${brMoney(map[f].v)}</span><button class="btn btn-ghost btn-sm pdf-fab" data-fab="${escapeHtml(f)}">PDF</button></div>`).join('')+`<div class="av-forn-row" style="border-color:var(--ouro)"><span class="nome">TOTAL</span><span class="qt">${tot}</span><span class="val">${brMoney(totv)}</span></div>`):'<div class="empty">Nenhum defeito parado.</div>';
   $('dfResumo').querySelectorAll('.pdf-fab').forEach(b=>b.onclick=()=>avPdfDefeitos(b.dataset.fab));
   if(dfFabFiltro&&fs.indexOf(dfFabFiltro)<0)dfFabFiltro='';
   if($('dfFabChips')){
@@ -2637,12 +2660,74 @@ function renderDefeitos(){
     fs.forEach(function(f){_ch+='<button class="fin2-chip'+(dfFabFiltro===f?' on':'')+'" onclick="dfSetFab(\''+f.replace(/'/g,"\\'")+'\')">'+escapeHtml(f)+' ('+map[f].n+')</button>';});
     $('dfFabChips').innerHTML=tot?_ch:'';
   }
+  const visIds=new Set();
   $('dfLista').innerHTML=defeitos.map((d,i)=>{
+    if(d.devolvido)return '';
     const f=((d.fab||'').trim())||'Sem fabricante';
     if(dfFabFiltro&&f!==dfFabFiltro)return '';
-    return `<div class="av-item"><div class="ai-main"><div class="ai-t">${escapeHtml(d.nome)}${d.cor?' &middot; '+escapeHtml(d.cor):''}</div><div class="ai-s">${escapeHtml(d.fab||'-')} &middot; ${escapeHtml(d.desc||'')}${avCustoDefeito(d)?(' &middot; '+brMoney(avCustoDefeito(d))):''} &middot; <span class="tp">parado ${tempoParado(d.ts)}</span></div></div><button class="ai-ed" title="Editar" onclick="avEditarDefeito(${i})">&#9998;</button><button class="ai-du" title="Duplicar" onclick="avDuplicarDefeito(${i})">&#10697;</button><button class="ai-re" title="Reimprimir" onclick="avReimpDefeito(${i})">&#8635;</button><button class="ai-x" onclick="avDelDefeito(${i})">&times;</button></div>`;
-  }).join('')||'<div class="empty">Nenhum defeito'+(dfFabFiltro?' desta fábrica':' registrado')+'.</div>';
+    visIds.add(d.id);
+    const chk=dfSel.has(d.id)?'checked':'';
+    return `<div class="av-item${dfSel.has(d.id)?' sel':''}"><input type="checkbox" class="ai-chk" ${chk} onchange="avToggleSel(${JSON.stringify(d.id)})"><div class="ai-main"><div class="ai-t">${escapeHtml(d.nome)}${d.cor?' &middot; '+escapeHtml(d.cor):''}</div><div class="ai-s">${escapeHtml(d.fab||'-')} &middot; ${escapeHtml(d.desc||'')}${avCustoDefeito(d)?(' &middot; '+brMoney(avCustoDefeito(d))):''} &middot; <span class="tp">parado ${tempoParado(d.ts)}</span></div></div><button class="ai-ed" title="Editar" onclick="avEditarDefeito(${i})">&#9998;</button><button class="ai-du" title="Duplicar" onclick="avDuplicarDefeito(${i})">&#10697;</button><button class="ai-re" title="Reimprimir" onclick="avReimpDefeito(${i})">&#8635;</button><button class="ai-x" onclick="avDelDefeito(${i})">&times;</button></div>`;
+  }).join('')||'<div class="empty">Nenhum defeito'+(dfFabFiltro?' desta fábrica':' parado')+'.</div>';
+  [...dfSel].forEach(id=>{if(!visIds.has(id))dfSel.delete(id);});
+  renderDfSelBar([...visIds]);
+  renderDevolucoes();
 }
+function renderDfSelBar(vis){
+  const bar=$('dfSelBar');if(!bar)return;
+  if(!vis.length){bar.classList.add('hide');bar.innerHTML='';return;}
+  bar.classList.remove('hide');
+  const n=dfSel.size;let val=0;dfSel.forEach(id=>{const d=defeitos.find(x=>x.id===id);if(d)val+=avCustoDefeito(d);});
+  const allSel=vis.every(id=>dfSel.has(id));
+  bar.innerHTML='<button class="btn btn-ghost btn-sm" onclick="avSelTodos()">'+(allSel?'Desmarcar todos':'Selecionar todos')+'</button>'+(n?('<span class="sb-count">'+n+' selecionado(s)'+(val?' · '+brMoney(val):'')+'</span>'):'<span class="sb-count" style="opacity:.65;font-weight:400">marque os pares que vão voltar pra fábrica</span>')+'<span class="sb-spacer"></span>'+(n?('<button class="btn btn-ghost btn-sm" onclick="avSelLimpar()">Limpar</button><button class="btn btn-ouro btn-sm" onclick="avDevolverLote()">&#128230; Enviar '+n+' pra fábrica</button>'):'');
+}
+window.avToggleSel=function(id){if(dfSel.has(id))dfSel.delete(id);else dfSel.add(id);renderDefeitos();};
+window.avSelLimpar=function(){dfSel.clear();renderDefeitos();};
+window.avSelTodos=function(){const vis=dfVisiveis();const allSel=vis.length&&vis.every(id=>dfSel.has(id));if(allSel)vis.forEach(id=>dfSel.delete(id));else vis.forEach(id=>dfSel.add(id));renderDefeitos();};
+window.avDevolverLote=function(){
+  const ids=[...dfSel];const itens=ids.map(id=>defeitos.find(x=>x.id===id)).filter(Boolean);
+  if(!itens.length){toast('Selecione ao menos um defeito');return;}
+  const fabs=[...new Set(itens.map(d=>((d.fab||'').trim())||'Sem fabricante'))];
+  const fabLabel=fabs.length===1?fabs[0]:'Várias fábricas';
+  if(!confirm('Enviar '+itens.length+' defeito(s) para '+fabLabel+'?\n\nEles saem da lista de parados e vão pro histórico de devolvidos (sem serem apagados). Um relatório será gerado.'))return;
+  const loteId='dv'+Date.now(),quem=(typeof userAtual!=='undefined'&&userAtual)?userAtual:'',em=Date.now();
+  itens.forEach(d=>{d.devolvido=true;d.devLote=loteId;d.devEm=em;d.devFab=((d.fab||'').trim())||'Sem fabricante';d.devPor=quem;});
+  salvarDefeitos();dfSel.clear();renderDefeitos();
+  toast(itens.length+' enviado(s) pra fábrica');
+  var l=$('dfDevLista');if(l&&l.classList.contains('hide')){l.classList.remove('hide');var c=$('dfDevCar');if(c)c.style.transform='rotate(180deg)';}
+  avPdfLote(loteId);
+};
+function renderDevolucoes(){
+  const box=$('dfDevLista'),ct=$('dfDevCt');if(!box)return;
+  const devs=defeitos.filter(d=>d.devolvido);
+  const grupos={};devs.forEach(d=>{const k=d.devLote||('x'+d.id);(grupos[k]=grupos[k]||[]).push(d);});
+  const lotes=Object.keys(grupos).map(k=>{const arr=grupos[k];const fs=[...new Set(arr.map(x=>x.devFab||'Sem fabricante'))];return {id:k,em:arr[0].devEm||0,fab:fs.length===1?fs[0]:'Várias fábricas',por:arr[0].devPor||'',itens:arr,val:arr.reduce((s,x)=>s+avCustoDefeito(x),0)};}).sort((a,b)=>b.em-a.em);
+  if(ct)ct.textContent=lotes.length?('· '+lotes.length+' lote(s) · '+devs.length+' par(es)'):'';
+  if(!lotes.length){box.innerHTML='<div class="empty">Nada devolvido ainda. Marque defeitos na lista acima e clique em "Enviar pra fábrica".</div>';return;}
+  box.innerHTML=lotes.map(l=>{
+    const dt=new Date(l.em);const quando=dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR').slice(0,5);
+    const itensHtml=l.itens.map(it=>`<div class="df-devitem"><b>${escapeHtml(it.nome)}</b>${it.cor?' · '+escapeHtml(it.cor):''} · ${escapeHtml(it.desc||'-')}${avCustoDefeito(it)?' · '+brMoney(avCustoDefeito(it)):''}</div>`).join('');
+    return `<div class="df-devlote"><div class="df-devlote-h"><div><div class="df-devlote-t">${escapeHtml(l.fab)} · ${l.itens.length} par(es)${l.val?' · '+brMoney(l.val):''}</div><div class="df-devlote-s">${quando}${l.por?' · '+escapeHtml(l.por):''}</div></div><div class="df-devlote-acts"><button class="btn btn-ouro btn-sm" onclick="avPdfLote('${l.id}')">Relatório</button><button class="btn btn-ghost btn-sm" onclick="avDesfazerDev('${l.id}')">Desfazer</button></div></div>${itensHtml}</div>`;
+  }).join('');
+}
+window.avPdfLote=function(loteId){
+  const itens=defeitos.filter(d=>d.devolvido&&d.devLote===loteId);
+  if(!itens.length){toast('Lote não encontrado');return;}
+  const em=itens[0].devEm?new Date(itens[0].devEm):new Date();
+  const fabs={};itens.forEach(d=>{const f=((d.fab||'').trim())||'Sem fabricante';(fabs[f]=fabs[f]||[]).push(d);});
+  const fnames=Object.keys(fabs).sort();
+  const cab='<h1 class="rp2-h1">Devolução para a fábrica</h1><p style="text-align:center;margin:-6px 0 16px;color:#555;font-size:13px">'+em.toLocaleDateString('pt-BR')+' &middot; '+itens.length+' par(es)</p>';
+  const inner=cab+fnames.map((f,i)=>relatorioFabHtml(f,fabs[f],i<fnames.length-1)).join('');
+  avPdfShell(inner);
+};
+window.avDesfazerDev=function(loteId){
+  const itens=defeitos.filter(d=>d.devolvido&&d.devLote===loteId);
+  if(!itens.length)return;
+  if(!confirm('Desfazer esta devolução? Os '+itens.length+' par(es) voltam pra lista de defeitos parados.'))return;
+  itens.forEach(d=>{delete d.devolvido;delete d.devLote;delete d.devEm;delete d.devFab;delete d.devPor;});
+  salvarDefeitos();renderDefeitos();toast('Devolução desfeita');
+};
+if($('dfDevHead'))$('dfDevHead').addEventListener('click',function(){var l=$('dfDevLista'),c=$('dfDevCar');if(!l)return;l.classList.toggle('hide');if(c)c.style.transform=l.classList.contains('hide')?'':'rotate(180deg)';});
 window.dfSetFab=function(f){dfFabFiltro=f;renderDefeitos();};
 function ptComplementares(){
   const grupos={};
@@ -2720,7 +2805,7 @@ if($('dfAdd'))$('dfAdd').addEventListener('click',()=>dfRegistrar(true));
 if($('dfReg'))$('dfReg').addEventListener('click',()=>dfRegistrar(false));
 if($('ptAdd'))$('ptAdd').addEventListener('click',()=>ptRegistrar(true));
 if($('ptReg'))$('ptReg').addEventListener('click',()=>ptRegistrar(false));
-if($('dfLimpar'))$('dfLimpar').addEventListener('click',()=>{if(defeitos.length&&confirm('Apagar todos os defeitos registrados?')){defeitos=[];salvarDefeitos();renderDefeitos();}});
+if($('dfLimpar'))$('dfLimpar').addEventListener('click',()=>{const ativos=defeitos.filter(d=>!d.devolvido);if(ativos.length&&confirm('Apagar os '+ativos.length+' defeito(s) parados? (O histórico de devolvidos pra fábrica é mantido.)')){defeitos=defeitos.filter(d=>d.devolvido);dfSel.clear();salvarDefeitos();renderDefeitos();}});
 if($('ptLimpar'))$('ptLimpar').addEventListener('click',()=>{if(petrocados.length&&confirm('Apagar todos os pés trocados?')){petrocados=[];salvarPetroca();renderPetroca();}});
 document.querySelectorAll('.av-subnav .rep-tab').forEach(b=>b.addEventListener('click',()=>avSetSub(b.dataset.av)));
 if($('dfModelo'))['input','change'].forEach(ev=>$('dfModelo').addEventListener(ev,dfSyncModelo));
@@ -2748,11 +2833,12 @@ function relatorioFabHtml(f,lista,sep){
     `<h2 class="rp2-h2">Itens (tempo parado)</h2><table class="rp2-grade" style="width:100%"><thead><tr><th style="text-align:left">Modelo</th><th style="text-align:left">Defeito</th><th>Entrada</th><th>Parado</th><th>Custo</th></tr></thead><tbody>${ord.map(d=>`<tr><td style="text-align:left">${escapeHtml(d.nome)}${d.cor?' '+escapeHtml(d.cor):''}</td><td style="text-align:left">${escapeHtml(d.desc||'-')}</td><td>${fmtData(d.ts)}</td><td>${tempoParado(d.ts)}</td><td>${brMoney(avCustoDefeito(d))}</td></tr>`).join('')}</tbody></table></div>`;
 }
 window.avPdfDefeitos=(fab)=>{
-  if(!defeitos.length){toast('Nenhum defeito para o relatório');return;}
+  const ativos=defeitos.filter(d=>!d.devolvido);
+  if(!ativos.length){toast('Nenhum defeito para o relatório');return;}
   let fabs;
   if(fab)fabs=[fab];
-  else{const set={};defeitos.forEach(d=>{set[((d.fab||'').trim())||'Sem fabricante']=1;});fabs=Object.keys(set).sort();}
-  const inner=fabs.map((f,i)=>relatorioFabHtml(f,defeitos.filter(d=>(((d.fab||'').trim())||'Sem fabricante')===f),i<fabs.length-1)).join('');
+  else{const set={};ativos.forEach(d=>{set[((d.fab||'').trim())||'Sem fabricante']=1;});fabs=Object.keys(set).sort();}
+  const inner=fabs.map((f,i)=>relatorioFabHtml(f,ativos.filter(d=>(((d.fab||'').trim())||'Sem fabricante')===f),i<fabs.length-1)).join('');
   avPdfShell(inner);
 };
 window.avPdfPetroca=()=>{
