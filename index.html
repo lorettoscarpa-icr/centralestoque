@@ -562,6 +562,10 @@
   .df-selbar .btn-sm{padding:7px 13px;font-size:12.5px}
   .df-devct{font-family:'DM Mono',monospace;font-size:12px;color:rgba(251,249,238,.5);font-weight:400;margin-left:4px}
   .df-devlista{margin-top:6px}
+  .dfv-lbl{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ouro);font-weight:700;margin:14px 0 6px}
+  .dfv-inp{width:100%;background:rgba(0,0,0,.22);border:1px solid var(--linha);color:var(--creme,#fbf9ee);padding:10px 12px;font-family:'Barlow',sans-serif;font-size:14px;border-radius:8px;outline:none;transition:border-color .2s;box-sizing:border-box}
+  .dfv-inp:focus{border-color:var(--ouro)}
+  select.dfv-inp option{background:#2c3a1c;color:#fbf9ee}
   .df-devlote{border:1px solid var(--linha);border-radius:10px;margin-bottom:12px;overflow:hidden}
   .df-devlote-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:11px 13px;background:rgba(0,0,0,.18)}
   .df-devlote-t{font-weight:700;font-size:14px}
@@ -1366,7 +1370,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
-      <div class="side-build">build 06/07 · volumes obrigatórios no crédito (R$30/vol)</div>
+      <div class="side-build">build 06/07 · valor de venda do Kigi</div>
     </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
@@ -1847,7 +1851,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
         <div id="dfLista" class="av-lista"></div>
       </div>
       <div class="rep-card">
-        <div class="rep-card-h" id="dfDevHead" style="cursor:pointer"><h3>&#128230; Devolvidos para a fábrica <span id="dfDevCt" class="df-devct"></span></h3><span id="dfDevCar" style="color:var(--ouro)">&#9660;</span></div>
+        <div class="rep-card-h" id="dfDevHead" style="cursor:pointer"><h3>&#128230; Devolvidos para a fábrica <span id="dfDevCt" class="df-devct"></span></h3><span style="display:flex;align-items:center;gap:10px"><button class="btn btn-ghost btn-sm" title="Configurar valor do volume e transportadoras" onclick="event.stopPropagation();dfCfgAbrir()">&#9881; Config</button><span id="dfDevCar" style="color:var(--ouro)">&#9660;</span></span></div>
         <div id="dfDevLista" class="df-devlista hide"></div>
       </div>
     </section>
@@ -2430,7 +2434,8 @@ function refreshCatalogoUI(){
 }
 function mergeById(local,remoto){const map={};(remoto||[]).forEach(x=>{if(x&&x.id!=null)map[x.id]=x;});(local||[]).forEach(x=>{if(x&&x.id!=null&&!map[x.id])map[x.id]=x;});return Object.values(map).sort((a,b)=>(b.ts||0)-(a.ts||0));}
 function persistAvariasLocal(){try{localStorage.setItem('loretto_defeitos',JSON.stringify(defeitos));localStorage.setItem('loretto_petrocados',JSON.stringify(petrocados));}catch(e){}}
-function syncPushAvarias(){if(!_aRef)return;_aRef.set({defeitos:defeitos,petrocados:petrocados,ts:Date.now()}).catch(function(){});}
+function syncPushAvarias(){if(!_aRef)return;_aRef.set({defeitos:defeitos,petrocados:petrocados,devCfg:(typeof devCfg!=='undefined'?devCfg:null),ts:Date.now()}).catch(function(){});}
+function aplicarDevCfgRemoto(rc){if(!rc||typeof rc!=='object'||typeof devCfg==='undefined')return false;if(!Array.isArray(rc.transps))rc.transps=[];if(JSON.stringify(rc)!==JSON.stringify(devCfg)){devCfg=rc;try{localStorage.setItem('loretto_devcfg',JSON.stringify(devCfg));}catch(e){}return true;}return false;}
 function renderAvariasListas(){if(typeof renderDefeitos==='function'){renderDefeitos();renderPetroca();}}
 function aplicarPrefsRemoto(data){
   if(!data)return; let mudou=false;
@@ -2474,10 +2479,11 @@ function conectarSync(){
         const data=snap.data();
         const rd=(data&&Array.isArray(data.defeitos))?data.defeitos:[];
         const rp=(data&&Array.isArray(data.petrocados))?data.petrocados:[];
-        if(!_avInit){_avInit=true;const md=mergeById(defeitos,rd),mp=mergeById(petrocados,rp);const mudou=(JSON.stringify(md)!==JSON.stringify(rd)||JSON.stringify(mp)!==JSON.stringify(rp));defeitos=md;petrocados=mp;persistAvariasLocal();renderAvariasListas();if(mudou)syncPushAvarias();return;}
+        if(!_avInit){_avInit=true;const md=mergeById(defeitos,rd),mp=mergeById(petrocados,rp);const mudou=(JSON.stringify(md)!==JSON.stringify(rd)||JSON.stringify(mp)!==JSON.stringify(rp));defeitos=md;petrocados=mp;if(data&&data.devCfg)aplicarDevCfgRemoto(data.devCfg);persistAvariasLocal();renderAvariasListas();if(mudou||!(data&&data.devCfg))syncPushAvarias();return;}
         let mud=false;
         if(JSON.stringify(rd)!==JSON.stringify(defeitos)){defeitos=rd;mud=true;}
         if(JSON.stringify(rp)!==JSON.stringify(petrocados)){petrocados=rp;mud=true;}
+        if(data&&data.devCfg&&aplicarDevCfgRemoto(data.devCfg))mud=true;
         if(mud){persistAvariasLocal();renderAvariasListas();}
       },function(){});
       _fRef.get().then(function(snp){if(!snp.exists)_fRef.set({itens:fila,ts:Date.now()});}).catch(function(){});
@@ -2684,25 +2690,72 @@ function renderDfSelBar(vis){
 window.avToggleSel=function(id){if(dfSel.has(id))dfSel.delete(id);else dfSel.add(id);renderDefeitos();};
 window.avSelLimpar=function(){dfSel.clear();renderDefeitos();};
 window.avSelTodos=function(){const vis=dfVisiveis();const allSel=vis.length&&vis.every(id=>dfSel.has(id));if(allSel)vis.forEach(id=>dfSel.delete(id));else vis.forEach(id=>dfSel.add(id));renderDefeitos();};
-const FRETE_VOLUME=30; // R$ por caixa/volume devolvido — vira crédito com a fábrica
-function avPedirVolumes(atual){
-  while(true){
-    const r=prompt('OBRIGATÓRIO — Quantos VOLUMES (caixas) estão sendo devolvidos neste lote?\n\nCada volume gera R$ '+FRETE_VOLUME.toFixed(2).replace('.',',')+' de crédito de frete com a fábrica.',atual!=null?String(atual):'');
-    if(r===null){toast('Informe os volumes pra fechar o crédito');return null;}
-    const n=parseInt(String(r).replace(/\D/g,''),10);
-    if(!isFinite(n)||n<1){alert('Valor inválido. Informe a quantidade de volumes (mínimo 1).');continue;}
-    return n;
-  }
+/* ===== Config de devolução: valor do volume + transportadoras (sincroniza no Firestore) ===== */
+let devCfg=carregar('loretto_devcfg',{freteVol:30,transps:[]});
+if(!devCfg||typeof devCfg!=='object')devCfg={freteVol:30,transps:[]};
+if(!Array.isArray(devCfg.transps))devCfg.transps=[];
+function salvarDevCfg(push){try{localStorage.setItem('loretto_devcfg',JSON.stringify(devCfg));}catch(e){}if(push!==false&&typeof syncPushAvarias==='function')syncPushAvarias();}
+function freteVolAtual(){const v=Number(devCfg&&devCfg.freteVol);return (isFinite(v)&&v>0)?v:30;}
+function freteDoLote(arr){const u=Number(arr&&arr[0]&&arr[0].devFreteUnit);return (isFinite(u)&&u>0)?u:freteVolAtual();}
+function dfVolFechar(){var m=$('dfVolModal');if(m)m.classList.add('hide');_dfVolCb=null;}
+window.dfVolFechar=dfVolFechar;
+let _dfVolCb=null;
+function dfTranspOpts(sel){const list=devCfg.transps.slice().sort((a,b)=>a.localeCompare(b));return '<option value="">Selecione a transportadora...</option>'+list.map(t=>`<option value="${escapeHtml(t)}"${t===sel?' selected':''}>${escapeHtml(t)}</option>`).join('')+'<option value="__nova__">+ Nova transportadora (digitar)...</option>';}
+function dfVolModalAbrir(titulo,vAtual,tAtual,cb){
+  let m=$('dfVolModal');
+  if(!m){m=document.createElement('div');m.id='dfVolModal';m.className='modal-bg hide';m.innerHTML='<div class="modal"><button class="modal-x" type="button" onclick="dfVolFechar()" aria-label="Fechar">&times;</button><div id="dfVolBox"></div></div>';m.addEventListener('click',function(e){if(e.target===m)dfVolFechar();});document.body.appendChild(m);}
+  _dfVolCb=cb;
+  $('dfVolBox').innerHTML='<div class="pe-modal-h">'+titulo+'</div>'+
+    '<label class="dfv-lbl">Volumes (caixas) devolvidos — obrigatório</label>'+
+    '<input id="dfVolQtd" class="dfv-inp" type="number" min="1" step="1" value="'+(vAtual!=null&&vAtual>0?vAtual:'')+'" placeholder="Ex.: 2" style="width:100%">'+
+    '<p style="font-size:11.5px;color:rgba(251,249,238,.55);margin:5px 0 0">Cada volume gera <b style="color:var(--ouro-claro)">'+brMoney(freteVolAtual())+'</b> de crédito de frete com a fábrica <span style="cursor:pointer;text-decoration:underline dotted;color:var(--ouro)" onclick="dfVolFechar();dfCfgAbrir()">alterar valor</span></p>'+
+    '<label class="dfv-lbl">Por quem vou mandar (transportadora) — obrigatório</label>'+
+    '<select id="dfVolTransp" class="dfv-inp" style="width:100%" onchange="var t=$(\'dfVolTranspNova\');if(t)t.classList.toggle(\'hide\',this.value!==\'__nova__\')">'+dfTranspOpts(tAtual||'')+'</select>'+
+    '<input id="dfVolTranspNova" class="dfv-inp hide" type="text" placeholder="Nome da nova transportadora" style="width:100%;margin-top:8px">'+
+    '<div class="pe-modal-foot"><button class="btn" onclick="dfVolFechar()">Cancelar</button><button class="btn btn-ouro" onclick="dfVolOk()">Confirmar</button></div>';
+  if(tAtual&&devCfg.transps.indexOf(tAtual)<0&&$('dfVolTransp')){const o=document.createElement('option');o.value=tAtual;o.textContent=tAtual;o.selected=true;$('dfVolTransp').insertBefore(o,$('dfVolTransp').lastElementChild);}
+  m.classList.remove('hide');
+  setTimeout(function(){var i=$('dfVolQtd');if(i)i.focus();},60);
 }
+window.dfVolOk=function(){
+  const n=parseInt($('dfVolQtd')&&$('dfVolQtd').value,10);
+  if(!isFinite(n)||n<1){alert('Informe a quantidade de volumes (mínimo 1). É obrigatório pra fechar o crédito.');return;}
+  let t=$('dfVolTransp')?$('dfVolTransp').value:'';
+  if(t==='__nova__'){t=($('dfVolTranspNova')&&$('dfVolTranspNova').value||'').trim();if(!t){alert('Digite o nome da nova transportadora.');return;}if(devCfg.transps.indexOf(t)<0){devCfg.transps.push(t);salvarDevCfg();}}
+  if(!t){alert('Selecione por quem você vai mandar (transportadora).');return;}
+  const cb=_dfVolCb;dfVolFechar();if(cb)cb(n,t);
+};
+/* ===== Config: ⚙ valor do volume + transportadoras ===== */
+window.dfCfgAbrir=function(){
+  let m=$('dfVolModal');
+  if(!m){dfVolModalAbrir('',null,'',null);dfVolFechar();m=$('dfVolModal');}
+  _dfVolCb=null;
+  const lista=devCfg.transps.slice().sort((a,b)=>a.localeCompare(b));
+  window._dfCfgLista=lista;
+  $('dfVolBox').innerHTML='<div class="pe-modal-h">&#9881; Configurar devolução</div>'+
+    '<label class="dfv-lbl">Valor do crédito por volume (R$)</label>'+
+    '<input id="dfCfgVal" class="dfv-inp" type="number" min="0.01" step="0.01" value="'+freteVolAtual()+'" style="width:100%">'+
+    '<p style="font-size:11.5px;color:rgba(251,249,238,.55);margin:5px 0 0">Vale pros pr&oacute;ximos lotes. Lotes j&aacute; fechados mant&ecirc;m o valor da &eacute;poca.</p>'+
+    '<label class="dfv-lbl">Transportadoras</label>'+
+    '<div id="dfCfgTransps">'+(lista.length?lista.map((t,i)=>'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--linha)"><span style="flex:1">'+escapeHtml(t)+'</span><button class="btn btn-ghost btn-sm" onclick="dfCfgDelTransp('+i+')">&times;</button></div>').join(''):'<div style="font-size:12px;color:rgba(251,249,238,.5);padding:6px 0">Nenhuma cadastrada ainda.</div>')+'</div>'+
+    '<div style="display:flex;gap:8px;margin-top:10px"><input id="dfCfgNovaT" class="dfv-inp" type="text" placeholder="Nova transportadora" style="flex:1"><button class="btn btn-ghost" onclick="dfCfgAddTransp()">Adicionar</button></div>'+
+    '<div class="pe-modal-foot"><button class="btn" onclick="dfVolFechar()">Fechar</button><button class="btn btn-ouro" onclick="dfCfgSalvar()">Salvar</button></div>';
+  m.classList.remove('hide');
+};
+window.dfCfgAddTransp=function(){const i=$('dfCfgNovaT');const t=(i&&i.value||'').trim();if(!t)return;if(devCfg.transps.indexOf(t)<0)devCfg.transps.push(t);salvarDevCfg();dfCfgAbrir();toast('Transportadora adicionada');};
+window.dfCfgDelTransp=function(i){const t=(window._dfCfgLista||[])[i];if(t==null)return;if(!confirm('Remover "'+t+'" da lista? (Lotes antigos não mudam.)'))return;devCfg.transps=devCfg.transps.filter(x=>x!==t);salvarDevCfg();dfCfgAbrir();};
+window.dfCfgSalvar=function(){const v=parseFloat(String($('dfCfgVal')&&$('dfCfgVal').value||'').replace(',','.'));if(!isFinite(v)||v<=0){alert('Valor por volume inválido.');return;}devCfg.freteVol=v;salvarDevCfg();dfVolFechar();renderDefeitos();toast('Config salva · '+brMoney(v)+' por volume');};
 window.avDevolverLote=function(){
   const ids=[...dfSel];const itens=ids.map(id=>defeitos.find(x=>x.id===id)).filter(Boolean);
   if(!itens.length){toast('Selecione ao menos um defeito');return;}
   const fabs=[...new Set(itens.map(d=>((d.fab||'').trim())||'Sem fabricante'))];
   const fabLabel=fabs.length===1?fabs[0]:'Várias fábricas';
   if(!confirm('Enviar '+itens.length+' defeito(s) para '+fabLabel+'?\n\nEles saem da lista de parados e vão pro histórico de devolvidos (sem serem apagados). Um relatório será gerado.'))return;
-  const vols=avPedirVolumes(null);if(vols===null)return;
-  const loteId='dv'+Date.now(),quem=(typeof userAtual!=='undefined'&&userAtual)?userAtual:'',em=Date.now();
-  itens.forEach(d=>{d.devolvido=true;d.devLote=loteId;d.devEm=em;d.devFab=((d.fab||'').trim())||'Sem fabricante';d.devPor=quem;d.devVol=vols;});
+  dfVolModalAbrir('Fechar devolução — '+escapeHtml(fabLabel),null,'',function(vols,transp){avDevolverLoteFinal(itens,vols,transp);});
+};
+function avDevolverLoteFinal(itens,vols,transp){
+  const loteId='dv'+Date.now(),quem=(typeof userAtual!=='undefined'&&userAtual)?userAtual:'',em=Date.now(),unit=freteVolAtual();
+  itens.forEach(d=>{d.devolvido=true;d.devLote=loteId;d.devEm=em;d.devFab=((d.fab||'').trim())||'Sem fabricante';d.devPor=quem;d.devVol=vols;d.devTransp=transp;d.devFreteUnit=unit;});
   salvarDefeitos();dfSel.clear();renderDefeitos();
   toast(itens.length+' enviado(s) pra fábrica');
   var l=$('dfDevLista');if(l&&l.classList.contains('hide')){l.classList.remove('hide');var c=$('dfDevCar');if(c)c.style.transform='rotate(180deg)';}
@@ -2712,12 +2765,12 @@ function renderDevolucoes(){
   const box=$('dfDevLista'),ct=$('dfDevCt');if(!box)return;
   const devs=defeitos.filter(d=>d.devolvido);
   const grupos={};devs.forEach(d=>{const k=d.devLote||('x'+d.id);(grupos[k]=grupos[k]||[]).push(d);});
-  const lotes=Object.keys(grupos).map(k=>{const arr=grupos[k];const fs=[...new Set(arr.map(x=>x.devFab||'Sem fabricante'))];const vol=Math.max(0,parseInt(arr[0].devVol,10)||0);return {id:k,em:arr[0].devEm||0,fab:fs.length===1?fs[0]:'Várias fábricas',por:arr[0].devPor||'',itens:arr,vol:vol,frete:vol*FRETE_VOLUME,val:arr.reduce((s,x)=>s+avCustoDefeito(x),0)};}).sort((a,b)=>b.em-a.em);
+  const lotes=Object.keys(grupos).map(k=>{const arr=grupos[k];const fs=[...new Set(arr.map(x=>x.devFab||'Sem fabricante'))];const vol=Math.max(0,parseInt(arr[0].devVol,10)||0);const unit=freteDoLote(arr);return {id:k,em:arr[0].devEm||0,fab:fs.length===1?fs[0]:'Várias fábricas',por:arr[0].devPor||'',transp:arr[0].devTransp||'',itens:arr,vol:vol,frete:vol*unit,val:arr.reduce((s,x)=>s+avCustoDefeito(x),0)};}).sort((a,b)=>b.em-a.em);
   if(ct)ct.textContent=lotes.length?('· '+lotes.length+' lote(s) · '+devs.length+' par(es)'):'';
   if(!lotes.length){box.innerHTML='<div class="empty">Nada devolvido ainda. Marque defeitos na lista acima e clique em "Enviar pra fábrica".</div>';return;}
   box.innerHTML=lotes.map(l=>{
     const dt=new Date(l.em);const quando=dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR').slice(0,5);
-    const volTag=l.vol?`<span style="cursor:pointer;text-decoration:underline dotted" title="Clique pra corrigir os volumes" onclick="avEditVolumes('${l.id}')">${l.vol} volume(s) · frete ${brMoney(l.frete)}</span>`:`<span style="cursor:pointer;color:#e08a6a;text-decoration:underline dotted" title="Obrigatório — clique pra informar" onclick="avEditVolumes('${l.id}')">&#9888; informar volumes</span>`;
+    const volTag=l.vol?`<span style="cursor:pointer;text-decoration:underline dotted" title="Clique pra corrigir volumes/transportadora" onclick="avEditVolumes('${l.id}')">${l.vol} volume(s) · frete ${brMoney(l.frete)}${l.transp?' · via '+escapeHtml(l.transp):''}</span>`:`<span style="cursor:pointer;color:#e08a6a;text-decoration:underline dotted" title="Obrigatório — clique pra informar" onclick="avEditVolumes('${l.id}')">&#9888; informar volumes/transportadora</span>`;
     const credTotal=l.val+l.frete;
     const itensHtml=l.itens.map(it=>`<div class="df-devitem"><b>${escapeHtml(it.nome)}</b>${it.cor?' · '+escapeHtml(it.cor):''} · ${escapeHtml(it.desc||'-')}${avCustoDefeito(it)?' · '+brMoney(avCustoDefeito(it)):''}</div>`).join('');
     return `<div class="df-devlote"><div class="df-devlote-h"><div><div class="df-devlote-t">${escapeHtml(l.fab)} · ${l.itens.length} par(es)${credTotal?' · crédito '+brMoney(credTotal):''}</div><div class="df-devlote-s">${quando}${l.por?' · '+escapeHtml(l.por):''} · ${volTag}</div></div><div class="df-devlote-acts"><button class="btn btn-ouro btn-sm" onclick="avPdfLote('${l.id}')">Relatório</button><button class="btn btn-ghost btn-sm" onclick="avDesfazerDev('${l.id}')">Desfazer</button></div></div>${itensHtml}</div>`;
@@ -2726,22 +2779,26 @@ function renderDevolucoes(){
 window.avPdfLote=function(loteId){
   const itens=defeitos.filter(d=>d.devolvido&&d.devLote===loteId);
   if(!itens.length){toast('Lote não encontrado');return;}
-  let vols=Math.max(0,parseInt(itens[0].devVol,10)||0);
-  if(vols<1){ // obrigatório: não fecha relatório de crédito sem os volumes
-    const v=avPedirVolumes(null);if(v===null)return;
-    vols=v;itens.forEach(d=>{d.devVol=vols;});salvarDefeitos();renderDefeitos();
+  const vols=Math.max(0,parseInt(itens[0].devVol,10)||0);
+  if(vols<1){ // obrigatório: não fecha relatório de crédito sem volumes + transportadora
+    dfVolModalAbrir('Completar dados do lote',null,itens[0].devTransp||'',function(v,t){
+      const u=freteVolAtual();itens.forEach(d=>{d.devVol=v;d.devTransp=t;if(!(Number(d.devFreteUnit)>0))d.devFreteUnit=u;});
+      salvarDefeitos();renderDefeitos();avPdfLote(loteId);
+    });
+    return;
   }
+  const unit=freteDoLote(itens),transp=itens[0].devTransp||'';
   const em=itens[0].devEm?new Date(itens[0].devEm):new Date();
   const fabs={};itens.forEach(d=>{const f=((d.fab||'').trim())||'Sem fabricante';(fabs[f]=fabs[f]||[]).push(d);});
   const fnames=Object.keys(fabs).sort();
   const totPares=itens.reduce((s,d)=>s+avCustoDefeito(d),0);
-  const frete=vols*FRETE_VOLUME,credTotal=totPares+frete;
-  const cab='<h1 class="rp2-h1">Devolução para a fábrica</h1><p style="text-align:center;margin:-6px 0 16px;color:#555;font-size:13px">'+em.toLocaleDateString('pt-BR')+' &middot; '+itens.length+' par(es) &middot; '+vols+' volume(s)</p>';
+  const frete=vols*unit,credTotal=totPares+frete;
+  const cab='<h1 class="rp2-h1">Devolução para a fábrica</h1><p style="text-align:center;margin:-6px 0 16px;color:#555;font-size:13px">'+em.toLocaleDateString('pt-BR')+' &middot; '+itens.length+' par(es) &middot; '+vols+' volume(s)'+(transp?' &middot; via '+escapeHtml(transp):'')+'</p>';
   const fech='<div style="margin-top:18px"><h2 class="rp2-h2">Fechamento do cr&eacute;dito</h2><table class="rp2-grade" style="width:100%"><thead><tr><th style="text-align:left">Item</th><th>Qtde</th><th>Valor unit.</th><th>Subtotal</th></tr></thead><tbody>'+
     '<tr><td style="text-align:left">Pares devolvidos (defeito)</td><td>'+itens.length+'</td><td>&mdash;</td><td>'+brMoney(totPares)+'</td></tr>'+
-    '<tr><td style="text-align:left">Volumes devolvidos (frete pago pela loja)</td><td>'+vols+'</td><td>'+brMoney(FRETE_VOLUME)+'</td><td>'+brMoney(frete)+'</td></tr>'+
+    '<tr><td style="text-align:left">Volumes devolvidos (frete pago pela loja'+(transp?' &mdash; '+escapeHtml(transp):'')+')</td><td>'+vols+'</td><td>'+brMoney(unit)+'</td><td>'+brMoney(frete)+'</td></tr>'+
     '<tr><td style="text-align:left"><b>CR&Eacute;DITO TOTAL com a f&aacute;brica</b></td><td></td><td></td><td><b>'+brMoney(credTotal)+'</b></td></tr>'+
-    '</tbody></table><p style="font-size:11px;color:#666;margin-top:6px">Frete de devolu&ccedil;&atilde;o pago pela Loretto Scarpa &agrave; transportadora ('+brMoney(FRETE_VOLUME)+' por volume) &mdash; valor a abater junto &agrave; f&aacute;brica.</p></div>';
+    '</tbody></table><p style="font-size:11px;color:#666;margin-top:6px">Frete de devolu&ccedil;&atilde;o pago pela Loretto Scarpa &agrave; transportadora'+(transp?' ('+escapeHtml(transp)+')':'')+' &mdash; '+brMoney(unit)+' por volume &mdash; valor a abater junto &agrave; f&aacute;brica.</p></div>';
   const inner=cab+fnames.map((f,i)=>relatorioFabHtml(f,fabs[f],i<fnames.length-1)).join('')+fech;
   avPdfShell(inner);
 };
@@ -2749,14 +2806,16 @@ window.avEditVolumes=function(loteId){
   const itens=defeitos.filter(d=>d.devolvido&&d.devLote===loteId);
   if(!itens.length)return;
   const atual=Math.max(0,parseInt(itens[0].devVol,10)||0);
-  const v=avPedirVolumes(atual>0?atual:null);if(v===null)return;
-  itens.forEach(d=>{d.devVol=v;});salvarDefeitos();renderDefeitos();toast('Volumes: '+v+' · frete '+brMoney(v*FRETE_VOLUME));
+  dfVolModalAbrir('Corrigir volumes / transportadora',atual>0?atual:null,itens[0].devTransp||'',function(v,t){
+    const u=freteVolAtual();itens.forEach(d=>{d.devVol=v;d.devTransp=t;if(!(Number(d.devFreteUnit)>0))d.devFreteUnit=u;});
+    salvarDefeitos();renderDefeitos();toast('Volumes: '+v+' · via '+t);
+  });
 };
 window.avDesfazerDev=function(loteId){
   const itens=defeitos.filter(d=>d.devolvido&&d.devLote===loteId);
   if(!itens.length)return;
   if(!confirm('Desfazer esta devolução? Os '+itens.length+' par(es) voltam pra lista de defeitos parados.'))return;
-  itens.forEach(d=>{delete d.devolvido;delete d.devLote;delete d.devEm;delete d.devFab;delete d.devPor;delete d.devVol;});
+  itens.forEach(d=>{delete d.devolvido;delete d.devLote;delete d.devEm;delete d.devFab;delete d.devPor;delete d.devVol;delete d.devTransp;delete d.devFreteUnit;});
   salvarDefeitos();renderDefeitos();toast('Devolução desfeita');
 };
 if($('dfDevHead'))$('dfDevHead').addEventListener('click',function(){var l=$('dfDevLista'),c=$('dfDevCar');if(!l)return;l.classList.toggle('hide');if(c)c.style.transform=l.classList.contains('hide')?'':'rotate(180deg)';});
@@ -2898,16 +2957,18 @@ $('kigiFile').addEventListener('change',ev=>{
       const novo=processarKigi(rows);
       if(!novo.length){toast('Nenhum calcado valido no arquivo');return;}
       const res=mergeKigi(catalogo, novo);
+      const comPrecoTot=(res.catalogo||[]).filter(m=>m.precoVenda>0).length;
       const resumo='Importar do Kigi (mesclar sem duplicar):\n\n'+
         '• Modelos novos: '+res.novosMod+'\n'+
         '• Cores novas: '+res.coresAdd+'\n'+
         '• Códigos novos adicionados: '+res.codigosAdd+'\n'+
-        '• Códigos que já existiam (mantidos como estão): '+res.jaExistiam+'\n\n'+
+        '• Códigos que já existiam (mantidos como estão): '+res.jaExistiam+'\n'+
+        '• Valor de venda armazenado: '+comPrecoTot+' modelo(s)'+(comPrecoTot?'':' — coluna de preço não encontrada na planilha')+'\n\n'+
         'Nada do que você já tem é apagado ou duplicado. Continuar?';
       if(!confirm(resumo))return;
       catalogo=res.catalogo;
       marcarUser();salvarCatalogo();salvarFav();abertos.clear();renderLista();renderGerenciar();
-      toast('Importado: +'+res.codigosAdd+' códigos · '+res.jaExistiam+' já existiam');
+      toast('Importado: +'+res.codigosAdd+' códigos · '+comPrecoTot+' com valor de venda');
     }catch(err){console.error(err);toast('Erro ao ler o relatório');}
   };
   r.readAsArrayBuffer(f);ev.target.value='';
@@ -2917,6 +2978,7 @@ function processarKigi(rows){
   if(!rows.length)return[];
   const keys=Object.keys(rows[0]);
   const cP=achaCol(keys,['produto']),cC=achaCol(keys,['cor']),cT=achaCol(keys,['tamanho']),cB=achaCol(keys,['codigo barras','codigo','barras','ean']);
+  const cV=acharColPreco(keys);
   if(!cP||!cB)return[];
   const grupos={};
   rows.forEach(r=>{
@@ -2925,19 +2987,40 @@ function processarKigi(rows){
     if(ACC_KW.some(k=>normKey(prod).includes(k)))return; // ignora acessorios
     let cor=String(r[cC]||'Sem Cor').trim()||'Sem Cor';
     let tam=String(r[cT]||'').trim();if(!tam||tam.toLowerCase()==='nan')tam='UN';
-    (grupos[prod]=grupos[prod]||[]).push({cor,tam,cod});
+    let preco=cV?parsePreco(r[cV]):0;
+    (grupos[prod]=grupos[prod]||[]).push({cor,tam,cod,preco});
   });
   const modelos=[];let idx=0;
   for(const prod in grupos){
     const linhas=grupos[prod];
     const corpos=linhas.map(l=>l.cod.endsWith(l.tam)?l.cod.slice(0,-l.tam.length):l.cod);
     const prefixo=lcp(corpos);const cmap={};const ordem=[];
-    linhas.forEach(l=>{const ck=normKey(l.cor);if(!cmap[ck]){cmap[ck]={nome:titulo(l.cor),skus:{}};ordem.push(ck);}if(cmap[ck].nome===cmap[ck].nome.toUpperCase()&&titulo(l.cor)!==titulo(l.cor).toUpperCase())cmap[ck].nome=titulo(l.cor);cmap[ck].skus[l.tam]=l.cod;});
-    const cores=ordem.map(ck=>{const info=cmap[ck];const anyTam=Object.keys(info.skus)[0];const anyCod=info.skus[anyTam];const body=anyCod.endsWith(anyTam)?anyCod.slice(0,-anyTam.length):anyCod;const sigla=body.startsWith(prefixo)?body.slice(prefixo.length):'';return{nome:info.nome,sigla,hex:corHex(info.nome),skus:info.skus};});
-    modelos.push({id:'k'+(++idx),nome:prod,prefixo,cores,criadoEm:Date.now()+idx});
+    linhas.forEach(l=>{const ck=normKey(l.cor);if(!cmap[ck]){cmap[ck]={nome:titulo(l.cor),skus:{},precos:[]};ordem.push(ck);}if(cmap[ck].nome===cmap[ck].nome.toUpperCase()&&titulo(l.cor)!==titulo(l.cor).toUpperCase())cmap[ck].nome=titulo(l.cor);cmap[ck].skus[l.tam]=l.cod;if(l.preco>0)cmap[ck].precos.push(l.preco);});
+    const cores=ordem.map(ck=>{const info=cmap[ck];const anyTam=Object.keys(info.skus)[0];const anyCod=info.skus[anyTam];const body=anyCod.endsWith(anyTam)?anyCod.slice(0,-anyTam.length):anyCod;const sigla=body.startsWith(prefixo)?body.slice(prefixo.length):'';const co={nome:info.nome,sigla,hex:corHex(info.nome),skus:info.skus};const pv=modaPreco(info.precos);if(pv>0)co.precoVenda=pv;return co;});
+    const precoMod=modaPreco(linhas.map(l=>l.preco).filter(p=>p>0));
+    const mo={id:'k'+(++idx),nome:prod,prefixo,cores,criadoEm:Date.now()+idx};if(precoMod>0)mo.precoVenda=precoMod;
+    modelos.push(mo);
   }
   modelos.sort((a,b)=>a.nome.localeCompare(b.nome));
   return modelos;
+}
+// Detecta coluna de PREÇO DE VENDA no relatório do Kigi (nunca a de custo)
+function acharColPreco(keys){
+  const cand=['preco venda','preço venda','preco de venda','preço de venda','valor venda','valor de venda','vlr venda','preco varejo','preço varejo','venda','preco','preço','valor unitario','valor unitário','vlr unit'];
+  for(const a of cand){for(const k of keys){const nk=normKey(k);if(nk.includes('custo'))continue;if(nk.includes(a))return k;}}
+  return null;
+}
+function parsePreco(v){
+  if(v==null)return 0;if(typeof v==='number')return v>0?v:0;
+  let s=String(v).replace(/[^\d.,-]/g,'').trim();if(!s)return 0;
+  if(s.indexOf(',')>=0&&s.indexOf('.')>=0){s=s.replace(/\./g,'').replace(',', '.');}
+  else if(s.indexOf(',')>=0){s=s.replace(',', '.');}
+  const n=parseFloat(s);return isFinite(n)&&n>0?n:0;
+}
+function modaPreco(arr){
+  if(!arr||!arr.length)return 0;const c={};let best=arr[0],bn=0;
+  arr.forEach(p=>{const k=p.toFixed(2);c[k]=(c[k]||0)+1;if(c[k]>bn){bn=c[k];best=p;}});
+  return best;
 }
 // Mescla import do Kigi no catálogo atual, sem duplicar: código que já existe é mantido (o do sistema vence)
 function mergeKigi(atual, novo){
@@ -2945,7 +3028,7 @@ function mergeKigi(atual, novo){
   const codeLoc = {}; // CÓDIGO(maiúsc) -> true (já existe em algum lugar)
   base.forEach(m=>(m.cores||[]).forEach(c=>{const sk=c.skus||{};Object.keys(sk).forEach(t=>{codeLoc[String(sk[t]).toUpperCase()]=true;});}));
   const nameIdx = {}; base.forEach((m,mi)=>{nameIdx[normKey(m.nome)]=mi;});
-  let novosMod=0, coresAdd=0, codigosAdd=0, jaExistiam=0;
+  let novosMod=0, coresAdd=0, codigosAdd=0, jaExistiam=0, comPreco=0;
   (novo||[]).forEach(nm=>{
     const nk = normKey(nm.nome);
     let mi = nameIdx[nk];
@@ -2957,12 +3040,18 @@ function mergeKigi(atual, novo){
       const skus = nc.skus||{};
       const inedito = {};
       Object.keys(skus).forEach(t=>{const up=String(skus[t]).toUpperCase(); if(codeLoc[up]){ jaExistiam++; } else { inedito[t]=up; codeLoc[up]=true; codigosAdd++; }});
-      if(!Object.keys(inedito).length) return; // toda essa cor já existe pelos códigos
-      if(corIdx[nck]!=null){ const c=m.cores[corIdx[nck]]; c.skus=c.skus||{}; Object.assign(c.skus, inedito); }
-      else { m.cores.push({nome:nc.nome, sigla:(nc.sigla||'').toUpperCase(), hex:nc.hex||corHex(nc.nome), skus:inedito}); corIdx[nck]=m.cores.length-1; coresAdd++; }
+      let ci = corIdx[nck];
+      if(ci==null){
+        if(!Object.keys(inedito).length) return; // cor já existe (por código) e sem match de nome: nada a mudar
+        m.cores.push({nome:nc.nome, sigla:(nc.sigla||'').toUpperCase(), hex:nc.hex||corHex(nc.nome), skus:inedito}); ci=m.cores.length-1; corIdx[nck]=ci; coresAdd++;
+      } else {
+        const c=m.cores[ci]; c.skus=c.skus||{}; if(Object.keys(inedito).length)Object.assign(c.skus, inedito);
+      }
+      if(nc.precoVenda>0) m.cores[ci].precoVenda=nc.precoVenda; // guarda/atualiza o valor de venda da cor
     });
+    if(nm.precoVenda>0){ if(m.precoVenda!==nm.precoVenda)comPreco++; m.precoVenda=nm.precoVenda; } // valor de venda do modelo
   });
-  return { catalogo: base.filter(m=>m.cores&&m.cores.length), novosMod, coresAdd, codigosAdd, jaExistiam };
+  return { catalogo: base.filter(m=>m.cores&&m.cores.length), novosMod, coresAdd, codigosAdd, jaExistiam, comPreco };
 }
 
 // ===================== EDITOR MANUAL =====================
