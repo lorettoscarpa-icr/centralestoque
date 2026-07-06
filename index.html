@@ -1366,7 +1366,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
-      <div class="side-build">build 02/07 · devolução de defeitos em lote</div>
+      <div class="side-build">build 06/07 · volumes obrigatórios no crédito (R$30/vol)</div>
     </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
@@ -2684,14 +2684,25 @@ function renderDfSelBar(vis){
 window.avToggleSel=function(id){if(dfSel.has(id))dfSel.delete(id);else dfSel.add(id);renderDefeitos();};
 window.avSelLimpar=function(){dfSel.clear();renderDefeitos();};
 window.avSelTodos=function(){const vis=dfVisiveis();const allSel=vis.length&&vis.every(id=>dfSel.has(id));if(allSel)vis.forEach(id=>dfSel.delete(id));else vis.forEach(id=>dfSel.add(id));renderDefeitos();};
+const FRETE_VOLUME=30; // R$ por caixa/volume devolvido — vira crédito com a fábrica
+function avPedirVolumes(atual){
+  while(true){
+    const r=prompt('OBRIGATÓRIO — Quantos VOLUMES (caixas) estão sendo devolvidos neste lote?\n\nCada volume gera R$ '+FRETE_VOLUME.toFixed(2).replace('.',',')+' de crédito de frete com a fábrica.',atual!=null?String(atual):'');
+    if(r===null){toast('Informe os volumes pra fechar o crédito');return null;}
+    const n=parseInt(String(r).replace(/\D/g,''),10);
+    if(!isFinite(n)||n<1){alert('Valor inválido. Informe a quantidade de volumes (mínimo 1).');continue;}
+    return n;
+  }
+}
 window.avDevolverLote=function(){
   const ids=[...dfSel];const itens=ids.map(id=>defeitos.find(x=>x.id===id)).filter(Boolean);
   if(!itens.length){toast('Selecione ao menos um defeito');return;}
   const fabs=[...new Set(itens.map(d=>((d.fab||'').trim())||'Sem fabricante'))];
   const fabLabel=fabs.length===1?fabs[0]:'Várias fábricas';
   if(!confirm('Enviar '+itens.length+' defeito(s) para '+fabLabel+'?\n\nEles saem da lista de parados e vão pro histórico de devolvidos (sem serem apagados). Um relatório será gerado.'))return;
+  const vols=avPedirVolumes(null);if(vols===null)return;
   const loteId='dv'+Date.now(),quem=(typeof userAtual!=='undefined'&&userAtual)?userAtual:'',em=Date.now();
-  itens.forEach(d=>{d.devolvido=true;d.devLote=loteId;d.devEm=em;d.devFab=((d.fab||'').trim())||'Sem fabricante';d.devPor=quem;});
+  itens.forEach(d=>{d.devolvido=true;d.devLote=loteId;d.devEm=em;d.devFab=((d.fab||'').trim())||'Sem fabricante';d.devPor=quem;d.devVol=vols;});
   salvarDefeitos();dfSel.clear();renderDefeitos();
   toast(itens.length+' enviado(s) pra fábrica');
   var l=$('dfDevLista');if(l&&l.classList.contains('hide')){l.classList.remove('hide');var c=$('dfDevCar');if(c)c.style.transform='rotate(180deg)';}
@@ -2701,30 +2712,51 @@ function renderDevolucoes(){
   const box=$('dfDevLista'),ct=$('dfDevCt');if(!box)return;
   const devs=defeitos.filter(d=>d.devolvido);
   const grupos={};devs.forEach(d=>{const k=d.devLote||('x'+d.id);(grupos[k]=grupos[k]||[]).push(d);});
-  const lotes=Object.keys(grupos).map(k=>{const arr=grupos[k];const fs=[...new Set(arr.map(x=>x.devFab||'Sem fabricante'))];return {id:k,em:arr[0].devEm||0,fab:fs.length===1?fs[0]:'Várias fábricas',por:arr[0].devPor||'',itens:arr,val:arr.reduce((s,x)=>s+avCustoDefeito(x),0)};}).sort((a,b)=>b.em-a.em);
+  const lotes=Object.keys(grupos).map(k=>{const arr=grupos[k];const fs=[...new Set(arr.map(x=>x.devFab||'Sem fabricante'))];const vol=Math.max(0,parseInt(arr[0].devVol,10)||0);return {id:k,em:arr[0].devEm||0,fab:fs.length===1?fs[0]:'Várias fábricas',por:arr[0].devPor||'',itens:arr,vol:vol,frete:vol*FRETE_VOLUME,val:arr.reduce((s,x)=>s+avCustoDefeito(x),0)};}).sort((a,b)=>b.em-a.em);
   if(ct)ct.textContent=lotes.length?('· '+lotes.length+' lote(s) · '+devs.length+' par(es)'):'';
   if(!lotes.length){box.innerHTML='<div class="empty">Nada devolvido ainda. Marque defeitos na lista acima e clique em "Enviar pra fábrica".</div>';return;}
   box.innerHTML=lotes.map(l=>{
     const dt=new Date(l.em);const quando=dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR').slice(0,5);
+    const volTag=l.vol?`<span style="cursor:pointer;text-decoration:underline dotted" title="Clique pra corrigir os volumes" onclick="avEditVolumes('${l.id}')">${l.vol} volume(s) · frete ${brMoney(l.frete)}</span>`:`<span style="cursor:pointer;color:#e08a6a;text-decoration:underline dotted" title="Obrigatório — clique pra informar" onclick="avEditVolumes('${l.id}')">&#9888; informar volumes</span>`;
+    const credTotal=l.val+l.frete;
     const itensHtml=l.itens.map(it=>`<div class="df-devitem"><b>${escapeHtml(it.nome)}</b>${it.cor?' · '+escapeHtml(it.cor):''} · ${escapeHtml(it.desc||'-')}${avCustoDefeito(it)?' · '+brMoney(avCustoDefeito(it)):''}</div>`).join('');
-    return `<div class="df-devlote"><div class="df-devlote-h"><div><div class="df-devlote-t">${escapeHtml(l.fab)} · ${l.itens.length} par(es)${l.val?' · '+brMoney(l.val):''}</div><div class="df-devlote-s">${quando}${l.por?' · '+escapeHtml(l.por):''}</div></div><div class="df-devlote-acts"><button class="btn btn-ouro btn-sm" onclick="avPdfLote('${l.id}')">Relatório</button><button class="btn btn-ghost btn-sm" onclick="avDesfazerDev('${l.id}')">Desfazer</button></div></div>${itensHtml}</div>`;
+    return `<div class="df-devlote"><div class="df-devlote-h"><div><div class="df-devlote-t">${escapeHtml(l.fab)} · ${l.itens.length} par(es)${credTotal?' · crédito '+brMoney(credTotal):''}</div><div class="df-devlote-s">${quando}${l.por?' · '+escapeHtml(l.por):''} · ${volTag}</div></div><div class="df-devlote-acts"><button class="btn btn-ouro btn-sm" onclick="avPdfLote('${l.id}')">Relatório</button><button class="btn btn-ghost btn-sm" onclick="avDesfazerDev('${l.id}')">Desfazer</button></div></div>${itensHtml}</div>`;
   }).join('');
 }
 window.avPdfLote=function(loteId){
   const itens=defeitos.filter(d=>d.devolvido&&d.devLote===loteId);
   if(!itens.length){toast('Lote não encontrado');return;}
+  let vols=Math.max(0,parseInt(itens[0].devVol,10)||0);
+  if(vols<1){ // obrigatório: não fecha relatório de crédito sem os volumes
+    const v=avPedirVolumes(null);if(v===null)return;
+    vols=v;itens.forEach(d=>{d.devVol=vols;});salvarDefeitos();renderDefeitos();
+  }
   const em=itens[0].devEm?new Date(itens[0].devEm):new Date();
   const fabs={};itens.forEach(d=>{const f=((d.fab||'').trim())||'Sem fabricante';(fabs[f]=fabs[f]||[]).push(d);});
   const fnames=Object.keys(fabs).sort();
-  const cab='<h1 class="rp2-h1">Devolução para a fábrica</h1><p style="text-align:center;margin:-6px 0 16px;color:#555;font-size:13px">'+em.toLocaleDateString('pt-BR')+' &middot; '+itens.length+' par(es)</p>';
-  const inner=cab+fnames.map((f,i)=>relatorioFabHtml(f,fabs[f],i<fnames.length-1)).join('');
+  const totPares=itens.reduce((s,d)=>s+avCustoDefeito(d),0);
+  const frete=vols*FRETE_VOLUME,credTotal=totPares+frete;
+  const cab='<h1 class="rp2-h1">Devolução para a fábrica</h1><p style="text-align:center;margin:-6px 0 16px;color:#555;font-size:13px">'+em.toLocaleDateString('pt-BR')+' &middot; '+itens.length+' par(es) &middot; '+vols+' volume(s)</p>';
+  const fech='<div style="margin-top:18px"><h2 class="rp2-h2">Fechamento do cr&eacute;dito</h2><table class="rp2-grade" style="width:100%"><thead><tr><th style="text-align:left">Item</th><th>Qtde</th><th>Valor unit.</th><th>Subtotal</th></tr></thead><tbody>'+
+    '<tr><td style="text-align:left">Pares devolvidos (defeito)</td><td>'+itens.length+'</td><td>&mdash;</td><td>'+brMoney(totPares)+'</td></tr>'+
+    '<tr><td style="text-align:left">Volumes devolvidos (frete pago pela loja)</td><td>'+vols+'</td><td>'+brMoney(FRETE_VOLUME)+'</td><td>'+brMoney(frete)+'</td></tr>'+
+    '<tr><td style="text-align:left"><b>CR&Eacute;DITO TOTAL com a f&aacute;brica</b></td><td></td><td></td><td><b>'+brMoney(credTotal)+'</b></td></tr>'+
+    '</tbody></table><p style="font-size:11px;color:#666;margin-top:6px">Frete de devolu&ccedil;&atilde;o pago pela Loretto Scarpa &agrave; transportadora ('+brMoney(FRETE_VOLUME)+' por volume) &mdash; valor a abater junto &agrave; f&aacute;brica.</p></div>';
+  const inner=cab+fnames.map((f,i)=>relatorioFabHtml(f,fabs[f],i<fnames.length-1)).join('')+fech;
   avPdfShell(inner);
+};
+window.avEditVolumes=function(loteId){
+  const itens=defeitos.filter(d=>d.devolvido&&d.devLote===loteId);
+  if(!itens.length)return;
+  const atual=Math.max(0,parseInt(itens[0].devVol,10)||0);
+  const v=avPedirVolumes(atual>0?atual:null);if(v===null)return;
+  itens.forEach(d=>{d.devVol=v;});salvarDefeitos();renderDefeitos();toast('Volumes: '+v+' · frete '+brMoney(v*FRETE_VOLUME));
 };
 window.avDesfazerDev=function(loteId){
   const itens=defeitos.filter(d=>d.devolvido&&d.devLote===loteId);
   if(!itens.length)return;
   if(!confirm('Desfazer esta devolução? Os '+itens.length+' par(es) voltam pra lista de defeitos parados.'))return;
-  itens.forEach(d=>{delete d.devolvido;delete d.devLote;delete d.devEm;delete d.devFab;delete d.devPor;});
+  itens.forEach(d=>{delete d.devolvido;delete d.devLote;delete d.devEm;delete d.devFab;delete d.devPor;delete d.devVol;});
   salvarDefeitos();renderDefeitos();toast('Devolução desfeita');
 };
 if($('dfDevHead'))$('dfDevHead').addEventListener('click',function(){var l=$('dfDevLista'),c=$('dfDevCar');if(!l)return;l.classList.toggle('hide');if(c)c.style.transform=l.classList.contains('hide')?'':'rotate(180deg)';});
