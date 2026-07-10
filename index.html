@@ -1378,7 +1378,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
-      <div class="side-build">build 07/07 · etiquetas img: nuvem + criar texto + editar</div>
+      <div class="side-build">build 08/07 · sync: conferência, curvas, pedidos, usuários</div>
     </div>
   </aside>
   <div class="sidebar-bg" id="sidebarBg"></div>
@@ -2513,6 +2513,26 @@ var _db=null,_fRef=null,_pRef=null,_aRef=null,_cRef=null,_unsubF=null,_unsubP=nu
 var _iCol=null,_unsubI=null,_imgInit=false;
 function syncPushEtImg(im){if(!_iCol||!im||!im.id)return;_iCol.doc(String(im.id)).set({id:im.id,nome:im.nome||'',texto:im.texto||'',tipo:im.tipo||'upload',data:im.data||'',ts:im.ts||Date.now()}).catch(function(){});}
 function syncDelEtImg(id){if(!_iCol||!id)return;_iCol.doc(String(id)).delete().catch(function(){});}
+
+/* ===== Sync "leve" (sem tempo real) de dados que hoje ficavam só no aparelho:
+   conferência de fábrica, curvas, pedidos (repo) e lista de usuários.
+   Sobe quando muda; baixa uma vez ao abrir em outro aparelho (recarrega pra aplicar). ===== */
+var MISC_KEYS={'ls_conf_sessao_v1':1,'ls_conf_catalogo_v1':1,'ls_conf_hist_v1':1,'loretto_curvas':1,'loretto_repo_config':1,'loretto_repo_estoque':1,'loretto_repo_hist':1,'loretto_usuarios':1};
+var _miscRef=null,_miscTs=parseInt(localStorage.getItem('ls_misc_ts'))||0,_miscPushT=null,_miscApplying=false;
+function isMiscKey(k){return !!(k&&MISC_KEYS[k]);}
+function miscBundle(){var o={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(isMiscKey(k)){var v=localStorage.getItem(k);if(v!=null)o[k]=v;}}}catch(e){}return o;}
+function miscPush(){if(!_miscRef||_miscApplying)return;clearTimeout(_miscPushT);_miscPushT=setTimeout(function(){_miscTs=Date.now();try{localStorage.setItem('ls_misc_ts',String(_miscTs));}catch(e){}_miscRef.set({keys:miscBundle(),ts:_miscTs,por:(typeof userAtual!=='undefined'?userAtual:'')||''}).catch(function(){});},1200);}
+function miscApplyIfNewer(d){
+  if(d&&d.keys&&(d.ts||0)>_miscTs){
+    _miscApplying=true;
+    try{Object.keys(d.keys).forEach(function(k){if(isMiscKey(k)){try{localStorage.setItem(k,d.keys[k]);}catch(e){}}});}finally{_miscApplying=false;}
+    _miscTs=d.ts||Date.now();try{localStorage.setItem('ls_misc_ts',String(_miscTs));}catch(e){}
+    try{var mark='misc_rl_'+_miscTs;if(!sessionStorage.getItem(mark)){sessionStorage.setItem(mark,'1');if(typeof toast==='function')toast('Baixando seus dados mais recentes\u2026');setTimeout(function(){location.reload();},450);}}catch(e){setTimeout(function(){location.reload();},450);}
+    return;
+  }
+  miscPush(); // nuvem igual/mais velha/inexistente: garante que o deste aparelho suba
+}
+(function(){try{var _os=localStorage.setItem.bind(localStorage);localStorage.setItem=function(k,v){_os(k,v);if(!_miscApplying&&isMiscKey(k)){try{miscPush();}catch(e){}}};}catch(e){}})();
 function salvaSync(){try{localStorage.setItem('loretto_sync',JSON.stringify({on:!!syncCfg.on}));}catch(e){}}
 function syncCodigo(){return ((typeof userAtual!=='undefined'&&userAtual)||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^a-zA-Z0-9_-]/g,'').toLowerCase();}
 function setSyncStatus(st,msg){
@@ -2627,6 +2647,7 @@ function conectarSync(){
         if(Array.isArray(d.catalogo))repCatalogo=d.catalogo;
         if(d.estoque)repEstoque=d.estoque;
         repCfgTs=d.ts||Date.now();
+        if(typeof repMigraGradeSePreciso==='function')repMigraGradeSePreciso();
         if(d.lorettoEm||d.lorettoPor){repCfgStamp={por:d.lorettoPor||'?',em:d.lorettoEm||d.ts||0};try{localStorage.setItem('loretto_rep_cfg_stamp',JSON.stringify(repCfgStamp));}catch(e){}}
         try{localStorage.setItem('loretto_rep_cfg',JSON.stringify(repCfg));localStorage.setItem('loretto_rep_forn',JSON.stringify(repForn||{}));localStorage.setItem('loretto_rep_custo',JSON.stringify(repCusto||{}));localStorage.setItem('loretto_rep_forn_report',JSON.stringify(repFornReport||{}));if(repInfo)localStorage.setItem('loretto_rep_info',JSON.stringify(repInfo));localStorage.setItem('loretto_rep_catalogo',JSON.stringify(repCatalogo||[]));localStorage.setItem('loretto_rep_estoque',JSON.stringify(repEstoque||{}));localStorage.setItem('loretto_rep_cfg_ts',String(repCfgTs));}catch(e){}
         if(typeof repRender==='function'&&$('tab-reposicao')&&!$('tab-reposicao').classList.contains('hide'))repRender();
@@ -2645,12 +2666,30 @@ function conectarSync(){
         if(typeof peRender==='function'&&$('tab-pronta')&&!$('tab-pronta').classList.contains('hide'))peRender();if(MODO_FABRICA&&typeof renderModoFabrica==='function')renderModoFabrica(MODO_FABRICA);
       },function(){});
       _rfRef.get().then(function(snp){var d=snp.exists?snp.data():null;if(!d||((d.ts||0)<repFotosTs))repPushFotos();}).catch(function(){});
+      // GRADE por usuário (doc separado por usuário; nunca sobrescreve o de outro)
+      repGradeReload();
+      _gRef=_db.collection('ls_rep_grade').doc(repGradeUserKey());
+      if(_unsubG)_unsubG(); _gInit=false;
+      _unsubG=_gRef.onSnapshot(function(snap){
+        var d=snap.exists?snap.data():null; var rg=(d&&d.grade)?d.grade:{};
+        if(!_gInit){_gInit=true;
+          if(Object.keys(repGradeU).length&&!Object.keys(rg).length){repPushGrade();}
+          else if(Object.keys(rg).length){repGradeU=rg;try{localStorage.setItem(repGradeStoreKey(),JSON.stringify(repGradeU));}catch(e){}}
+          if(typeof repSub!=='undefined'&&repSub==='modelos'&&typeof repRenderModelos==='function'&&$('tab-reposicao')&&!$('tab-reposicao').classList.contains('hide'))repRenderModelos();
+          return;
+        }
+        if((d&&d.ts||0)<=_gLastPush)return;
+        repGradeU=rg;try{localStorage.setItem(repGradeStoreKey(),JSON.stringify(repGradeU));}catch(e){}
+        if(typeof repSub!=='undefined'&&repSub==='modelos'&&typeof repRenderModelos==='function'&&$('tab-reposicao')&&!$('tab-reposicao').classList.contains('hide'))repRenderModelos();
+      },function(){});
+      _miscRef=_db.collection('ls_misc').doc('loja');
+      _miscRef.get().then(function(snp){miscApplyIfNewer(snp.exists?snp.data():null);}).catch(function(){});
     }catch(e){setSyncStatus('err',e.message);}
   });
 }
 function mergeFila(local,remoto){const seen={};const out=(remoto||[]).filter(x=>x&&x.key!=null);out.forEach(x=>seen[x.key]=1);(local||[]).forEach(x=>{if(x&&x.key!=null&&!seen[x.key]){out.push(x);seen[x.key]=1;}});return out;}
 function mergeCatalogo(local,remoto){const seen={};const out=(remoto||[]).filter(x=>x&&x.id!=null);out.forEach(x=>seen[x.id]=1);(local||[]).forEach(x=>{if(x&&x.id!=null&&!seen[x.id]){out.push(x);seen[x.id]=1;}});return out;}
-function desconectarSync(){if(_unsubF){_unsubF();_unsubF=null;}if(_unsubP){_unsubP();_unsubP=null;}if(_unsubA){_unsubA();_unsubA=null;}if(_unsubC){_unsubC();_unsubC=null;}if(_unsubI){_unsubI();_unsubI=null;}_iCol=null;_imgInit=false;if(_unsubRC){_unsubRC();_unsubRC=null;}if(_unsubRF){_unsubRF();_unsubRF=null;}_rcRef=_rfRef=null;_avInit=false;_catInit=false;_filaInit=false;_fRef=_pRef=_aRef=_cRef=_db=null;setSyncStatus('off');}
+function desconectarSync(){if(_unsubF){_unsubF();_unsubF=null;}if(_unsubP){_unsubP();_unsubP=null;}if(_unsubA){_unsubA();_unsubA=null;}if(_unsubC){_unsubC();_unsubC=null;}if(_unsubI){_unsubI();_unsubI=null;}_iCol=null;_imgInit=false;if(_unsubG){_unsubG();_unsubG=null;}_gRef=null;_gInit=false;_miscRef=null;if(_unsubRC){_unsubRC();_unsubRC=null;}if(_unsubRF){_unsubRF();_unsubRF=null;}_rcRef=_rfRef=null;_avInit=false;_catInit=false;_filaInit=false;_fRef=_pRef=_aRef=_cRef=_db=null;setSyncStatus('off');}
 function preencheSyncModal(){if($('syncUserName'))$('syncUserName').textContent=(typeof userAtual!=='undefined'&&userAtual)||'\u2014';if($('syncToggle'))$('syncToggle').checked=!!syncCfg.on;}
 function aplicarSync(){salvaSync();if(syncCfg.on&&syncCodigo())conectarSync();else desconectarSync();}
 function iniciarSync(){preencheSyncModal();if(syncCfg.on&&syncCodigo())conectarSync();else setSyncStatus('off');}
@@ -4666,20 +4705,33 @@ setTimeout(function(){document.querySelectorAll('.fin2-tab').forEach(function(b)
 let repCatalogo=carregar('loretto_rep_catalogo',[]);  // [{id,nome,cores:[{nome,skus:{tam:chave}}]}]
 let repEstoque=carregar('loretto_rep_estoque',{});    // {chave: qtd}
 let repInfo=carregar('loretto_rep_info',null);
-let repCfg=carregar('loretto_rep_cfg',{});            // {id:{fixo,fornId,custo,grade:{cor:{tam:meta}},coresOff:{cor:1}}}
+let repCfg=carregar('loretto_rep_cfg',{});            // {id:{fixo,fornId,custo,refs:{cor:code},coresOff:{cor:1}}}  (grade agora é por usuário)
 let repForn=carregar('loretto_rep_forn',null);        // {fid:{nome,whatsapp,off}}
 let repCusto=carregar('loretto_rep_custo',{});
 let repSub='estoque', repAberto=null, repPedidoCache=null;
 
+/* ---------- GRADE por usuário (cada um monta o seu pedido; não sobrescreve o do outro) ---------- */
+function repGradeUserKey(){return (typeof userAtual!=='undefined'&&userAtual)?String(userAtual).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_').toLowerCase():'geral';}
+function repGradeStoreKey(){return 'loretto_rep_grade__'+repGradeUserKey();}
+let repGradeU=carregar(repGradeStoreKey(),{});         // {id:{cor:{tam:meta}}}
+function repGradeReload(){repGradeU=carregar(repGradeStoreKey(),{});}
+function salvaGradeU(){try{localStorage.setItem(repGradeStoreKey(),JSON.stringify(repGradeU));}catch(e){}if(typeof repPushGrade==='function')repPushGrade();}
+function repGradeMeta(id,cor,tam){const m=repGradeU[id];if(!m||!m[cor]||m[cor][tam]==null)return '';return m[cor][tam];}
+function repGradeCor(id,cor){const m=repGradeU[id];return (m&&m[cor])||null;}
+// Traz pra grade-por-usuário qualquer grade antiga que ainda esteja no repCfg (migração automática, uma vez por modelo)
+function repMigraGradeSePreciso(){
+  let mudou=false;
+  Object.keys(repCfg||{}).forEach(function(id){
+    const g=repCfg[id]&&repCfg[id].grade;
+    if(g&&Object.keys(g).length&&!(repGradeU[id]&&Object.keys(repGradeU[id]).length)){repGradeU[id]=JSON.parse(JSON.stringify(g));mudou=true;}
+  });
+  if(mudou){try{localStorage.setItem(repGradeStoreKey(),JSON.stringify(repGradeU));}catch(e){}if(typeof repPushGrade==='function')repPushGrade();}
+}
+
 function repSalvar(){
-  try{
-    localStorage.setItem('loretto_rep_catalogo',JSON.stringify(repCatalogo));
-    localStorage.setItem('loretto_rep_estoque',JSON.stringify(repEstoque));
-    localStorage.setItem('loretto_rep_cfg',JSON.stringify(repCfg));
-    localStorage.setItem('loretto_rep_forn',JSON.stringify(repForn||{}));
-    localStorage.setItem('loretto_rep_custo',JSON.stringify(repCusto));
-    if(repInfo)localStorage.setItem('loretto_rep_info',JSON.stringify(repInfo));
-  }catch(e){}
+  const sets=[['loretto_rep_cfg',repCfg],['loretto_rep_forn',repForn||{}],['loretto_rep_custo',repCusto],['loretto_rep_catalogo',repCatalogo],['loretto_rep_estoque',repEstoque]];
+  sets.forEach(function(p){try{localStorage.setItem(p[0],JSON.stringify(p[1]));}catch(e){}});
+  try{if(repInfo)localStorage.setItem('loretto_rep_info',JSON.stringify(repInfo));}catch(e){}
   repPushCfg();
 }
 function repFornKeyByName(nome){if(!repForn)repInit();const n=repNormCab(nome);let k=Object.keys(repForn).find(x=>repNormCab(repForn[x].nome)===n);if(!k){k=(n.replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''))||('forn'+Date.now());if(!repForn[k])repForn[k]={nome:String(nome).trim(),whatsapp:'',off:false};}return k;}
@@ -4703,10 +4755,20 @@ function repPushCfg(){
     _rcLastPush=Date.now(); repCfgTs=_rcLastPush;
     try{localStorage.setItem('loretto_rep_cfg_ts',String(repCfgTs));}catch(e){}
     var _quem=(typeof userAtual!=='undefined'?userAtual:'')||'Loretto';
-    _rcRef.set({cfg:repCfg,forn:repForn||{},custo:repCusto||{},fornReport:repFornReport||{},info:repInfo||null,catalogo:repCatalogo||[],estoque:repEstoque||{},ts:_rcLastPush,lorettoEm:_rcLastPush,lorettoPor:_quem})
+    var cfgClean={};Object.keys(repCfg||{}).forEach(function(id){var c=repCfg[id]||{},cp={};Object.keys(c).forEach(function(k){if(k!=='grade')cp[k]=c[k];});cfgClean[id]=cp;}); // grade é por usuário, não vai no doc compartilhado
+    _rcRef.set({cfg:cfgClean,forn:repForn||{},custo:repCusto||{},fornReport:repFornReport||{},info:repInfo||null,catalogo:repCatalogo||[],estoque:repEstoque||{},ts:_rcLastPush,lorettoEm:_rcLastPush,lorettoPor:_quem})
       .then(function(){repCfgStamp={por:_quem,em:_rcLastPush};try{localStorage.setItem('loretto_rep_cfg_stamp',JSON.stringify(repCfgStamp));}catch(e){}repAtualizaStatus();})
-      .catch(function(e){toast('Não consegui salvar a grade na nuvem'+(e&&e.code?' ('+e.code+')':'')+' — verifique a conexão/permissões');});
+      .catch(function(e){toast('Não consegui salvar a referência na nuvem'+(e&&e.code?' ('+e.code+')':'')+' — verifique a conexão/permissões');});
   },800);
+}
+var _gRef=null,_unsubG=null,_gInit=false,_gLastPush=0,_gPushT=null;
+function repPushGrade(){
+  if(!_gRef)return;
+  clearTimeout(_gPushT);
+  _gPushT=setTimeout(function(){
+    _gLastPush=Date.now();
+    _gRef.set({grade:repGradeU||{},ts:_gLastPush,por:(typeof userAtual!=='undefined'?userAtual:'')||''}).catch(function(){});
+  },700);
 }
 function repPushFotos(){
   if(!_rfRef)return;
@@ -4824,6 +4886,7 @@ function repImportar(file){
 /* ---------- MODELOS & GRADE ---------- */
 function repRenderModelos(){
   const lst=$('repModLista'); if(!lst)return;
+  repMigraGradeSePreciso();
   if(!repCatalogo.length){lst.innerHTML='<div class="empty">Importe o relatório do Kigi na aba Estoque para listar os produtos.</div>';return;}
   const busca=normKey(($('repModBusca')&&$('repModBusca').value)||'');
   const soFixos=$('repSoFixos')&&$('repSoFixos').checked;
@@ -4860,7 +4923,7 @@ function repRenderModelos(){
           html+=`<div class="rep-cor-meta"><div class="rep-cor-foto">${fotoC?`<img class="rep-foto-thumb sm" src="${fotoC}" alt="">`:`<div class="rep-foto-thumb sm ph">foto</div>`}<div class="rep-foto-acts"><label class="rep-foto-btn sm">${fotoC?'Trocar':'Adicionar foto'}<input type="file" accept="image/*" onchange="repSetFoto('${m.id}','${cor}',this)" hidden></label>${fotoC?`<button type="button" class="rep-foto-del" onclick="repRemoveFoto('${m.id}','${cor}')">remover</button>`:''}</div></div><label class="rep-fld rep-ref-fld">Referência da fábrica<input type="text" value="${escapeHtml(refC)}" placeholder="código da fábrica" oninput="repSetRef('${m.id}','${cor}',this.value)"></label></div>`;
           html+=`<div class="rep-gtams">`;
           repTams(c).forEach(t=>{
-            const meta=(cf.grade&&cf.grade[c.nome]&&cf.grade[c.nome][t])||'';
+            const meta=repGradeMeta(m.id,c.nome,t);
             const e=repEstoque[c.skus[t]]||0;
             html+=`<div class="rep-gtam"><span class="rep-gn">${escapeHtml(t)}</span><input type="number" min="0" value="${meta}" placeholder="0" oninput="repSetGrade('${m.id}','${cor}','${escapeHtml(t)}',this.value)"><span class="rep-ge">tem ${e}</span></div>`;
           });
@@ -4888,7 +4951,7 @@ window.repAplicarForn=(id)=>{const uf=repUltimaFabrica(id);if(uf){repCfgDe(id).f
 window.repAplicarCusto=(id)=>{const uc=repUltimoCusto(id);if(uc.valor>0){repCfgDe(id).custo=uc.valor;repSalvar();repRenderModelos();}};
 window.repSetFoto=(id,cor,inp)=>{const f=inp.files&&inp.files[0];if(!f)return;repFotoLer(f,function(d){repFotos[id]=repFotos[id]||{};repFotos[id][cor]=d;salvaFotos();repRenderModelos();if(repSub==='pedido')repRenderPedido();toast('Foto salva');});inp.value='';};
 window.repRemoveFoto=(id,cor)=>{if(repFotos[id]){delete repFotos[id][cor];if(!Object.keys(repFotos[id]).length)delete repFotos[id];}salvaFotos();repRenderModelos();if(repSub==='pedido')repRenderPedido();};
-window.repSetGrade=(id,cor,tam,v)=>{const cf=repCfgDe(id);cf.grade[cor]=cf.grade[cor]||{};const n=parseInt(v);if(n>0)cf.grade[cor][tam]=n;else delete cf.grade[cor][tam];repSalvar();};
+window.repSetGrade=(id,cor,tam,v)=>{repGradeU[id]=repGradeU[id]||{};repGradeU[id][cor]=repGradeU[id][cor]||{};const n=parseInt(v);if(n>0)repGradeU[id][cor][tam]=n;else delete repGradeU[id][cor][tam];salvaGradeU();};
 window.repToggleCor=(id,cor,off)=>{const cf=repCfgDe(id);if(off)cf.coresOff[cor]=1;else delete cf.coresOff[cor];repSalvar();repRenderModelos();};
 
 /* ---------- CONFIGURACOES: fábricas ---------- */
@@ -4915,7 +4978,7 @@ function repGerar(){
     const coresOff=cf.coresOff||{};
     m.cores.forEach(c=>{
       if(coresOff[c.nome])return; // cor desativada
-      const g=cf.grade&&cf.grade[c.nome]; if(!g)return;
+      const g=repGradeCor(m.id,c.nome); if(!g)return;
       Object.keys(g).forEach(t=>{
         const meta=g[t]||0; if(meta<=0)return;
         const est=repEstoque[c.skus[t]]||0;
