@@ -1142,6 +1142,24 @@
 #tab-suprimentos .forn-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 #tab-suprimentos .forn-name{ font-size:12px; flex:1; }
 #tab-suprimentos .forn-pct{ font-size:12px; color:var(--dourado-claro); font-variant-numeric:tabular-nums; }
+.dfrk-hint{font-size:11px;color:rgba(251,249,238,.45);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.dfrk{display:flex;flex-direction:column;gap:8px}
+.dfrk-row{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-radius:12px;overflow:hidden}
+.dfrk-row[open]{border-color:var(--ouro)}
+.dfrk-sum{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:11px 13px}
+.dfrk-sum::-webkit-details-marker{display:none}
+.dfrk-pos{width:24px;height:24px;border-radius:50%;background:rgba(220,189,96,.14);color:var(--ouro,#dcbd60);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.dfrk-row:first-child .dfrk-pos{background:var(--ouro,#dcbd60);color:#1a2711}
+.dfrk-nome{flex:1;font-size:14px;color:var(--areia,#f3ede0);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dfrk-n{font-size:13px;color:var(--areia,#f3ede0);font-variant-numeric:tabular-nums;white-space:nowrap}
+.dfrk-v{font-size:12px;color:var(--ouro,#dcbd60);font-variant-numeric:tabular-nums;min-width:74px;text-align:right;white-space:nowrap}
+.dfrk-bar{height:3px;background:rgba(220,189,96,.5)}
+.dfrk-body{padding:4px 13px 13px;border-top:1px solid var(--linha)}
+.dfrk-h{font-size:10px;color:rgba(251,249,238,.5);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;margin:11px 0 5px}
+.dfrk-li{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--areia,#f3ede0);padding:3px 0}
+.dfrk-li i{color:rgba(251,249,238,.35);font-style:normal;font-size:11px;font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
+.dfrk-li b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dfrk-empty{color:rgba(251,249,238,.4);font-size:12px;padding:2px 0}
 #tab-suprimentos .alert-list{ display:flex; flex-direction:column; gap:8px; }
 #tab-suprimentos .alert-item{ display:flex; align-items:center; gap:12px; background:rgba(192,57,43,.08); border:1px solid rgba(192,57,43,.2); border-left:3px solid #e57373; border-radius:3px; padding:10px 14px; font-size:12px; }
 #tab-suprimentos .alert-item.warn{ background:rgba(212,133,10,.08); border-color:rgba(212,133,10,.2); border-left-color:#f0b429; }
@@ -1858,7 +1876,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
           <div><label>Cor</label><select id="dfCor"></select><input id="dfCorTxt" class="hide" placeholder="Cor"></div>
           <div><label>Fabricante</label><input list="avForns" id="dfFab" placeholder="puxado do modelo" autocomplete="off"></div>
           <div><label>Custo do par (R$) <span class="av-opt">opcional</span></label><input id="dfCusto" inputmode="decimal" placeholder="puxado do cadastro"></div>
-          <div class="av-full"><label>Descrição do defeito <span class="av-opt">opcional</span></label><input id="dfDesc" placeholder="ex: Biqueira descolou"></div>
+          <div class="av-full"><label>Descrição do defeito <span class="av-opt">opcional</span></label><input id="dfDesc" list="avDefs" autocomplete="off" placeholder="ex: Biqueira descolou"><datalist id="avDefs"></datalist></div>
         </div>
         <div id="dfEditBar" class="av-editbar hide">Editando lancamento &mdash; altere e salve.</div>
         <div class="av-acts"><button class="btn btn-ouro" id="dfAdd">Adicionar a fila + registrar</button><button class="btn btn-ghost" id="dfReg">Só registrar</button><button class="btn btn-ouro hide" id="dfSave">Salvar alteração</button><button class="btn btn-ghost hide" id="dfCancel">Cancelar</button></div>
@@ -1866,6 +1884,10 @@ textarea.cons-field{min-height:80px;resize:vertical}
       <div class="rep-card">
         <div class="rep-card-h"><h3>Defeitos por fabricante</h3><button class="btn btn-ouro btn-sm" id="dfPdf">PDF de todas</button></div>
         <div id="dfResumo" class="av-resumo"></div>
+      </div>
+      <div class="rep-card">
+        <div class="rep-card-h"><h3>Ranking de fornecedores</h3><span class="dfrk-hint">histórico completo &middot; inclui os já devolvidos</span></div>
+        <div id="dfRanking" class="dfrk"></div>
       </div>
       <div class="rep-card">
         <div class="rep-card-h"><h3>Lancamentos</h3><button class="btn btn-ghost btn-sm" id="dfLimpar">Limpar tudo</button></div>
@@ -2810,6 +2832,59 @@ function avDatalists(){
   if($('avModelos'))$('avModelos').innerHTML=catalogo.map(m=>'<option value="'+escapeHtml(m.nome)+'">').join('');
   let fs=[];try{if(typeof repForn!=='undefined'&&repForn)fs=Object.values(repForn).map(f=>f&&f.nome).filter(Boolean);}catch(e){}
   if($('avForns'))$('avForns').innerHTML=fs.map(n=>'<option value="'+escapeHtml(n)+'">').join('');
+  if($('avDefs'))$('avDefs').innerHTML=dfTiposDefeito().map(function(t){return '<option value="'+escapeHtml(t.label)+'">';}).join('');
+}
+function dfNorm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
+function dfTiposDefeito(){
+  var g={};
+  (defeitos||[]).forEach(function(d){
+    var raw=String(d&&d.desc||'').trim();if(!raw)return;
+    var k=dfNorm(raw);if(!k)return;
+    g[k]=g[k]||{n:0,var:{}};g[k].n++;g[k]['var'][raw]=(g[k]['var'][raw]||0)+1;
+  });
+  return Object.keys(g).map(function(k){
+    var vs=g[k]['var'],best=Object.keys(vs).sort(function(a,b){return vs[b]-vs[a]||a.localeCompare(b);})[0];
+    return {key:k,label:best.replace(/\s+/g,' '),n:g[k].n};
+  }).sort(function(a,b){return b.n-a.n||a.label.localeCompare(b.label);});
+}
+function dfTopDe(arr,fn){
+  var g={};
+  arr.forEach(function(d){
+    var raw=String(fn(d)||'').trim();if(!raw)return;
+    var k=dfNorm(raw);if(!k)return;
+    g[k]=g[k]||{n:0,var:{}};g[k].n++;g[k]['var'][raw]=(g[k]['var'][raw]||0)+1;
+  });
+  return Object.keys(g).map(function(k){
+    var vs=g[k]['var'],best=Object.keys(vs).sort(function(a,b){return vs[b]-vs[a]||a.localeCompare(b);})[0];
+    return {label:best.replace(/\s+/g,' '),n:g[k].n};
+  }).sort(function(a,b){return b.n-a.n||a.label.localeCompare(b.label);});
+}
+function renderDfRanking(){
+  var box=$('dfRanking');if(!box)return;
+  var todos=(defeitos||[]);
+  if(!todos.length){box.innerHTML='<div class="dfrk-empty">Nenhum defeito registrado ainda.</div>';return;}
+  var map={};
+  todos.forEach(function(d){
+    var f=((d.fab||'').trim())||'Sem fabricante';
+    map[f]=map[f]||{n:0,v:0,itens:[]};map[f].n++;map[f].v+=avCustoDefeito(d);map[f].itens.push(d);
+  });
+  var fs=Object.keys(map).sort(function(a,b){return map[b].n-map[a].n||map[b].v-map[a].v;});
+  var max=map[fs[0]].n||1;
+  box.innerHTML=fs.map(function(f,i){
+    var o=map[f],semDesc=o.itens.filter(function(d){return !String(d.desc||'').trim();}).length;
+    var mods=dfTopDe(o.itens,function(d){return d.nome;}).slice(0,3);
+    var defs=dfTopDe(o.itens,function(d){return d.desc;}).slice(0,3);
+    var h='<details class="dfrk-row"><summary class="dfrk-sum"><span class="dfrk-pos">'+(i+1)+'</span><span class="dfrk-nome">'+escapeHtml(f)+'</span><span class="dfrk-n">'+o.n+' par(es)</span><span class="dfrk-v">'+brMoney(o.v)+'</span></summary>';
+    h+='<div class="dfrk-bar" style="width:'+Math.round(o.n/max*100)+'%"></div>';
+    h+='<div class="dfrk-body">';
+    h+='<div class="dfrk-h">Modelos que mais dão problema</div>';
+    h+=mods.length?mods.map(function(m){return '<div class="dfrk-li"><i>'+m.n+'x</i><b>'+escapeHtml(m.label)+'</b></div>';}).join(''):'<div class="dfrk-empty">Sem modelo informado.</div>';
+    h+='<div class="dfrk-h">Defeitos mais frequentes</div>';
+    h+=defs.length?defs.map(function(m){return '<div class="dfrk-li"><i>'+m.n+'x</i><b>'+escapeHtml(m.label)+'</b></div>';}).join(''):'<div class="dfrk-empty">Nenhuma descrição preenchida.</div>';
+    if(semDesc)h+='<div class="dfrk-empty" style="margin-top:7px">'+semDesc+' de '+o.n+' sem descrição do defeito.</div>';
+    h+='</div></details>';
+    return h;
+  }).join('');
 }
 function renderAvarias(){avDatalists();dfRenderForm();ptRenderForm();renderDefeitos();renderPetroca();}
 let dfSel=new Set();
@@ -2840,6 +2915,8 @@ function renderDefeitos(){
   }).join('')||'<div class="empty">Nenhum defeito'+(dfFabFiltro?' desta fábrica':' parado')+'.</div>';
   [...dfSel].forEach(id=>{if(!visIds.has(id))dfSel.delete(id);});
   renderDfSelBar([...visIds]);
+  renderDfRanking();
+  if($('avDefs'))$('avDefs').innerHTML=dfTiposDefeito().map(function(t){return '<option value="'+escapeHtml(t.label)+'">';}).join('');
   renderDevolucoes();
 }
 function renderDfSelBar(vis){
