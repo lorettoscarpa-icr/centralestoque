@@ -1580,7 +1580,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     <div class="modal modal-lg">
       <button class="modal-x" type="button" onclick="peEnvioFechar()" aria-label="Fechar">&times;</button>
       <div id="peEnvioBox"></div>
-      <div class="pe-modal-foot"><button class="btn" onclick="peEnvioFechar()">Cancelar</button><button class="btn btn-ouro" id="peEnvioOk">Confirmar envio</button></div>
+      <div class="pe-modal-foot"><button class="btn" onclick="peEnvioFechar()">Cancelar</button><button class="btn" id="peEnvioEtiqBtn" onclick="peImprimirEtiquetasDoModal()" style="display:none">&#127991; Etiquetas</button><button class="btn btn-ouro" id="peEnvioOk">Confirmar envio</button></div>
     </div>
   </div>
 
@@ -4291,7 +4291,7 @@ function peRomaneioCampo(){
 }
 window.peRomSelect=function(inp){var f=inp&&inp.files&&inp.files[0];var msg=document.getElementById('peRomMsg');if(!f){_peEnvioRomaneio=null;if(msg)msg.textContent='';return;}if(msg)msg.textContent='Carregando...';peLerArquivo(f,function(r){if(!r){if(msg)msg.textContent='N\u00e3o consegui ler o arquivo';return;}if(r.data.length>900000){_peEnvioRomaneio=null;if(msg)msg.textContent='Arquivo muito grande. Use foto menor ou PDF mais leve.';return;}_peEnvioRomaneio=r;if(msg)msg.textContent='\u2713 '+r.nome;});};
 window.peVerRomaneio=function(ref){if(!_db){toast('Sem conex\u00e3o');return;}_db.collection('ls_pe_romaneios').doc(ref).get().then(function(s){if(!s.exists){toast('Romaneio n\u00e3o encontrado');return;}var d=s.data();var w=window.open('','_blank');if(!w){toast('Permita pop-up para ver o romaneio');return;}if(d.tipo==='img'){w.document.write('<title>'+(d.nome||'Romaneio')+'</title><img src="'+d.data+'" style="max-width:100%">');}else{w.document.write('<title>'+(d.nome||'Romaneio')+'</title><iframe src="'+d.data+'" style="border:0;width:100%;height:100vh"></iframe>');}w.document.close();}).catch(function(){toast('Erro ao abrir romaneio');});};
-function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';}_peEnvio={fid:null,oid:null,avulso:false};_peEnvioRomaneio=null;_peEditEnvio=null;}
+function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';}var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='none';_peEnvio={fid:null,oid:null,avulso:false};_peEnvioRomaneio=null;_peEditEnvio=null;}
 function peEnvioSelecionar(fid){
   var cache=_peEstoqueCache[fid]||{};var peds=(cache.ordens||[]).filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
   if(!peds.length){toast('Nenhum pedido da loja para enviar');return;}
@@ -4313,6 +4313,7 @@ function peEnvioAbrir(fid,oid){
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';}).join('');
   document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Ao confirmar, baixa do estoque da pronta-entrega e vai pro romaneio da conferencia.</p>'+rows+peRomaneioCampo();
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';ok.onclick=function(){peConfirmarEnvio();};}
+  var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='';
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
 function peProduzirAbrir(fid){
@@ -4395,6 +4396,7 @@ function peEnvioAvulsoAbrir(fid){
   }).join('');
   document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Enviar avulso (sem pedido)</div><p class="pe-metahint">Preencha quanto voc\u00ea est\u00e1 mandando de cada numera\u00e7\u00e3o. Baixa do seu estoque e vai pro recebimento da loja.</p>'+rows+peRomaneioCampo();
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';ok.onclick=function(){peConfirmarEnvio();};}
+  var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='';
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
 function peEscreveRomaneio(repoId,sent){
@@ -4423,10 +4425,40 @@ function peConfirmarEnvio(){
     if(repoId)peEscreveRomaneio(repoId,sent);
     _pePersistir(did,fid,{ordens:ordens,estoque:est,pedido:t.pedido,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Envio confirmado &mdash; baixado do estoque');
   }
-  if(!_db){aplica({},false);peEnvioFechar();return;}
+  var _sentEtiq=sent;
+  function _ofereceEtiq(){setTimeout(function(){if(confirm('Envio confirmado!\n\nImprimir as etiquetas Loretto para colar nas caixas?'))peImprimirEtiquetas(_sentEtiq);},150);}
+  if(!_db){aplica({},false);peEnvioFechar();_ofereceEtiq();return;}
   _db.collection('ls_pe').doc(did).get().then(function(sp){aplica(sp.exists?sp.data():{},sp.exists);}).catch(function(){aplica({},false);});
-  peEnvioFechar();
+  peEnvioFechar();_ofereceEtiq();
 }
+/* ===== Etiquetas Loretto no envio da fabrica ===== */
+function peGradeParaEtiquetas(grade){
+  var itens=[];
+  Object.keys(grade||{}).forEach(function(k){
+    var q=parseInt(grade[k])||0; if(q<=0) return;
+    var p=k.split('|');                 // modId | cor | numeracao
+    var m=(repCatalogo||[]).find(function(x){return x.id===p[0];});
+    if(!m) return;
+    var c=(m.cores||[]).find(function(cc){return cc.nome===p[1];})||{nome:p[1]};
+    var cod=(typeof getCodigo==='function')?getCodigo(m,c,p[2]):((m.prefixo||'')+(c.sigla||'')+p[2]);
+    itens.push({key:'pe-'+k,modId:m.id,nome:m.nome,cor:c.nome,numero:p[2],codigo:String(cod).toUpperCase(),qtd:q});
+  });
+  return itens;
+}
+function peImprimirEtiquetas(grade){
+  var itens=peGradeParaEtiquetas(grade);
+  if(!itens.length){toast('Nada para etiquetar');return false;}
+  var grid=$('printGrid'); if(!grid){toast('Area de impressao indisponivel');return false;}
+  grid.innerHTML=''; var bc=0;
+  itens.forEach(function(e){for(var i=0;i<e.qtd;i++){var d=document.createElement('div');d.className='etiqueta';grid.appendChild(d);montaEtiqueta(d,e,'bc-pe-'+(bc++));}});
+  return imprimirEtiquetasPopup();
+}
+window.peImprimirEtiquetas=peImprimirEtiquetas;
+window.peImprimirEtiquetasDoModal=function(){
+  var grade={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)grade[i.getAttribute('data-k')]=q;});
+  if(!Object.keys(grade).length){toast('Preencha a grade primeiro');return;}
+  peImprimirEtiquetas(grade);
+};
 function peOrdensPainel(fid){var cache=_peEstoqueCache[fid]||{},ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});var prods=ordens.filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||a.criadoEm||0)-(b.producaoEm||b.criadoEm||0);});var h='<div class="pe-ords">';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot ped"></span>Pedidos enviados <b>'+peds.length+'</b></div>';if(!peds.length)h+='<div class="pe-ordempty">Nenhum pedido aguardando produção.</div>';peds.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);h+='<div class="pe-ordcard ped"><div class="pe-ordtop"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peEnvioAbrir(\''+fid+'\',\''+o.id+'\')">Confirmar envio</button><button class="btn sm" onclick="peExcluirOrdem(\''+fid+'\',\''+o.id+'\')">Excluir</button></div></div>';});h+='</div>';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot prod"></span>Em produção <b>'+prods.length+'</b></div>';if(!prods.length)h+='<div class="pe-ordempty">Nada em produção no momento.</div>';prods.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;h+='<div class="pe-ordcard prod"><div class="pe-ordtop"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto</button></div></div>';});h+='</div>';var _peEnvCusto={};peModelosDaFabrica(fid).forEach(function(m){_peEnvCusto[m.id]=m.custo||0;});function _peEnvVal(g){var v=0;Object.keys(g||{}).forEach(function(k){v+=(parseInt(g[k])||0)*(_peEnvCusto[k.split('|')[0]]||0);});return v;}var envs=ordens.filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot env"></span>Enviados / romaneio <b>'+envs.length+'</b></div>';if(!envs.length)h+='<div class="pe-ordempty">Nenhum envio confirmado ainda.</div>';envs.forEach(function(o){var rp=_peOrdemResumo(fid,o.grade);var rm=_peOrdemResumo(fid,o.enviado||{});var _ev=_peEnvVal(o.enviado||o.grade);h+='<details class="pe-ordcard env pe-envdet"><summary class="pe-envsum"><span class="pe-envsum-l"><b>Enviado '+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.enviadoPor?'<span class="pe-envsum-by">'+escapeHtml(o.enviadoPor)+'</span>':'')+'</span><span class="pe-envsum-r">'+rm.tot+' pares'+(_ev?' \u00b7 '+brMoney(_ev):'')+'</span></summary><div class="pe-envres"><div class="pe-envreslbl">Pediu</div>'+rp.html+'<div class="pe-envreslbl">Mandou</div>'+rm.html+_peCorrecoesHTML(o)+'</div></details>';});h+='</div>';h+='</div>';return h;}
 function pePedidoLancar(fid){var P=_pePedidoCache[fid];if(!P||!P.itens||!P.itens.length){toast('Nada a lançar');return;}var grade={};P.itens.forEach(function(it){(it.nums||[]).forEach(function(n){if(!it.mid)return;var k=it.mid+'|'+it.cor+'|'+n.tam;grade[k]=(grade[k]||0)+(parseInt(n.qtd)||0);});});peNovaOrdem(fid,grade);pePedidoFechar(fid);}
 window.pePublicar=pePublicar;window.peCopiarLink=peCopiarLink;window.peTrocarFoto=peTrocarFoto;window.peSalvarMetas=peSalvarMetas;window.peAbrir=peAbrir;window.peSalvarCritPct=peSalvarCritPct;window.peVoltar=peVoltar;window.pePedido=pePedido;window.pePedidoFechar=pePedidoFechar;window.pePedidoCopiar=pePedidoCopiar;window.pePedidoWhats=pePedidoWhats;window.peColocarProducao=peColocarProducao;window.peOrdemPronta=peOrdemPronta;window.peExcluirOrdem=peExcluirOrdem;window.peNovaOrdem=peNovaOrdem;window.pePedidoLancar=pePedidoLancar;window.peEnvioAbrir=peEnvioAbrir;window.peEnvioFechar=peEnvioFechar;window.peConfirmarEnvio=peConfirmarEnvio;window.peEnvioSelecionar=peEnvioSelecionar;
