@@ -3457,7 +3457,12 @@ window.avPdfLote=function(loteId){
   const fnames=Object.keys(fabs).sort();
   const totPares=itens.reduce((s,d)=>s+avCustoDefeito(d),0);
   const frete=vols*unit,credTotal=totPares+frete;
-  const cab='<h1 class="rp2-h1">Devolução para a fábrica</h1><p style="text-align:center;margin:-6px 0 16px;color:#555;font-size:13px">'+em.toLocaleDateString('pt-BR')+' &middot; '+itens.length+' par(es) &middot; '+vols+' volume(s)'+(transp?' &middot; via '+escapeHtml(transp):'')+'</p>';
+  const destaqueCred='<div style="margin:0 auto 18px;max-width:440px;border:2px solid #314b21;border-radius:12px;padding:12px 20px;text-align:center;background:#f5f8f0;page-break-inside:avoid;break-inside:avoid">'+
+    '<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#314b21;font-weight:700">Cr&eacute;dito total com a f&aacute;brica</div>'+
+    '<div style="font-family:\'Playfair Display\',serif;font-size:32px;font-weight:700;color:#1a1a1a;line-height:1.1;margin:3px 0 2px">'+brMoney(credTotal)+'</div>'+
+    '<div style="font-size:11px;color:#666">'+itens.length+' par(es) em defeito &middot; frete de '+vols+' volume(s) incluso</div>'+
+    '</div>';
+  const cab='<h1 class="rp2-h1">Devolução para a fábrica</h1><p style="text-align:center;margin:-6px 0 14px;color:#555;font-size:13px">'+em.toLocaleDateString('pt-BR')+' &middot; '+itens.length+' par(es) &middot; '+vols+' volume(s)'+(transp?' &middot; via '+escapeHtml(transp):'')+'</p>'+destaqueCred;
   const fech='<div style="margin-top:18px"><h2 class="rp2-h2">Fechamento do cr&eacute;dito</h2><table class="rp2-grade" style="width:100%"><thead><tr><th style="text-align:left">Item</th><th>Qtde</th><th>Valor unit.</th><th>Subtotal</th></tr></thead><tbody>'+
     '<tr><td style="text-align:left">Pares devolvidos (defeito)</td><td>'+itens.length+'</td><td>&mdash;</td><td>'+brMoney(totPares)+'</td></tr>'+
     '<tr><td style="text-align:left">Volumes devolvidos (frete pago pela loja'+(transp?' &mdash; '+escapeHtml(transp):'')+')</td><td>'+vols+'</td><td>'+brMoney(unit)+'</td><td>'+brMoney(frete)+'</td></tr>'+
