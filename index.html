@@ -7,9 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Barlow:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script>window.__libFail=[];window.__libNames={JsBarcode:'código de barras',XLSX:'exportar/ler Excel',ExcelJS:'exportar Excel',pdfjsLib:'ler PDF'};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js" onerror="__libFail.push('JsBarcode')"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" onerror="__libFail.push('XLSX')"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js" onerror="__libFail.push('ExcelJS')"></script>
 <style>
   :root{--verde:#314b21;--verde-claro:#3b5a28;--verde-escuro:#283e1a;--ouro:#dcbd60;--ouro-claro:#ead08a;--areia:#fbf9ee;--carvao:#16240e;--linha:rgba(220,189,96,.22);
     /* ===== Sistema de design Loretto Scarpa =====
@@ -214,7 +215,8 @@
   .import-box p{font-size:var(--fs-base);color:rgba(251,249,238,.7);margin-bottom:12px;line-height:1.5}
   .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ouro);color:var(--verde-escuro);padding:12px 24px;border-radius:var(--r-lg);font-weight:700;font-size:var(--fs-md);opacity:0;pointer-events:none;transition:.3s;z-index:200;box-shadow:0 8px 30px rgba(0,0,0,.4)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .mem-alerta{position:fixed;top:0;left:0;right:0;z-index:300;display:none;align-items:center;gap:12px;padding:11px 18px;background:linear-gradient(180deg,#7a1f1f,#5e1717);color:#fff;font-family:'Barlow',sans-serif;font-size:var(--fs-md);font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.45);border-bottom:1px solid rgba(255,255,255,.15)}
+  .top-alertas{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;flex-direction:column}
+  .mem-alerta{display:none;align-items:center;gap:12px;padding:11px 18px;background:linear-gradient(180deg,#7a1f1f,#5e1717);color:#fff;font-family:'Barlow',sans-serif;font-size:var(--fs-md);font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.45);border-bottom:1px solid rgba(255,255,255,.15)}
   .mem-alerta.show{display:flex}
   .mem-alerta.aviso{background:linear-gradient(180deg,#8a6a12,#6f5410)}
   .mem-alerta .mem-ic{font-size:16px;flex-shrink:0}
@@ -573,6 +575,9 @@
   @media(max-width:680px){.login-h1{font-size:38px}.login-users{gap:12px;max-width:none}.login-user{padding:22px 10px;gap:12px}.lu-ava{width:72px;height:72px;font-size:26px}.lu-nome{letter-spacing:2px}}
   .side-foot{margin-top:auto;padding:12px}
   .side-build{font-size:var(--fs-micro);color:rgba(251,249,238,.35);text-align:center;margin-top:8px;letter-spacing:.4px;font-family:'DM Mono',monospace}
+  .side-backup{display:flex;gap:6px;margin-top:8px}
+  .side-bkp-btn{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--linha);color:var(--texto-fraco);border-radius:var(--r-sm);padding:6px 8px;font-family:'Barlow',sans-serif;font-size:var(--fs-micro);font-weight:600;letter-spacing:.3px;cursor:pointer;transition:.15s}
+  .side-bkp-btn:hover{border-color:var(--ouro);color:var(--ouro-claro);background:rgba(220,189,96,.06)}
   .side-user{display:flex;align-items:center;gap:10px;width:100%;background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:var(--r-md);padding:9px 11px;cursor:pointer;color:var(--areia)}
   .side-user:hover{border-color:var(--ouro)}
   .su-ava{width:30px;height:30px;border-radius:50%;background:var(--ouro);color:var(--verde-escuro);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--fs-md);flex:0 0 auto}
@@ -1598,7 +1603,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
 .cons-badge{margin-left:auto;min-width:20px;height:20px;line-height:20px;padding:0 6px;border-radius:10px;background:var(--ouro);color:var(--verde-escuro);font-family:'DM Mono',monospace;font-size:11px;font-weight:600;text-align:center}
 .cons-badge.alerta{background:#d98a6a;color:#1a1a1a}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" onerror="__libFail.push('pdfjsLib')"></script>
 <script>if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";}</script>
 </head>
 <body>
@@ -1630,6 +1635,11 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </nav>
     <div class="side-foot">
       <button class="side-user" id="userBtn"><span class="su-ava" id="userAva">?</span><span class="su-nome" id="userNome">Entrar</span><span class="su-troca">trocar</span></button>
+      <div class="side-backup">
+        <button type="button" class="side-bkp-btn" id="sideBackupBtn" title="Baixar uma cópia de tudo (catálogo, estoque, fotos, etc.)">↓ Backup</button>
+        <button type="button" class="side-bkp-btn" id="sideRestoreBtn" title="Restaurar de um arquivo de backup">↥ Restaurar</button>
+        <input type="file" id="backupFile" accept=".json,application/json" hidden>
+      </div>
       <div class="side-build">build 08/07 · uma linguagem só: tokens, dados e botões</div>
     </div>
   </aside>
@@ -2429,11 +2439,19 @@ textarea.cons-field{min-height:80px;resize:vertical}
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="top-alertas" id="topAlertas">
 <div class="mem-alerta" id="memAlerta" role="alert" aria-live="assertive">
   <span class="mem-ic" aria-hidden="true">⚠️</span>
   <span class="mem-txt" id="memAlertaTxt">A memória deste aparelho encheu. Dados novos podem <b>não estar sendo salvos</b>.</span>
   <button type="button" class="mem-btn" id="memAlertaBackup">Exportar backup</button>
   <button type="button" class="mem-x" id="memAlertaX" aria-label="Fechar aviso">×</button>
+</div>
+<div class="mem-alerta aviso" id="libAlerta" role="alert" aria-live="polite">
+  <span class="mem-ic" aria-hidden="true">📡</span>
+  <span class="mem-txt" id="libAlertaTxt"></span>
+  <button type="button" class="mem-btn" id="libAlertaReload">Recarregar</button>
+  <button type="button" class="mem-x" id="libAlertaX" aria-label="Fechar aviso">×</button>
+</div>
 </div>
 
 <script>
@@ -2480,10 +2498,46 @@ const $=id=>document.getElementById(id);
       if(window.toast)toast('Backup exportado');
     }catch(e){if(window.toast)toast('Não foi possível exportar o backup');}
   };
+  window.restaurarBackupCompleto=function(file){
+    const r=new FileReader();
+    r.onload=function(){
+      try{
+        const obj=JSON.parse(r.result);
+        const dados=obj&&obj.dados;
+        if(!dados||typeof dados!=='object'){if(window.toast)toast('Arquivo de backup inválido');return;}
+        const chaves=Object.keys(dados).filter(k=>/^(loretto_|ls_)/.test(k));
+        if(!chaves.length){if(window.toast)toast('Nenhum dado reconhecido no arquivo');return;}
+        if(!window.confirm('Restaurar '+chaves.length+' conjuntos de dados deste backup?\n\nIsso substitui os dados deste aparelho. Convém baixar um backup atual antes.'))return;
+        let ok=0;
+        chaves.forEach(function(k){try{localStorage.setItem(k,dados[k]);ok++;}catch(e){}});
+        if(window.toast)toast('Backup restaurado ('+ok+') — recarregando…');
+        setTimeout(function(){location.reload();},900);
+      }catch(e){if(window.toast)toast('Não foi possível ler o backup');}
+    };
+    r.onerror=function(){if(window.toast)toast('Não foi possível ler o arquivo');};
+    r.readAsText(file);
+  };
   document.addEventListener('DOMContentLoaded',function(){
     const b=document.getElementById('memAlertaBackup');if(b)b.addEventListener('click',window.exportarBackupCompleto);
     const x=document.getElementById('memAlertaX');if(x)x.addEventListener('click',function(){const el=document.getElementById('memAlerta');if(el)el.classList.remove('show');});
+    const bk=document.getElementById('sideBackupBtn');if(bk)bk.addEventListener('click',window.exportarBackupCompleto);
+    const rs=document.getElementById('sideRestoreBtn'),fi=document.getElementById('backupFile');
+    if(rs&&fi){rs.addEventListener('click',function(){fi.click();});fi.addEventListener('change',function(){if(fi.files&&fi.files[0])window.restaurarBackupCompleto(fi.files[0]);fi.value='';});}
     setTimeout(checar,5000);setInterval(checar,60000);
+    /* #4/#5 avisa se alguma biblioteca externa (CDN) não carregou */
+    try{
+      const nomes=window.__libNames||{}, faltas=[];
+      if(!window.JsBarcode)faltas.push(nomes.JsBarcode||'código de barras');
+      if(!window.XLSX&&!window.ExcelJS)faltas.push('exportar/ler Excel');
+      else{if(!window.XLSX)faltas.push('ler Excel');if(!window.ExcelJS)faltas.push('exportar Excel');}
+      if(!window.pdfjsLib)faltas.push(nomes.pdfjsLib||'ler PDF');
+      if(faltas.length){
+        const el=document.getElementById('libAlerta'),t=document.getElementById('libAlertaTxt');
+        if(el&&t){t.innerHTML='Parece que você está sem internet. Estas funções podem não funcionar agora: <b>'+faltas.join(', ')+'</b>. O resto do sistema funciona normalmente.';el.classList.add('show');}
+      }
+      const lr=document.getElementById('libAlertaReload');if(lr)lr.addEventListener('click',function(){location.reload();});
+      const lx=document.getElementById('libAlertaX');if(lx)lx.addEventListener('click',function(){const el=document.getElementById('libAlerta');if(el)el.classList.remove('show');});
+    }catch(e){}
   });
 })();
 const LEAO_SVG=`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><text x="50" y="54" text-anchor="middle" dominant-baseline="central" font-family="'Playfair Display',Georgia,serif" font-weight="700" font-size="44" fill="currentColor" letter-spacing="-3">LS</text></svg>`;
@@ -6448,7 +6502,7 @@ function renderDetalhe() {
   document.getElementById('mesSelecionadoLabel').textContent=nomes[mesSelecionado-1]+' '+ano;
   const dados=historico.filter(h=>{ const d=new Date(h.data+'T12:00:00'); return d.getMonth()+1===mesSelecionado&&d.getFullYear()===ano; }).sort((a,b)=>new Date(b.data)-new Date(a.data));
   if(!dados.length){ document.getElementById('tabelaDetalhe').innerHTML='<tr><td colspan="6" class="hist-empty">Nenhuma compra neste mês.</td></tr>'; return; }
-  document.getElementById('tabelaDetalhe').innerHTML=dados.map(h=>`<tr><td style="font-size:12px">${h.itemNome}</td><td class="td-forn"><span class="tag">${h.forn.split(' ')[0]}</span></td><td class="td-num">${h.qtdComprada.toLocaleString('pt-BR')}</td><td class="td-num">${brl(h.unitPago)}</td><td class="td-num td-gold">${brl(h.totalPago)}</td><td style="font-size:12px;color:var(--texto-fraco)">${h.resp}</td></tr>`).join('');
+  document.getElementById('tabelaDetalhe').innerHTML=dados.map(h=>`<tr><td style="font-size:12px">${escapeHtml(h.itemNome)}</td><td class="td-forn"><span class="tag">${escapeHtml(String(h.forn||'').split(' ')[0])}</span></td><td class="td-num">${h.qtdComprada.toLocaleString('pt-BR')}</td><td class="td-num">${brl(h.unitPago)}</td><td class="td-num td-gold">${brl(h.totalPago)}</td><td style="font-size:12px;color:var(--texto-fraco)">${escapeHtml(h.resp)}</td></tr>`).join('');
 }
 
 // ════════════════════════════════════════════
