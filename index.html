@@ -1552,6 +1552,13 @@
   .etiqueta.tpl .tbc svg{height:7em!important;width:auto!important;max-width:100%;display:block}
   .etiqueta.tpl .shoe{display:block}
   .etiqueta.tpl .shoe svg{width:100%;height:100%;display:block;stroke:#000;fill:none}
+  .etiqueta.tpl .shoe img{width:100%;height:100%;object-fit:contain;display:block}
+  .modimg-row{display:flex;gap:12px;align-items:flex-start;margin:6px 0 4px}
+  .modimg-prev{width:66px;height:52px;flex-shrink:0;border:1px solid var(--linha);border-radius:var(--r-sm);background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .modimg-prev.empty{background:rgba(0,0,0,.18)}
+  .modimg-prev img{max-width:100%;max-height:100%;object-fit:contain}
+  .modimg-acts{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+  .modimg-hint{font-size:var(--fs-micro);color:var(--texto-fraco)}
   .etiqueta.tpl .bcw{background:#fff;padding:.7em .9em .3em;border-radius:.3em}
   .etiqueta.tpl .row{display:flex}
   /* T1 */
@@ -2226,6 +2233,16 @@ textarea.cons-field{min-height:80px;resize:vertical}
           <div><label>No inicial</label><input type="text" id="mNumIni" placeholder="37"></div>
           <div><label>No final</label><input type="text" id="mNumFim" placeholder="44"></div>
         </div>
+        <label>Imagem do modelo <span style="font-weight:400;color:var(--texto-fraco);font-size:var(--fs-sm)">— SVG ou PNG, aparece nos modelos de etiqueta</span></label>
+        <div class="modimg-row">
+          <div class="modimg-prev" id="mImgPrev" aria-hidden="true"></div>
+          <div class="modimg-acts">
+            <input type="file" id="mImgFile" accept=".svg,.png,.jpg,.jpeg,image/svg+xml,image/png,image/jpeg" hidden>
+            <button type="button" class="btn btn-ghost btn-sm" id="mImgBtn">Escolher imagem</button>
+            <button type="button" class="btn btn-ghost btn-sm hide" id="mImgClear">Remover</button>
+            <div class="modimg-hint" id="mImgHint">Nenhuma imagem — usa o ícone padrão.</div>
+          </div>
+        </div>
         <label>Cores</label>
         <div id="coresEditor"></div>
         <button class="add-cor" id="addCorBtn">+ Adicionar cor</button>
@@ -2778,7 +2795,9 @@ const SHOE_SVG=`<svg viewBox="0 0 120 60" fill="none" stroke="#000" stroke-width
 let etqModelo=localStorage.getItem('loretto_modelo_etq')||'padrao';
 function tplEtiqueta(modelo,d,barId){
   const nome=escapeHtml(d.nome||''),cor=escapeHtml(d.cor||''),br=escapeHtml(d.numero||''),cod=escapeHtml(d.codigo||'');
-  const site='www.lorettoscarpa.com.br',marca='LORETTO SCARPA',shoe='<span class="shoe">'+SHOE_SVG+'</span>';
+  const _mm=(typeof catalogo!=='undefined'&&d&&d.modId)?catalogo.find(x=>x.id===d.modId):null;
+  const ilus=(_mm&&_mm.img)?('<img src="'+_mm.img+'" alt="">'):SHOE_SVG;
+  const site='www.lorettoscarpa.com.br',marca='LORETTO SCARPA',shoe='<span class="shoe">'+ilus+'</span>';
   const BC='<span class="tbc"><svg id="'+barId+'"></svg></span>';
   const PH='<span class="tph">a preencher</span>';
   const pncor=nome+(cor?' · '+cor:'');
@@ -2796,12 +2815,12 @@ function tplEtiqueta(modelo,d,barId){
     case 't4': return '<div class="top"><div><div class="cod mono">'+cod+'</div><div class="cor">Cor '+cor+'</div></div>'+
       '<div class="gr mono"><div><b>UK</b>--<br><b>BR</b>'+br+'</div><div><b>cm</b>--<br><b>EUR</b>--</div></div></div>'+
       '<div class="body"><div class="bleft"><div class="pn">'+nome+'</div><div class="bc">'+BC+'</div><div class="brand">'+marca+'</div></div>'+
-      '<div class="bright"><div class="sd">'+PH+'</div><div class="shoe">'+SHOE_SVG+'</div><div class="mi"><span class="tph">origem a preencher</span></div></div></div>';
+      '<div class="bright"><div class="sd">'+PH+'</div><div class="shoe">'+ilus+'</div><div class="mi"><span class="tph">origem a preencher</span></div></div></div>';
     case 't5': return '<div class="block"><div class="r1"><div class="cod mono">'+cod+'</div><div class="brand">'+marca+'</div></div>'+
       '<div class="r2"><div class="v">'+br+'</div><div class="gr mono"><div><b>US</b>--<br><b>BR</b>'+br+'</div><div><b>cm</b>--<br><b>EUR</b>--</div></div></div>'+
       '<div class="r3"><div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="bcw">'+BC+'</div></div>'+
       '<div><div class="mi"><span class="tph">origem a preencher</span></div><div class="site">'+site+'</div></div></div></div>';
-    case 't6': return '<div class="top"><div class="brand">'+marca+'</div><span class="shoe">'+SHOE_SVG+'</span></div>'+
+    case 't6': return '<div class="top"><div class="brand">'+marca+'</div><span class="shoe">'+ilus+'</span></div>'+
       '<div class="mid"><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>'+
       '<div class="bottom"><div class="sizes mono"><b>BR</b> '+br+' · US -- · cm -- · EUR --</div><div class="bc">'+BC+'</div></div>';
     case 't7': return '<div class="hdr">'+pncor+'</div><div class="cols"><div class="c1"><div class="v">'+br+'</div><div class="u">BR</div></div>'+
@@ -2818,9 +2837,9 @@ function tplEtiqueta(modelo,d,barId){
       '<div class="strip"><span class="tph" style="color:#c9c9c9">descrição a preencher</span><span class="pn">'+nome+'</span><span>'+cod+'</span><span class="site">'+site+'</span></div>';
     case 't11': return '<div class="left"><div class="brand">'+marca+'</div><div class="num"><span class="v">'+br+'</span><span class="u">BR</span></div>'+
       '<div class="mini mono">UK -- · EUR -- · cm --</div><div class="bc">'+BC+'</div><div class="mi"><span class="tph">origem a preencher</span></div></div>'+
-      '<div class="right"><span class="shoe">'+SHOE_SVG+'</span><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>';
+      '<div class="right"><span class="shoe">'+ilus+'</span><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>';
     case 't12': return '<div class="main"><div class="left"><div class="brand">LORETTO<br>SCARPA</div><div class="cod mono">'+cod+'</div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div></div>'+
-      '<div class="center"><span class="shoe">'+SHOE_SVG+'</span></div>'+
+      '<div class="center"><span class="shoe">'+ilus+'</span></div>'+
       '<div class="grid mono"><div><b>US</b> --</div><div><b>BR</b> '+br+'</div><div><b>cm</b> --</div><div><b>EUR</b> --</div></div></div><div class="site">'+site+'</div>';
     case 't13': return '<div class="cnum"><div class="v">'+br+'</div><div class="sz mono">US --<br>BR '+br+'<br>cm --</div></div>'+
       '<div class="rows"><div class="rw pn">'+pncor+'</div><div class="rw sd">'+PH+'</div><div class="rw bcrow">'+BC+'</div>'+
@@ -2835,7 +2854,7 @@ function tplEtiqueta(modelo,d,barId){
 let catalogo, favoritos, abertos=new Set(), fila=[], filtro='todos', mfiltro='ativos';
 let ordenacao=localStorage.getItem('loretto_ordenacao')||'cadastro';
 let logoData=localStorage.getItem('loretto_leao')||null;
-let editandoId=null, coresTmp=[];
+let editandoId=null, coresTmp=[], mImgData=null;
 
 function carregar(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
 function salvarCatalogo(){localStorage.setItem('loretto_catalogo',JSON.stringify(catalogo));if(typeof syncPushCatalogo==='function')syncPushCatalogo();}
@@ -4106,8 +4125,50 @@ function lerCoresEditor(){
     return o;
   });
 }
-function limparForm(){editandoId=null;$('formTitulo').textContent='Novo modelo';$('mNome').value='';$('mPrefixo').value='';$('mNumIni').value='37';$('mNumFim').value='44';coresTmp=[{nome:'Preto',sigla:'PT',hex:'#1a1a1a'}];renderCoresEditor(coresTmp);$('cancelarEdicaoBtn').classList.add('hide');}
+function limparForm(){editandoId=null;$('formTitulo').textContent='Novo modelo';$('mNome').value='';$('mPrefixo').value='';$('mNumIni').value='37';$('mNumFim').value='44';coresTmp=[{nome:'Preto',sigla:'PT',hex:'#1a1a1a'}];renderCoresEditor(coresTmp);$('cancelarEdicaoBtn').classList.add('hide');mImgData=null;if(typeof updateImgPrev==='function')updateImgPrev();}
 $('cancelarEdicaoBtn').addEventListener('click',limparForm);
+/* ===== Imagem (SVG/PNG) por modelo — aparece nos modelos de etiqueta ===== */
+function updateImgPrev(){
+  const prev=$('mImgPrev'),hint=$('mImgHint'),clr=$('mImgClear');if(!prev)return;
+  if(mImgData){prev.classList.remove('empty');prev.innerHTML='<img src="'+mImgData+'" alt="">';if(clr)clr.classList.remove('hide');if(hint)hint.textContent='Imagem definida.';}
+  else{prev.classList.add('empty');prev.innerHTML='';if(clr)clr.classList.add('hide');if(hint)hint.textContent='Nenhuma imagem — usa o ícone padrão.';}
+}
+if($('mImgBtn'))$('mImgBtn').addEventListener('click',()=>$('mImgFile').click());
+if($('mImgClear'))$('mImgClear').addEventListener('click',()=>{mImgData=null;updateImgPrev();});
+if($('mImgFile'))$('mImgFile').addEventListener('change',function(){
+  const f=this.files&&this.files[0];this.value='';if(!f)return;
+  const tipo=(f.type||'').toLowerCase(),nome=(f.name||'').toLowerCase();
+  const ehSvg=tipo.indexOf('svg')>=0||nome.endsWith('.svg');
+  const r=new FileReader();
+  if(ehSvg){
+    r.onload=function(){
+      let txt=String(r.result||'');
+      // remove scripts por seguranca (SVG pode conter JS)
+      txt=txt.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/on\w+\s*=\s*("[^"]*"|'[^']*')/gi,'');
+      mImgData='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(txt)));
+      updateImgPrev();toast('Imagem SVG definida');
+    };
+    r.onerror=function(){toast('Não foi possível ler o SVG');};
+    r.readAsText(f);
+  }else{
+    r.onload=function(){
+      const img=new Image();
+      img.onload=function(){
+        const MAX=480;let w=img.width,h=img.height;
+        if(w>MAX||h>MAX){const k=Math.min(MAX/w,MAX/h);w=Math.round(w*k);h=Math.round(h*k);}
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        try{mImgData=cv.toDataURL('image/png');}catch(e){mImgData=String(r.result);}
+        if(mImgData.length>350000)toast('Imagem grande — considere um PNG menor ou SVG');
+        updateImgPrev();toast('Imagem definida');
+      };
+      img.onerror=function(){toast('Arquivo de imagem inválido');};
+      img.src=String(r.result);
+    };
+    r.onerror=function(){toast('Não foi possível ler a imagem');};
+    r.readAsDataURL(f);
+  }
+});
 function geraPrefixo(nome){
   const limpo=(nome||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
   const palavras=limpo.split(/\s+/).filter(Boolean);
@@ -4125,8 +4186,8 @@ $('salvarModeloBtn').addEventListener('click',()=>{
   if(!pref&&!cores.every(c=>c.skus)){pref=geraPrefixo(nome);$('mPrefixo').value=pref;}
   if((isNaN(ini)||isNaN(fim)||ini>fim)&&!cores.every(c=>c.skus)){toast('Confira a numeração');return;}
   if(!cores.length){toast('Adicione ao menos uma cor');return;}
-  if(editandoId){const m=catalogo.find(x=>x.id===editandoId);m.nome=nome;m.prefixo=pref;m.ini=ini;m.fim=fim;m.cores=cores;toast('Modelo atualizado');}
-  else{catalogo.push({id:'u'+Date.now(),nome,prefixo:pref,ini,fim,cores,criadoEm:Date.now()});toast('Modelo salvo');}
+  if(editandoId){const m=catalogo.find(x=>x.id===editandoId);m.nome=nome;m.prefixo=pref;m.ini=ini;m.fim=fim;m.cores=cores;if(mImgData)m.img=mImgData;else delete m.img;toast('Modelo atualizado');}
+  else{const novo={id:'u'+Date.now(),nome,prefixo:pref,ini,fim,cores,criadoEm:Date.now()};if(mImgData)novo.img=mImgData;catalogo.push(novo);toast('Modelo salvo');}
   marcarUser();salvarCatalogo();limparForm();renderGerenciar();renderLista();
 });
 document.querySelectorAll('[data-mfiltro]').forEach(ch=>ch.addEventListener('click',()=>{document.querySelectorAll('[data-mfiltro]').forEach(x=>x.classList.remove('on'));ch.classList.add('on');mfiltro=ch.dataset.mfiltro;renderGerenciar();}));
@@ -4153,6 +4214,7 @@ window.editarModelo=(id)=>{
   $('mNumIni').value=ini||37;$('mNumFim').value=fim||44;
   coresTmp=m.cores.map(c=>({nome:c.nome,sigla:c.sigla||'',hex:c.hex||'#333333',skus:c.skus?{...c.skus}:undefined,off:!!c.off}));
   renderCoresEditor(coresTmp);$('cancelarEdicaoBtn').classList.remove('hide');
+  mImgData=m.img||null;if(typeof updateImgPrev==='function')updateImgPrev();
   document.querySelector('.side-item[data-tab=modelos]').click();window.scrollTo({top:0,behavior:'smooth'});
 };
 window.excluirModelo=(id)=>{const m=catalogo.find(x=>x.id===id);if(confirm('Excluir "'+m.nome+'" de vez? (Para apenas tirar da tela, use o olho para ocultar.)')){catalogo=catalogo.filter(x=>x.id!==id);favoritos.delete(id);marcarUser();salvarCatalogo();salvarFav();renderGerenciar();renderLista();if(editandoId===id)limparForm();}};
