@@ -1541,6 +1541,218 @@
   #tab-suprimentos .pedido-preco-val,#tab-suprimentos .pedido-preco-label,
   #tab-suprimentos .kpi-label,#tab-suprimentos .stat-num{font-family:'DM Mono',monospace}
   #tab-suprimentos .alert-icon svg{width:17px;height:17px;display:block}
+
+  /* ===== Modelos de etiqueta (P&B) — 14 layouts do catalogo + padrao da loja =====
+     Tudo escala com a altura da etiqueta: 1em = --lh/50 (aprox. 1mm quando --lh=50mm). */
+  .etiqueta.tpl{padding:0;background:#fff;color:#000;font-family:'Barlow',sans-serif;font-size:calc(var(--lh)*.02);line-height:1.12;overflow:hidden}
+  .etiqueta.tpl *{box-sizing:border-box}
+  .etiqueta.tpl .tph{color:#8a8a8a;font-style:italic;font-weight:400}
+  .etiqueta.tpl .mono{font-family:'DM Mono',monospace}
+  .etiqueta.tpl .tbc{display:flex;align-items:center;width:100%}
+  .etiqueta.tpl .tbc svg{height:7em!important;width:auto!important;max-width:100%;display:block}
+  .etiqueta.tpl .shoe{display:block}
+  .etiqueta.tpl .shoe svg{width:100%;height:100%;display:block;stroke:#000;fill:none}
+  .etiqueta.tpl .bcw{background:#fff;padding:.7em .9em .3em;border-radius:.3em}
+  .etiqueta.tpl .row{display:flex}
+  /* T1 */
+  .tpl1{display:flex;flex-direction:row;border:.35em solid #000}
+  .tpl1 .b{width:9em;border-right:.35em solid #000;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tpl1 .b span{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:900;font-size:4.4em;letter-spacing:.5px}
+  .tpl1 .m{flex:1;border-right:.35em solid #000;display:flex;flex-direction:column;padding:2em 2.4em;min-width:0}
+  .tpl1 .shoe{height:14em}
+  .tpl1 .i{margin-top:auto}
+  .tpl1 .cod{font-weight:700;font-size:4.4em;line-height:1}
+  .tpl1 .pn{font-size:3em;font-weight:600;margin-top:.4em}
+  .tpl1 .sd{font-size:2.5em}
+  .tpl1 .sz{display:flex;gap:5em;margin-top:1em;align-items:baseline}
+  .tpl1 .sz span{font-size:2.6em}.tpl1 .sz b{font-size:4.4em;font-weight:800;margin-left:.6em}
+  .tpl1 .r{width:33em;flex-shrink:0;display:flex;flex-direction:column}
+  .tpl1 .r>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:.35em solid #000;padding:1em}
+  .tpl1 .r>div:last-child{border-bottom:0}
+  .tpl1 .www b{font-weight:700;font-size:3em}.tpl1 .www .tph{font-size:2.2em;margin-top:.3em}
+  /* T2 */
+  .tpl2{display:flex;flex-direction:row;border:.35em solid #000}
+  .tpl2 .num{width:26em;background:#000;color:#fff;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2em 1em}
+  .tpl2 .num .v{font-weight:900;font-size:17em;line-height:.8}
+  .tpl2 .num .gr{display:flex;gap:3em;margin-top:2.5em;font-size:2em;line-height:1.6}
+  .tpl2 .num .gr b{font-weight:400;color:#cfcfcf}
+  .tpl2 .info{flex:1;padding:2.4em 2.8em;display:flex;flex-direction:column;min-width:0}
+  .tpl2 .cod{font-weight:700;font-size:4.4em;line-height:1}
+  .tpl2 .pn{font-weight:700;font-size:3.4em;margin-top:1em}
+  .tpl2 .cor{font-size:2.7em;color:#444}
+  .tpl2 .sd{font-size:2.5em;margin-top:1em}
+  .tpl2 .bc{margin-top:auto}
+  .tpl2 .site{font-weight:700;font-size:2.6em;margin-top:.8em;word-break:break-all}
+  .tpl2 .brand{width:9em;flex-shrink:0;border-left:.35em solid #000;display:flex;align-items:center;justify-content:center}
+  .tpl2 .brand span{writing-mode:vertical-rl;font-weight:900;font-size:4.2em;letter-spacing:.5px}
+  /* T3 */
+  .tpl3{display:flex;flex-direction:row;border:.35em solid #000}
+  .tpl3 .left{flex:1;display:flex;flex-direction:column;min-width:0}
+  .tpl3 .hdr{border-bottom:.35em solid #000;padding:1.6em 2.4em;font-size:3em;font-weight:600}
+  .tpl3 .lrow{flex:1;display:flex;min-height:0}
+  .tpl3 .bc{width:33em;border-right:.35em solid #000;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2em}
+  .tpl3 .bc .tbc{width:92%}
+  .tpl3 .mid{flex:1;padding:2.4em;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+  .tpl3 .sd{font-size:2.5em}
+  .tpl3 .site{font-weight:700;font-size:2.35em;margin-top:.5em;word-break:break-all;line-height:1.15}
+  .tpl3 .brand{margin-top:auto;font-weight:900;font-size:4.6em;line-height:.95}
+  .tpl3 .grid{width:19em;flex-shrink:0;display:flex;flex-direction:column}
+  .tpl3 .grid .g{flex:1;display:flex;align-items:center;border-bottom:.35em solid #000;padding:0 1.6em;gap:1.6em}
+  .tpl3 .grid .g:last-child{border-bottom:0}
+  .tpl3 .grid .g b{font-size:2.5em;font-weight:800;width:7em}
+  .tpl3 .grid .g span{font-size:2.7em}
+  /* T4 */
+  .tpl4{display:flex;flex-direction:column;border:.35em solid #000}
+  .tpl4 .top{background:#000;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:2.2em 3em}
+  .tpl4 .top .cod{font-weight:700;font-size:4.2em;line-height:1}
+  .tpl4 .top .cor{font-size:2.4em;letter-spacing:1px;text-transform:uppercase;margin-top:.5em}
+  .tpl4 .top .gr{display:flex;gap:4em;font-size:2.4em;line-height:1.6}
+  .tpl4 .top .gr b{font-weight:400;color:#cfcfcf;display:inline-block;width:5em}
+  .tpl4 .body{flex:1;display:flex;padding:2.6em 3em;gap:3em;min-height:0}
+  .tpl4 .bleft{flex:1;display:flex;flex-direction:column;min-width:0}
+  .tpl4 .pn{font-weight:900;font-size:5.2em;line-height:.95;text-transform:uppercase}
+  .tpl4 .bc{margin-top:auto}
+  .tpl4 .brand{font-weight:900;font-size:3.4em;margin-top:1.2em}
+  .tpl4 .bright{width:34em;flex-shrink:0;display:flex;flex-direction:column}
+  .tpl4 .sd{font-size:2.5em}
+  .tpl4 .shoe{height:13em;margin:auto 0}
+  .tpl4 .mi{font-size:2.2em;text-align:right}
+  /* T5 (bloco preto) */
+  .tpl5{display:flex;flex-direction:row;border:.35em solid #000}
+  .tpl5 .block{flex:1;background:#000;color:#fff;padding:2.6em 3em;display:flex;flex-direction:column}
+  .tpl5 .r1{display:flex;justify-content:space-between;align-items:flex-start}
+  .tpl5 .r1 .cod{font-weight:700;font-size:3.6em}
+  .tpl5 .r1 .brand{font-weight:900;font-size:5em}
+  .tpl5 .r2{display:flex;align-items:center;gap:4em;margin:1em 0}
+  .tpl5 .r2 .v{font-weight:900;font-size:13em;line-height:.8}
+  .tpl5 .r2 .gr{display:flex;gap:4em;font-size:2.6em;line-height:1.6}
+  .tpl5 .r2 .gr b{font-weight:400;color:#bdbdbd;display:inline-block;width:6em}
+  .tpl5 .r3{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:3em}
+  .tpl5 .r3 .pn{font-weight:700;font-size:3em}
+  .tpl5 .r3 .sd{font-size:2.4em;color:#bbb}
+  .tpl5 .r3 .bcw{margin-top:.6em}
+  .tpl5 .r3 .site{font-weight:700;font-size:2.7em;text-align:right}
+  .tpl5 .r3 .mi{font-size:2.2em;text-align:right;color:#bbb}
+  /* T6 */
+  .tpl6{display:flex;flex-direction:column;border:.35em solid #000;padding:3em 3.4em}
+  .tpl6 .top{display:flex;justify-content:space-between;align-items:flex-start}
+  .tpl6 .brand{font-weight:900;font-size:6.2em;line-height:.9}
+  .tpl6 .shoe{width:22em;height:11em;flex-shrink:0}
+  .tpl6 .mid{margin-top:2em}
+  .tpl6 .pn{font-weight:700;font-size:3.4em}
+  .tpl6 .sd{font-size:2.6em}
+  .tpl6 .site{font-weight:700;font-size:3em;margin-top:.4em}
+  .tpl6 .bottom{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:3em}
+  .tpl6 .sizes{font-size:2.3em;white-space:nowrap}.tpl6 .sizes b{font-weight:700}
+  .tpl6 .bc{width:31em;flex-shrink:0}
+  /* T7 (sem barras) */
+  .tpl7{display:flex;flex-direction:column;border:.35em solid #000}
+  .tpl7 .hdr{border-bottom:.35em solid #000;text-align:center;padding:1.6em;font-weight:600;font-size:3.2em}
+  .tpl7 .cols{flex:1;display:flex;min-height:0}
+  .tpl7 .c1{width:20em;border-right:.35em solid #000;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .tpl7 .c1 .v{font-weight:900;font-size:16em;line-height:.8}
+  .tpl7 .c1 .u{font-weight:800;font-size:3em;letter-spacing:1px;margin-top:1em}
+  .tpl7 .c2{width:15em;border-right:.35em solid #000;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;gap:1.6em;padding:2em 2.4em;font-size:2.7em}
+  .tpl7 .c2 b{font-weight:700}
+  .tpl7 .c3{flex:1;padding:2.4em;display:flex;flex-direction:column;min-width:0}
+  .tpl7 .c3 .sd{font-size:2.5em}
+  .tpl7 .c3 .site{font-weight:700;font-size:2.15em;margin-top:.3em;word-break:break-word;overflow:hidden}
+  .tpl7 .c3 .brand{margin-top:auto;font-weight:900;font-size:4.4em;line-height:.95}
+  /* T8 */
+  .tpl8{display:flex;flex-direction:column;border:.35em solid #000;padding:2.8em 3em}
+  .tpl8 .top{display:flex;gap:3em}
+  .tpl8 .bx{border:.35em solid #000;padding:1.4em 2em;text-align:center;display:flex;align-items:center;justify-content:center;flex:1}
+  .tpl8 .brand{font-weight:900;font-size:3.6em;letter-spacing:.5px}
+  .tpl8 .codbx{font-weight:700;font-size:3.4em}
+  .tpl8 .body{flex:1;display:flex;gap:3em;margin-top:2.4em;min-height:0}
+  .tpl8 .left{width:26em;flex-shrink:0;display:flex;flex-direction:column;justify-content:center}
+  .tpl8 .left .v{font-weight:900;font-size:15em;line-height:.8}
+  .tpl8 .left .sz{font-size:2.05em;margin-top:1.4em;white-space:nowrap}
+  .tpl8 .right{flex:1;display:flex;flex-direction:column;min-width:0}
+  .tpl8 .pn{font-weight:700;font-size:3em;margin-top:1.4em}
+  .tpl8 .sd{font-size:2.5em}
+  .tpl8 .mi{font-size:2.2em;margin-top:.4em}
+  /* T9 */
+  .tpl9{display:flex;flex-direction:row;border:.35em solid #000;padding:2.8em 3em;gap:3.4em}
+  .tpl9 .left{width:34em;flex-shrink:0;display:flex;flex-direction:column}
+  .tpl9 .box{border:.35em solid #000;padding:1.6em;display:flex;flex-direction:column;align-items:center}
+  .tpl9 .box .shoe{width:24em;height:13em}
+  .tpl9 .box .cap{font-weight:600;font-size:2.6em;margin-top:1em;text-align:center}
+  .tpl9 .bc{margin-top:auto;padding-top:2em}
+  .tpl9 .right{flex:1;display:flex;flex-direction:column;min-width:0}
+  .tpl9 .sd{font-size:2.6em}
+  .tpl9 .cod{font-weight:700;font-size:4.6em;line-height:1;margin:.6em 0 1.4em}
+  .tpl9 .gr{display:flex;gap:4em;font-size:2.5em;line-height:1.6}
+  .tpl9 .gr b{font-weight:400;color:#666;display:inline-block;width:6em}
+  .tpl9 .site{margin-top:auto;font-weight:700;font-size:2.9em;word-break:break-all}
+  /* T10 (banner preto) */
+  .tpl10{display:flex;flex-direction:column;background:#000;color:#fff;padding:3em}
+  .tpl10 .main{flex:1;display:flex;align-items:center;gap:4em;min-height:0}
+  .tpl10 .bcw{flex-shrink:0;width:46em}
+  .tpl10 .eur{display:flex;flex-direction:column;align-items:center;line-height:.85;flex-shrink:0}
+  .tpl10 .eur .u{font-size:2.8em;letter-spacing:1.5px}
+  .tpl10 .eur .v{font-weight:900;font-size:14em}
+  .tpl10 .grid{margin-left:auto;flex-shrink:0;min-width:22em}
+  .tpl10 .grid .g{display:flex;justify-content:space-between;gap:5em;border-bottom:.3em solid rgba(255,255,255,.5);padding:.5em 0;font-size:2.7em}
+  .tpl10 .grid .g:last-child{border-bottom:0}
+  .tpl10 .grid .g b{font-weight:400}
+  .tpl10 .strip{border-top:.3em solid rgba(255,255,255,.5);margin-top:2em;padding-top:1.6em;display:flex;justify-content:space-between;align-items:center;gap:2em;font-size:2.2em;letter-spacing:.3px;text-transform:uppercase}
+  .tpl10 .strip .pn{font-weight:700}
+  .tpl10 .strip .site{font-weight:700;text-transform:none;letter-spacing:0}
+  /* T11 */
+  .tpl11{display:flex;flex-direction:row;border:.35em solid #000;padding:2.8em 3em;gap:3em}
+  .tpl11 .left{flex:1;display:flex;flex-direction:column;min-width:0}
+  .tpl11 .brand{font-weight:900;font-size:4em;letter-spacing:.4px}
+  .tpl11 .num{display:flex;align-items:baseline;gap:2em;margin-top:.6em}
+  .tpl11 .num .v{font-weight:900;font-size:13em;line-height:.8}
+  .tpl11 .num .u{font-weight:800;font-size:3em;letter-spacing:1px}
+  .tpl11 .mini{font-size:2.5em;margin-top:1em}
+  .tpl11 .bc{margin-top:auto}
+  .tpl11 .mi{font-size:2.2em;margin-top:.6em}
+  .tpl11 .right{width:33em;flex-shrink:0;display:flex;flex-direction:column;border-left:.35em solid #000;padding-left:3em}
+  .tpl11 .shoe{width:100%;height:13em}
+  .tpl11 .pn{font-weight:700;font-size:3em;margin-top:1.4em}
+  .tpl11 .sd{font-size:2.5em}
+  .tpl11 .site{margin-top:auto;font-weight:700;font-size:2.35em;word-break:break-word}
+  /* T12 (sem barras) */
+  .tpl12{display:flex;flex-direction:column;border:.35em solid #000;padding:2.8em 3em}
+  .tpl12 .main{flex:1;display:flex;gap:2.5em;min-height:0}
+  .tpl12 .left{width:30em;flex-shrink:0;display:flex;flex-direction:column;min-width:0}
+  .tpl12 .brand{font-weight:900;font-size:4.6em;line-height:.9}
+  .tpl12 .cod{font-weight:700;font-size:3.6em;margin-top:1.4em}
+  .tpl12 .pn{font-weight:600;font-size:2.8em;margin-top:1em}
+  .tpl12 .sd{font-size:2.4em}
+  .tpl12 .center{flex:1;display:flex;align-items:center;justify-content:center;min-width:0}
+  .tpl12 .center .shoe{width:100%;height:16em}
+  .tpl12 .grid{width:15em;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;gap:2em;font-size:2.5em;text-align:right}
+  .tpl12 .grid b{font-weight:700}
+  .tpl12 .site{border-top:.35em solid #000;margin-top:2em;padding-top:1.4em;text-align:right;font-weight:700;font-size:3em}
+  /* T13 */
+  .tpl13{display:flex;flex-direction:row;border:.35em solid #000}
+  .tpl13 .cnum{width:22em;border-right:.35em solid #000;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2em 1em}
+  .tpl13 .cnum .v{font-weight:900;font-size:14em;line-height:.8}
+  .tpl13 .cnum .sz{font-size:2.5em;text-align:center;line-height:1.7;margin-top:1.4em}
+  .tpl13 .rows{flex:1;display:flex;flex-direction:column;min-width:0}
+  .tpl13 .rows .rw{flex:1;border-bottom:.35em solid #000;display:flex;align-items:center;padding:0 2.6em;min-width:0}
+  .tpl13 .rows .pn{font-weight:700;font-size:3.2em}
+  .tpl13 .rows .sd{font-size:2.6em}
+  .tpl13 .rows .bcrow{padding:.6em 2.6em}
+  .tpl13 .rows .split{flex:1;display:flex;min-width:0;border-bottom:0}
+  .tpl13 .rows .split .cod{flex:0 0 34%;min-width:0;border-right:.35em solid #000;display:flex;align-items:center;padding:0 2.6em;font-weight:700;font-size:2.9em}
+  .tpl13 .rows .split .site{flex:1;min-width:0;display:flex;align-items:center;padding:0 2em;font-weight:700;font-size:1.95em;word-break:break-word;overflow:hidden}
+  /* T14 */
+  .tpl14{display:flex;flex-direction:row;border:.35em solid #000}
+  .tpl14 .left{width:22em;border-right:.35em solid #000;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2em 1em}
+  .tpl14 .left .v{font-weight:900;font-size:15em;line-height:.8}
+  .tpl14 .left .sz{font-size:2.5em;text-align:center;line-height:1.7;margin-top:1.4em}
+  .tpl14 .mid{flex:1;border-right:.35em solid #000;padding:2.6em 3em;display:flex;flex-direction:column;min-width:0}
+  .tpl14 .mid .cod{font-weight:700;font-size:4.2em;line-height:1}
+  .tpl14 .mid .pn{font-weight:600;font-size:2.9em;margin-top:1.2em}
+  .tpl14 .mid .sd{font-size:2.5em}
+  .tpl14 .mid .site{margin-top:auto;font-weight:700;font-size:2.5em;word-break:break-word}
+  .tpl14 .right{width:28em;flex-shrink:0;display:flex;flex-direction:column;padding:2.6em}
+  .tpl14 .right .mi{font-size:2.2em;letter-spacing:.5px;text-transform:uppercase;text-align:right}
+  .tpl14 .right .bc{margin-top:auto}
 </style>
 <style id="pageRule"></style>
 <style id="consertos-css">
@@ -1721,6 +1933,24 @@ textarea.cons-field{min-height:80px;resize:vertical}
                 <option value="40,25">40 x 25 mm</option>
                 <option value="33,22">33 x 22 mm</option>
                 <option value="custom">Personalizado (mm)</option>
+              </select>
+              <label style="margin-top:12px">Modelo da etiqueta</label>
+              <select id="etqModelo">
+                <option value="padrao" selected>Padrão da loja</option>
+                <option value="t1">Modelo 1 — Marca vertical + 2 barras</option>
+                <option value="t2">Modelo 2 — Número grande + marca lateral</option>
+                <option value="t3">Modelo 3 — Cabeçalho + grade UK/BR/cm/EUR/JAP</option>
+                <option value="t4">Modelo 4 — Faixa preta + nome grande</option>
+                <option value="t5">Modelo 5 — Bloco preto (invertido)</option>
+                <option value="t6">Modelo 6 — Limpo com ilustração</option>
+                <option value="t7">Modelo 7 — Grade em colunas (sem barras)</option>
+                <option value="t8">Modelo 8 — Quadros marca | código</option>
+                <option value="t9">Modelo 9 — Ilustração em caixa</option>
+                <option value="t10">Modelo 10 — Banner preto</option>
+                <option value="t11">Modelo 11 — Marca + ilustração</option>
+                <option value="t12">Modelo 12 — Ilustração central (sem barras)</option>
+                <option value="t13">Modelo 13 — Número + linhas</option>
+                <option value="t14">Modelo 14 — 3 colunas</option>
               </select>
               <div id="customWrap" class="hide" style="display:flex;gap:8px;margin-top:8px">
                 <input type="text" id="customW" placeholder="largura mm">
@@ -2544,6 +2774,64 @@ const $=id=>document.getElementById(id);
 })();
 const LEAO_SVG=`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><text x="50" y="54" text-anchor="middle" dominant-baseline="central" font-family="'Playfair Display',Georgia,serif" font-weight="700" font-size="44" fill="currentColor" letter-spacing="-3">LS</text></svg>`;
 
+const SHOE_SVG=`<svg viewBox="0 0 120 60" fill="none" stroke="#000" stroke-width="2.4"><path d="M10 44 C12 22 26 15 36 22 C43 27 48 33 62 35 C82 38 104 37 110 46 C112 50 108 52 100 52 L18 52 C13 52 10 49 10 44 Z"/><path d="M40 24 c6 9 14 9 20 2"/><path d="M64 30 l3 -6 l3 7 l3 -7 l2 6"/></svg>`;
+let etqModelo=localStorage.getItem('loretto_modelo_etq')||'padrao';
+function tplEtiqueta(modelo,d,barId){
+  const nome=escapeHtml(d.nome||''),cor=escapeHtml(d.cor||''),br=escapeHtml(d.numero||''),cod=escapeHtml(d.codigo||'');
+  const site='www.lorettoscarpa.com.br',marca='LORETTO SCARPA',shoe='<span class="shoe">'+SHOE_SVG+'</span>';
+  const BC='<span class="tbc"><svg id="'+barId+'"></svg></span>';
+  const PH='<span class="tph">a preencher</span>';
+  const pncor=nome+(cor?' · '+cor:'');
+  switch(modelo){
+    case 't1': return '<div class="b"><span>'+marca+'</span></div>'+
+      '<div class="m">'+shoe+'<div class="i"><div class="cod mono">'+cod+'</div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div>'+
+      '<div class="sz"><span>BR<b>'+br+'</b></span><span>EU<b>--</b></span><span>US<b>--</b></span></div></div></div>'+
+      '<div class="r"><div>'+BC+'</div><div class="www"><b>'+site+'</b><span class="tph">origem a preencher</span></div></div>';
+    case 't2': return '<div class="num"><div class="v">'+br+'</div><div class="gr"><div><b>US</b> --<br><b>BR</b> '+br+'</div><div><b>cm</b> --<br><b>EUR</b> --</div></div></div>'+
+      '<div class="info"><div class="cod mono">'+cod+'</div><div class="pn">'+nome+'</div><div class="cor">Cor: '+cor+'</div><div class="sd">'+PH+'</div><div class="bc">'+BC+'</div><div class="site">'+site+'</div></div>'+
+      '<div class="brand"><span>'+marca+'</span></div>';
+    case 't3': return '<div class="left"><div class="hdr">'+nome+' &middot; <b class="mono">'+cod+'</b></div>'+
+      '<div class="lrow"><div class="bc">'+BC+'</div><div class="mid"><div class="sd">'+PH+'</div><div class="site">'+site+'</div><div class="brand">'+marca+'</div></div></div></div>'+
+      '<div class="grid">'+[['UK','--'],['BR',br],['cm','--'],['EUR','--'],['JAP','--']].map(g=>'<div class="g"><b>'+g[0]+'</b><span class="mono">'+g[1]+'</span></div>').join('')+'</div>';
+    case 't4': return '<div class="top"><div><div class="cod mono">'+cod+'</div><div class="cor">Cor '+cor+'</div></div>'+
+      '<div class="gr mono"><div><b>UK</b>--<br><b>BR</b>'+br+'</div><div><b>cm</b>--<br><b>EUR</b>--</div></div></div>'+
+      '<div class="body"><div class="bleft"><div class="pn">'+nome+'</div><div class="bc">'+BC+'</div><div class="brand">'+marca+'</div></div>'+
+      '<div class="bright"><div class="sd">'+PH+'</div><div class="shoe">'+SHOE_SVG+'</div><div class="mi"><span class="tph">origem a preencher</span></div></div></div>';
+    case 't5': return '<div class="block"><div class="r1"><div class="cod mono">'+cod+'</div><div class="brand">'+marca+'</div></div>'+
+      '<div class="r2"><div class="v">'+br+'</div><div class="gr mono"><div><b>US</b>--<br><b>BR</b>'+br+'</div><div><b>cm</b>--<br><b>EUR</b>--</div></div></div>'+
+      '<div class="r3"><div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="bcw">'+BC+'</div></div>'+
+      '<div><div class="mi"><span class="tph">origem a preencher</span></div><div class="site">'+site+'</div></div></div></div>';
+    case 't6': return '<div class="top"><div class="brand">'+marca+'</div><span class="shoe">'+SHOE_SVG+'</span></div>'+
+      '<div class="mid"><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>'+
+      '<div class="bottom"><div class="sizes mono"><b>BR</b> '+br+' · US -- · cm -- · EUR --</div><div class="bc">'+BC+'</div></div>';
+    case 't7': return '<div class="hdr">'+pncor+'</div><div class="cols"><div class="c1"><div class="v">'+br+'</div><div class="u">BR</div></div>'+
+      '<div class="c2 mono"><div><b>US</b> --</div><div><b>BR</b> '+br+'</div><div><b>cm</b> --</div><div><b>EUR</b> --</div></div>'+
+      '<div class="c3"><div class="sd">'+PH+'</div><div class="site">'+site+'</div><div class="brand">'+marca+'</div></div></div>';
+    case 't8': return '<div class="top"><div class="bx brand">'+marca+'</div><div class="bx codbx mono">'+cod+'</div></div>'+
+      '<div class="body"><div class="left"><div class="v">'+br+'</div><div class="sz mono">US -- · BR '+br+' · cm --</div></div>'+
+      '<div class="right"><div class="bc">'+BC+'</div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="mi"><span class="tph">origem a preencher</span></div></div></div>';
+    case 't9': return '<div class="left"><div class="box">'+shoe+'<div class="cap">'+nome+'</div></div><div class="bc">'+BC+'</div></div>'+
+      '<div class="right"><div class="sd">'+PH+'</div><div class="cod mono">'+cod+'</div>'+
+      '<div class="gr mono"><div><b>US</b>--<br><b>cm</b>--</div><div><b>BR</b>'+br+'<br><b>EUR</b>--</div></div><div class="site">'+site+'</div></div>';
+    case 't10': return '<div class="main"><div class="bcw">'+BC+'</div><div class="eur"><div class="u">BR</div><div class="v">'+br+'</div></div>'+
+      '<div class="grid mono"><div class="g"><b>US</b><span>--</span></div><div class="g"><b>UK</b><span>--</span></div><div class="g"><b>BR</b><span>'+br+'</span></div><div class="g"><b>cm</b><span>--</span></div></div></div>'+
+      '<div class="strip"><span class="tph" style="color:#c9c9c9">descrição a preencher</span><span class="pn">'+nome+'</span><span>'+cod+'</span><span class="site">'+site+'</span></div>';
+    case 't11': return '<div class="left"><div class="brand">'+marca+'</div><div class="num"><span class="v">'+br+'</span><span class="u">BR</span></div>'+
+      '<div class="mini mono">UK -- · EUR -- · cm --</div><div class="bc">'+BC+'</div><div class="mi"><span class="tph">origem a preencher</span></div></div>'+
+      '<div class="right"><span class="shoe">'+SHOE_SVG+'</span><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>';
+    case 't12': return '<div class="main"><div class="left"><div class="brand">LORETTO<br>SCARPA</div><div class="cod mono">'+cod+'</div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div></div>'+
+      '<div class="center"><span class="shoe">'+SHOE_SVG+'</span></div>'+
+      '<div class="grid mono"><div><b>US</b> --</div><div><b>BR</b> '+br+'</div><div><b>cm</b> --</div><div><b>EUR</b> --</div></div></div><div class="site">'+site+'</div>';
+    case 't13': return '<div class="cnum"><div class="v">'+br+'</div><div class="sz mono">US --<br>BR '+br+'<br>cm --</div></div>'+
+      '<div class="rows"><div class="rw pn">'+pncor+'</div><div class="rw sd">'+PH+'</div><div class="rw bcrow">'+BC+'</div>'+
+      '<div class="rw split"><div class="cod mono">'+cod+'</div><div class="site">'+site+'</div></div></div>';
+    case 't14': return '<div class="left"><div class="v">'+br+'</div><div class="sz mono">-- US<br>'+br+' BR<br>-- cm</div></div>'+
+      '<div class="mid"><div class="cod mono">'+cod+'</div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>'+
+      '<div class="right"><div class="mi"><span class="tph">origem a preencher</span></div><div class="bc">'+BC+'</div></div>';
+    default: return '';
+  }
+}
+
 let catalogo, favoritos, abertos=new Set(), fila=[], filtro='todos', mfiltro='ativos';
 let ordenacao=localStorage.getItem('loretto_ordenacao')||'cadastro';
 let logoData=localStorage.getItem('loretto_leao')||null;
@@ -2678,10 +2966,17 @@ function montaEtiqueta(container,d,barId){
       `<div class="et-linha" style="margin-top:auto;font-size:calc(var(--lh)*.072);opacity:.8"><b>${escapeHtml(d.dataLabel||'Finalizada')}:</b> ${d.dataFim?fmtData(d.dataFim):'-'}</div>`;
     return;
   }
-  const numSm=(d.numero||'').length>3?' sm':'';
-  container.innerHTML=`
-    <div class="et-top"><div class="et-info"><div class="et-nome">${escapeHtml(d.nome)||'&nbsp;'}</div><div class="et-cor">${escapeHtml(d.cor)}</div></div><div class="et-num${numSm}">${escapeHtml(d.numero)}</div></div>
-    <div class="et-bottom"><div class="et-barcode"><svg id="${barId}"></svg></div><div class="et-leao">${leao}</div></div>`;
+  const _mdl=(typeof etqModelo!=='undefined'&&etqModelo)||'padrao';
+  if(_mdl!=='padrao'){
+    container.className='etiqueta tpl tpl'+_mdl.slice(1);
+    container.innerHTML=tplEtiqueta(_mdl,d,barId);
+  }else{
+    container.className='etiqueta';
+    const numSm=(d.numero||'').length>3?' sm':'';
+    container.innerHTML=`
+      <div class="et-top"><div class="et-info"><div class="et-nome">${escapeHtml(d.nome)||'&nbsp;'}</div><div class="et-cor">${escapeHtml(d.cor)}</div></div><div class="et-num${numSm}">${escapeHtml(d.numero)}</div></div>
+      <div class="et-bottom"><div class="et-barcode"><svg id="${barId}"></svg></div><div class="et-leao">${leao}</div></div>`;
+  }
   const cod=d.codigo||'';
   if(cod){const _bh=(typeof layout!=='undefined'&&layout.bcHeight)||36;const qz={marginTop:0,marginBottom:0,marginLeft:14,marginRight:14};try{JsBarcode('#'+barId,cod,Object.assign({format:detectaFormato(cod),displayValue:true,font:'DM Mono, monospace',fontSize:13,textMargin:1,height:_bh,width:1.4},qz));}catch(e){try{JsBarcode('#'+barId,cod,Object.assign({format:'CODE128',displayValue:true,fontSize:13,height:_bh,width:1.4},qz));}catch(e2){}}}
 }
@@ -3898,6 +4193,7 @@ function toggleCustom(){$('customWrap').classList.toggle('hide',$('tamanho').val
 $('tamanho').addEventListener('change',()=>{toggleCustom();aplicaTamanho();salvaTamanho();if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');});
 ['customW','customH'].forEach(id=>$(id).addEventListener('input',()=>{aplicaTamanho();salvaTamanho();if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}));
 const tSalvo=localStorage.getItem('loretto_tamanho');if(tSalvo)$('tamanho').value=tSalvo;
+if($('etqModelo')){$('etqModelo').value=etqModelo;$('etqModelo').addEventListener('change',function(){etqModelo=$('etqModelo').value;try{localStorage.setItem('loretto_modelo_etq',etqModelo);}catch(e){}if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');renderFila&&renderFila();});}
 const cSalvo=(localStorage.getItem('loretto_custom')||'').split(',');if(cSalvo[0])$('customW').value=cSalvo[0];if(cSalvo[1])$('customH').value=cSalvo[1];
 toggleCustom();
 ['mNumIni','mNumFim'].forEach(id=>$(id).addEventListener('input',()=>{if(editandoId){coresTmp=lerCoresEditor();renderCoresEditor(coresTmp);}}));
