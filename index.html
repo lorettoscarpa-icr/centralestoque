@@ -240,7 +240,11 @@
   /* Galeria da marca */
   .marca-intro{font-size:var(--fs-base);color:rgba(251,249,238,.62);line-height:1.5;margin:0 0 14px}
   .marca-intro code{background:rgba(0,0,0,.3);padding:1px 6px;border-radius:4px;color:var(--ouro-claro);font-family:monospace}
-  .marca-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;overflow-y:auto;max-height:56vh;padding:2px}
+  .marca-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .marca-chip{font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--linha);background:transparent;color:rgba(251,249,238,.7);cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;transition:.15s}
+  .marca-chip:hover{border-color:var(--ouro)}
+  .marca-chip.on{background:var(--ouro);color:var(--verde-escuro);border-color:var(--ouro)}
+  .marca-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;overflow-y:auto;max-height:52vh;padding:2px}
   .marca-item{border:1px solid var(--linha);border-radius:var(--r-sm);background:rgba(0,0,0,.12);display:flex;flex-direction:column;overflow:hidden}
   .marca-item.on{outline:2px solid var(--ouro);outline-offset:-1px}
   .marca-thumb{height:110px;display:flex;align-items:center;justify-content:center;padding:8px;background:repeating-conic-gradient(#e5e5e5 0% 25%,#fff 0% 50%) 0/18px 18px}
@@ -2168,6 +2172,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
       <button class="modal-x" type="button" onclick="fecharGaleriaMarca()" aria-label="Fechar">&times;</button>
       <div class="modal-head" style="margin-bottom:4px"><div class="modal-title">Galeria da marca</div></div>
       <p class="marca-intro">Arquivos da pasta <code>marca/</code> no GitHub. Solte novos arquivos la e eles aparecem aqui &mdash; sem precisar subir de novo. Clique para usar como leao ou baixar o original.</p>
+      <div id="marcaChips" class="marca-chips"></div>
       <div id="marcaBox" class="marca-grid"></div>
       <div class="pe-modal-foot"><button class="btn" type="button" onclick="marcaCarregar(true)">Atualizar</button><button class="btn btn-ouro" type="button" onclick="fecharGaleriaMarca()">Fechar</button></div>
     </div>
@@ -4320,7 +4325,9 @@ function aplicarLeaoRemoto(url){
 function renderLogo(){const h=logoData?`<img src="${logoData}">`:LEAO_SVG;$('logoPrev').innerHTML=h;$('crestHolder').innerHTML=h;}
 /* ===== Galeria da marca — le a pasta marca/ do GitHub (repo publico) ===== */
 const MARCA_API='https://api.github.com/repos/lorettoscarpa-icr/centralestoque/contents/marca?ref=main';
-let _marcaCache=null;
+let _marcaCache=null,_marcaCat='__all';
+function marcaCat(name){var n=name.replace(/\.[a-z0-9]+$/i,'');n=n.replace(/[\s_-]*\d+$/,'').trim();return n||'Outros';}
+function marcaCatLabel(c){c=c.toLowerCase();return c.charAt(0).toUpperCase()+c.slice(1);}
 window.abrirGaleriaMarca=function(){const m=$('marcaModal');if(!m)return;m.classList.remove('hide');marcaCarregar(false);};
 window.fecharGaleriaMarca=function(){const m=$('marcaModal');if(m)m.classList.add('hide');};
 window.marcaCarregar=function(forcar){
@@ -4331,18 +4338,32 @@ window.marcaCarregar=function(forcar){
     .then(function(r){if(r.status===404)throw '404';if(!r.ok)throw r.status;return r.json();})
     .then(function(list){
       const imgs=(Array.isArray(list)?list:[]).filter(function(f){return f.type==='file'&&/\.(png|jpe?g|svg|webp|gif)$/i.test(f.name);});
-      imgs.sort(function(a,b){return a.name.localeCompare(b.name);});
-      _marcaCache=imgs;marcaRender(imgs);
+      imgs.sort(function(a,b){var ca=marcaCat(a.name),cb=marcaCat(b.name);return ca===cb?a.name.localeCompare(b.name,'pt',{numeric:true}):ca.localeCompare(cb,'pt');});
+      _marcaCache=imgs;marcaChips();marcaRender(imgs);
     })
     .catch(function(err){
       if(err==='404')box.innerHTML='<div class="marca-empty">A pasta <b>marca/</b> ainda nao tem arquivos.<br>Adicione as imagens da marca (PNG, SVG…) na pasta <code>marca/</code> do GitHub e clique em Atualizar.</div>';
       else box.innerHTML='<div class="marca-erro">Nao consegui carregar do GitHub agora.<br>Verifique a conexao e tente Atualizar.</div>';
     });
 };
+function marcaChips(){
+  const el=$('marcaChips');if(!el||!_marcaCache)return;
+  var counts={},order=[];
+  _marcaCache.forEach(function(f){var c=marcaCat(f.name);if(!(c in counts)){counts[c]=0;order.push(c);}counts[c]++;});
+  order.sort(function(a,b){return a.localeCompare(b,'pt');});
+  var chips=['<button type="button" class="marca-chip'+(_marcaCat==='__all'?' on':'')+'" onclick="marcaFiltrar(\'__all\')">Todos ('+_marcaCache.length+')</button>'];
+  order.forEach(function(c){
+    var arg=c.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    chips.push('<button type="button" class="marca-chip'+(_marcaCat===c?' on':'')+'" onclick="marcaFiltrar(\''+arg+'\')">'+escapeHtml(marcaCatLabel(c))+' ('+counts[c]+')</button>');
+  });
+  el.innerHTML=order.length>1?chips.join(''):'';
+}
+window.marcaFiltrar=function(cat){_marcaCat=cat;marcaChips();marcaRender(_marcaCache);};
 function marcaRender(imgs){
   const box=$('marcaBox');if(!box)return;
-  if(!imgs.length){box.innerHTML='<div class="marca-empty">Nenhuma imagem na pasta <b>marca/</b> ainda.<br>Adicione arquivos no GitHub e clique em Atualizar.</div>';return;}
-  box.innerHTML=imgs.map(function(f,i){
+  if(!imgs||!imgs.length){box.innerHTML='<div class="marca-empty">Nenhuma imagem na pasta <b>marca/</b> ainda.<br>Adicione arquivos no GitHub e clique em Atualizar.</div>';return;}
+  var html=imgs.map(function(f,i){
+    if(_marcaCat!=='__all'&&marcaCat(f.name)!==_marcaCat)return '';
     const nome=escapeHtml(f.name),url=escapeHtml(f.download_url||'');
     const usada=(logoData&&f.download_url&&logoData.indexOf(f.download_url)===0)?' on':'';
     return '<div class="marca-item'+usada+'" data-i="'+i+'">'
@@ -4352,6 +4373,7 @@ function marcaRender(imgs){
       +'<button type="button" onclick="marcaBaixar('+i+')">Baixar</button></div>'
       +'</div>';
   }).join('');
+  box.innerHTML=html||'<div class="marca-empty">Nenhum arquivo nesta categoria.</div>';
 }
 window.marcaUsarLeao=function(i){
   const f=_marcaCache&&_marcaCache[i];if(!f||!f.download_url)return;
