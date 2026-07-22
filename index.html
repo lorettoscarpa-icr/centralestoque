@@ -837,8 +837,13 @@
   .pe-pessoas-vazio{font-size:var(--fs-sm);color:rgba(251,249,238,.45);margin-bottom:8px}
   .pe-pessoa-add{display:flex;gap:6px}
   .pe-pessoa-add input{flex:1;font-size:var(--fs-base);padding:7px 9px}
-  .pe-fcardkey{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:rgba(220,189,96,.07);border:none;border-top:1px solid var(--linha);color:var(--ouro);padding:9px;font-size:var(--fs-sm);font-weight:600;letter-spacing:.3px;font-family:'Barlow',sans-serif;cursor:pointer;transition:.15s}
+  .pe-fcardfoot{display:flex;border-top:1px solid var(--linha)}
+  .pe-fcardkey{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(220,189,96,.07);border:none;color:var(--ouro);padding:9px;font-size:var(--fs-sm);font-weight:600;letter-spacing:.3px;font-family:'Barlow',sans-serif;cursor:pointer;transition:.15s}
+  .pe-fcardkey+.pe-fcardkey{border-left:1px solid var(--linha)}
   .pe-fcardkey:hover{background:rgba(220,189,96,.18)}
+  .pe-cfgsec{border-top:1px solid var(--linha);padding-top:14px;margin-top:16px}
+  .pe-cfgsec:first-of-type{border-top:none;padding-top:0;margin-top:14px}
+  .pe-cfgsech{font-family:'Playfair Display',serif;font-size:var(--fs-lg);color:var(--ouro-claro);margin-bottom:10px}
   .pe-acfld{display:block;font-size:var(--fs-sm);color:rgba(251,249,238,.7);margin:8px 0}
   .pe-acfld input{display:block;width:100%;margin-top:4px;padding:8px 10px;font-size:var(--fs-md)}
   .pe-acfld-l{font-size:var(--fs-sm);color:rgba(251,249,238,.7);margin:10px 0 4px}
@@ -2197,6 +2202,13 @@ textarea.cons-field{min-height:80px;resize:vertical}
     <div class="modal">
       <button class="modal-x" type="button" onclick="peAcessoModalFechar()" aria-label="Fechar">&times;</button>
       <div id="peAcessoBox"></div>
+    </div>
+  </div>
+
+  <div id="peConfigModal" class="modal-bg hide" onclick="if(event.target===this)peConfigModalFechar()">
+    <div class="modal modal-lg">
+      <button class="modal-x" type="button" onclick="peConfigModalFechar()" aria-label="Fechar">&times;</button>
+      <div id="peConfigBox"></div>
     </div>
   </div>
 
@@ -4925,10 +4937,59 @@ function peLogoDataUrl(src,name,max,cb){
   img.onerror=function(){cb(src);};
   img.src=src;
 }
-window.peUploadFabLogo=function(fid,inp){var f=inp&&inp.files&&inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){peLogoDataUrl(r.result,f.name,300,function(d){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].fabLogo=d;peSalvarEtqConfig();peRender();toast('Logo da fábrica salvo');});};r.readAsDataURL(f);};
-window.peRemFabLogo=function(fid){if(peEtqConfig[fid]){delete peEtqConfig[fid].fabLogo;peSalvarEtqConfig();peRender();}};
-window.peRemLorettoLogo=function(fid){if(peEtqConfig[fid]){delete peEtqConfig[fid].lorettoLogo;peSalvarEtqConfig();peRender();}};
-window.peEscolherLorettoLogo=function(fid){if(typeof abrirGaleriaMarca!=='function'){toast('Galeria indisponível');return;}abrirGaleriaMarca(function(f){toast('Preparando '+f.name+'…');marcaFetchDataUrl(f,300,function(url){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].lorettoLogo=url;peSalvarEtqConfig();peRender();toast('Logo da Loretto definido');});});};
+function peCfgRefresh(){if(typeof _peCfgFid!=='undefined'&&_peCfgFid&&$('peConfigModal')&&!$('peConfigModal').classList.contains('hide'))peConfigModalRender();else if(typeof peRender==='function')peRender();}
+window.peUploadFabLogo=function(fid,inp){var f=inp&&inp.files&&inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){peLogoDataUrl(r.result,f.name,300,function(d){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].fabLogo=d;peSalvarEtqConfig();peCfgRefresh();toast('Logo da fábrica salvo');});};r.readAsDataURL(f);};
+window.peRemFabLogo=function(fid){if(peEtqConfig[fid]){delete peEtqConfig[fid].fabLogo;peSalvarEtqConfig();peCfgRefresh();}};
+window.peRemLorettoLogo=function(fid){if(peEtqConfig[fid]){delete peEtqConfig[fid].lorettoLogo;peSalvarEtqConfig();peCfgRefresh();}};
+window.peEscolherLorettoLogo=function(fid){if(typeof abrirGaleriaMarca!=='function'){toast('Galeria indisponível');return;}abrirGaleriaMarca(function(f){toast('Preparando '+f.name+'…');marcaFetchDataUrl(f,300,function(url){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].lorettoLogo=url;peSalvarEtqConfig();peCfgRefresh();toast('Logo da Loretto definido');});});};
+let _peCfgFid=null;
+window.peConfigModalAbrir=function(fid){_peCfgFid=fid;peConfigModalRender();var m=$('peConfigModal');if(m)m.classList.remove('hide');};
+window.peConfigModalFechar=function(){var m=$('peConfigModal');if(m)m.classList.add('hide');_peCfgFid=null;};
+function peConfigModalRender(){
+  var fid=_peCfgFid;var box=$('peConfigBox');if(!fid||!box)return;
+  var nomeF=(peFabricas().find(function(x){return x.fid===fid;})||{}).nome||fid;
+  var cfg=peEtqConfig[fid]||{};
+  var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14'];
+  var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
+  var tplSel='<select class="pe-etqsel" onchange="peSetEtqModelo(\''+fid+'\',this.value)">'+mods.map(function(v){return '<option value="'+v+'"'+(((cfg.modelo||'padrao')===v)?' selected':'')+'>'+peEtqTplLabel(v)+'</option>';}).join('')+'</select>';
+  var tamSel='<select class="pe-etqsel" onchange="peSetEtqTam(\''+fid+'\',this.value)">'+tams.map(function(o){return '<option value="'+o[0]+'"'+(((cfg.tamanho||'80,50')===o[0])?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
+  var fabLogo=cfg.fabLogo?'<div class="pe-logoprev"><img src="'+escapeHtml(cfg.fabLogo)+'"></div>':'<div class="pe-logoprev vazio">sem logo</div>';
+  var lojaLogo=cfg.lorettoLogo?'<div class="pe-logoprev"><img src="'+escapeHtml(cfg.lorettoLogo)+'"></div>':'<div class="pe-logoprev vazio">sem logo</div>';
+  var logoCfg='<div class="pe-logocfg">'+
+    '<div class="pe-logofield"><span class="pe-logolbl">Logo da fábrica</span>'+fabLogo+
+      '<div class="pe-logobtns"><button class="btn sm" onclick="document.getElementById(\'peFabLogoInp-'+fid+'\').click()">Enviar PNG</button>'+(cfg.fabLogo?'<button class="btn btn-ghost sm" onclick="peRemFabLogo(\''+fid+'\')">Remover</button>':'')+'</div>'+
+      '<input type="file" id="peFabLogoInp-'+fid+'" accept="image/*" class="hide" onchange="peUploadFabLogo(\''+fid+'\',this)"></div>'+
+    '<div class="pe-logofield"><span class="pe-logolbl">Logo da Loretto</span>'+lojaLogo+
+      '<div class="pe-logobtns"><button class="btn sm" onclick="peEscolherLorettoLogo(\''+fid+'\')">Escolher da galeria</button>'+(cfg.lorettoLogo?'<button class="btn btn-ghost sm" onclick="peRemLorettoLogo(\''+fid+'\')">Remover</button>':'')+'</div></div>'+
+  '</div>'+
+  '<p class="pe-metahint">Aparecem lado a lado no topo do painel da fábrica. Prefira PNG com fundo transparente e cores claras/douradas — o fundo do cabeçalho é escuro.</p>';
+  box.innerHTML=
+    '<div class="pe-modal-h">Configurações — '+escapeHtml(nomeF)+'</div>'+
+    '<div class="pe-cfgsec"><div class="pe-cfgsech">🏷️ Etiqueta</div>'+
+      '<p class="pe-metahint">A fábrica imprime sempre neste modelo e tamanho — ela não escolhe (só ajusta detalhes de layout).</p>'+
+      '<label class="pe-etqrow">Modelo de etiqueta '+tplSel+'</label>'+
+      '<label class="pe-etqrow">Tamanho '+tamSel+'</label></div>'+
+    '<div class="pe-cfgsec"><div class="pe-cfgsech">Cabeçalho da fábrica</div>'+logoCfg+'</div>'+
+    '<div class="pe-cfgsec"><div class="pe-cfgsech">Etiquetas extras (fora da pronta-entrega)</div>'+
+      '<p class="pe-metahint">Modelos que esta fábrica produz mas <b>não são pronta-entrega</b>. Aparecem na aba <b>Etiquetas</b> da fábrica para ela imprimir e mandar já etiquetado.</p>'+
+      '<input type="text" id="peCfgBusca" placeholder="Buscar modelo do catálogo..." oninput="peCfgFiltrar()">'+
+      '<div class="pe-pick-list" id="peCfgLista"></div></div>'+
+    '<div class="pe-modal-foot"><button class="btn btn-ouro" onclick="peConfigModalFechar()">Concluir</button></div>';
+  peCfgFiltrar();
+}
+window.peCfgFiltrar=function(){
+  var fid=_peCfgFid;var lst=$('peCfgLista');if(!fid||!lst)return;
+  var cfg=peEtqConfig[fid]||{};var extra=(cfg.extraModelos||[]);var pe=(peFornModelos[fid]||[]);
+  var q=(typeof normKey==='function')?normKey(($('peCfgBusca')&&$('peCfgBusca').value)||''):(($('peCfgBusca')&&$('peCfgBusca').value)||'').toLowerCase();
+  var jah=extra.map(function(id){return (repCatalogo||[]).find(function(m){return m.id===id;});}).filter(Boolean).sort(function(a,b){return a.nome.localeCompare(b.nome);});
+  var disp=(repCatalogo||[]).filter(function(m){return pe.indexOf(m.id)<0&&extra.indexOf(m.id)<0&&(!q||((typeof normKey==='function'?normKey(m.nome):m.nome.toLowerCase()).indexOf(q)>=0));}).sort(function(a,b){return a.nome.localeCompare(b.nome);});
+  var html='';
+  if(jah.length)html+='<div class="pe-pick-jah"><div class="pe-pick-jah-t">Só etiqueta ('+jah.length+')</div>'+jah.map(function(m){return '<div class="pe-pick-row on"><span>'+escapeHtml(m.nome)+'</span><button class="lnk-del" onclick="peRemExtraEtiq(\''+fid+'\',\''+m.id+'\')">tirar</button></div>';}).join('')+'</div>';
+  html+='<div class="pe-pick-disp">'+(disp.length?disp.map(function(m){return '<button class="pe-pick-row add" onclick="peAddExtraEtiq(\''+fid+'\',\''+m.id+'\')"><span>'+escapeHtml(m.nome)+'</span><span class="pe-pick-cor">'+(m.cores||[]).length+' cor(es)</span><span class="pe-pick-add">+ adicionar</span></button>';}).join(''):'<p class="pe-pick-empty">'+(q?'Nenhum modelo encontrado.':'Todos os modelos do catálogo já estão liberados para esta fábrica.')+'</p>')+'</div>';
+  lst.innerHTML=html;
+};
+window.peAddExtraEtiq=function(fid,mid){if(!peEtqConfig[fid])peEtqConfig[fid]={};var ex=peEtqConfig[fid].extraModelos||[];if(ex.indexOf(mid)<0)ex.push(mid);peEtqConfig[fid].extraModelos=ex;peSalvarEtqConfig();peCfgFiltrar();toast('Modelo liberado só para etiqueta');};
+window.peRemExtraEtiq=function(fid,mid){if(!peEtqConfig[fid])return;peEtqConfig[fid].extraModelos=(peEtqConfig[fid].extraModelos||[]).filter(function(x){return x!==mid;});peSalvarEtqConfig();peCfgFiltrar();};
 function peEtqTplLabel(v){var m={padrao:'Padrão da loja',t1:'Modelo 1',t2:'Modelo 2',t3:'Modelo 3',t4:'Modelo 4',t5:'Modelo 5',t6:'Modelo 6',t7:'Modelo 7',t8:'Modelo 8',t9:'Modelo 9',t10:'Modelo 10',t11:'Modelo 11',t12:'Modelo 12',t13:'Modelo 13',t14:'Modelo 14'};return m[v]||v;}
 function peEtqConfigBox(fid){
   var cfg=peEtqConfig[fid]||{};var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14'];
@@ -5112,7 +5173,7 @@ function peRenderLista(c){
       '<span class="pe-farrow">&#8250;</span></div>'+
       '<div class="pe-fst">'+escapeHtml(st)+'</div>'+
       '<div class="pe-fstats"><div class="pe-fstat"><b>'+f.qtdModelos+'</b><span>modelos</span></div><div class="pe-fstat"><b>'+totEst+'</b><span>em estoque</span></div></div>'+
-      '</button><button class="pe-fcardkey" onclick="peAcessoModalAbrir(\''+f.fid+'\')" title="Acesso da fabrica">&#128273; Acesso</button></div>';
+      '</button><div class="pe-fcardfoot"><button class="pe-fcardkey" onclick="peAcessoModalAbrir(\''+f.fid+'\')" title="Acesso da fabrica">&#128273; Acesso</button><button class="pe-fcardkey" onclick="peConfigModalAbrir(\''+f.fid+'\')" title="Configuracoes da fabrica">&#9881; Configurações</button></div></div>';
   }).join('')+'</div>';
 }
 function peRenderFabrica(c,fid){
@@ -5174,7 +5235,7 @@ function peRenderFabrica(c,fid){
     '<button class="btn sm" onclick="peSalvarMetas(\''+f.fid+'\')">Salvar metas</button></div>'+
     pedidoBox+
     peOrdensPainel(f.fid)+
-    peEtqConfigBox(f.fid)+
+    '<div class="pe-actions" style="margin-top:6px"><button class="btn sm" onclick="peConfigModalAbrir(\''+f.fid+'\')">&#9881; Configurações e etiquetas</button></div>'+
     (hist?'<div class="pe-histbox"><b>Últimas alterações da fábrica:</b>'+hist+'</div>':'')+
     (modelos.length?'<details class="pe-det" open><summary>Grade e metas por numeração</summary><div class="pe-metahint">Defina a meta de cada numeração na linha <b>Meta</b> e toque em <b>Salvar metas</b>. A fábrica vê só quanto repor — nunca a meta.</div>'+grade+'</details>':grade)+'</div>';
 }
@@ -5631,7 +5692,21 @@ function peConfirmarEnvio(){
 var _fabEt={mod:'',cor:'',q:{},last:null};
 var _fabTab='estoque';
 var FAB_ET_TAMS=[['80,50','80 x 50 mm (padrao loja)'],['60,40','60 x 40 mm'],['70,40','70 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
-function fabEtMods(){return (typeof peModelosDaFabrica==='function'&&MODO_FABRICA)?peModelosDaFabrica(MODO_FABRICA):[];}
+function fabEtMods(){
+  if(!MODO_FABRICA||typeof peModelosDaFabrica!=='function')return [];
+  var out=peModelosDaFabrica(MODO_FABRICA);
+  var have={};out.forEach(function(m){have[m.id]=1;});
+  var extra=((typeof peEtqConfig!=='undefined'&&peEtqConfig[MODO_FABRICA])||{}).extraModelos||[];
+  extra.forEach(function(mid){
+    if(have[mid])return;
+    var m=(repCatalogo||[]).find(function(x){return x.id===mid;});if(!m)return;
+    var cf=(typeof repCfg!=='undefined'&&repCfg[m.id])||{};
+    var cores=[];
+    (m.cores||[]).forEach(function(c){if(cf.coresOff&&cf.coresOff[c.nome])return;var tams=Object.keys(c.skus||{});if(tams.length)cores.push({nome:c.nome,tams:tams});});
+    if(cores.length){out.push({id:m.id,nome:m.nome,custo:cf.custo||0,cores:cores,soEtiqueta:true});have[m.id]=1;}
+  });
+  return out;
+}
 function fabEtModAtual(){var ms=fabEtMods();return ms.find(function(m){return m.id===_fabEt.mod;})||ms[0]||null;}
 function fabEtCorAtual(){var m=fabEtModAtual();if(!m)return null;return (m.cores||[]).find(function(c){return c.nome===_fabEt.cor;})||m.cores[0]||null;}
 function _fabEsc(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
