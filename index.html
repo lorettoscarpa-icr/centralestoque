@@ -157,6 +157,7 @@
   .et-info{flex:1;min-width:0}
   .et-nome{font-weight:var(--etNomeW,700);line-height:1.05;font-size:calc(var(--lh)*.125);letter-spacing:-.2px;word-break:break-word}
   .et-cor{font-weight:var(--etCorW,400);font-size:calc(var(--lh)*.10);margin-top:calc(var(--lh)*.05)}
+  .et-ref{font-weight:700;margin-top:calc(var(--lh)*.02)}
   .et-num{color:#fff;background:#000;border-radius:0;flex-shrink:0;font-weight:var(--etNumW,800);line-height:.85;font-size:calc(var(--lh)*var(--etNum,.30));padding:calc(var(--lh)*.035) calc(var(--lh)*.06);min-width:calc(var(--lh)*.34);text-align:center;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .et-num.sm{font-size:calc(var(--lh)*.15)}
   .et-bottom{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:6px}
@@ -2999,7 +3000,7 @@ function montaEtiqueta(container,d,barId){
     container.className='etiqueta';
     const numSm=(d.numero||'').length>3?' sm':'';
     container.innerHTML=`
-      <div class="et-top"><div class="et-info"><div class="et-nome">${escapeHtml(d.nome)||'&nbsp;'}</div><div class="et-cor">${escapeHtml(d.cor)}${d.ref?' &middot; Ref '+escapeHtml(d.ref):''}</div></div><div class="et-num${numSm}">${escapeHtml(d.numero)}</div></div>
+      <div class="et-top"><div class="et-info"><div class="et-nome">${escapeHtml(d.nome)||'&nbsp;'}</div><div class="et-cor">${escapeHtml(d.cor)}</div>${d.ref?`<div class="et-cor et-ref">Ref ${escapeHtml(d.ref)}</div>`:''}</div><div class="et-num${numSm}">${escapeHtml(d.numero)}</div></div>
       <div class="et-bottom"><div class="et-barcode"><svg id="${barId}"></svg></div><div class="et-leao">${leao}</div></div>`;
   }
   const cod=d.codigo||'';
