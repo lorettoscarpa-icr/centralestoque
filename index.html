@@ -2999,7 +2999,7 @@ function montaEtiqueta(container,d,barId){
     container.className='etiqueta';
     const numSm=(d.numero||'').length>3?' sm':'';
     container.innerHTML=`
-      <div class="et-top"><div class="et-info"><div class="et-nome">${escapeHtml(d.nome)||'&nbsp;'}</div><div class="et-cor">${escapeHtml(d.cor)}</div></div><div class="et-num${numSm}">${escapeHtml(d.numero)}</div></div>
+      <div class="et-top"><div class="et-info"><div class="et-nome">${escapeHtml(d.nome)||'&nbsp;'}</div><div class="et-cor">${escapeHtml(d.cor)}${d.ref?' &middot; Ref '+escapeHtml(d.ref):''}</div></div><div class="et-num${numSm}">${escapeHtml(d.numero)}</div></div>
       <div class="et-bottom"><div class="et-barcode"><svg id="${barId}"></svg></div><div class="et-leao">${leao}</div></div>`;
   }
   const cod=d.codigo||'';
@@ -5384,8 +5384,8 @@ function fabEtSecHTML(){
   var opts=FAB_ET_TAMS.map(function(t){return '<option value="'+t[0]+'"'+(t[0]===tamSel?' selected':'')+'>'+t[1]+'</option>';}).join('');
   var cw=($('customW')&&$('customW').value)||'',ch=($('customH')&&$('customH').value)||'';
   var custom='<span class="fabet-f'+(tamSel==='custom'?'':' hide')+'" id="fabEtCustom" style="flex-direction:row;align-items:center;gap:6px"><input class="mm" id="fabEtW" type="number" min="10" max="200" placeholder="larg" value="'+escapeHtml(cw)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5)">x</span><input class="mm" id="fabEtH" type="number" min="10" max="200" placeholder="alt" value="'+escapeHtml(ch)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5);font-size:12px">mm</span></span>';
-  var modOpts=ms.map(function(x){return '<option value="'+escapeHtml(x.id)+'"'+(x.id===_fabEt.mod?' selected':'')+'>'+escapeHtml(x.nome)+'</option>';}).join('');
-  var corOpts=(m?m.cores:[]).map(function(x){return '<option value="'+escapeHtml(x.nome)+'"'+(x.nome===_fabEt.cor?' selected':'')+'>'+escapeHtml(x.nome)+'</option>';}).join('');
+  var modOpts=ms.map(function(x){var _r=(typeof repRefDe==='function'&&x.cores&&x.cores[0])?(repRefDe(x.id,x.cores[0].nome)||''):'';return '<option value="'+escapeHtml(x.id)+'"'+(x.id===_fabEt.mod?' selected':'')+'>'+escapeHtml(x.nome)+(_r?' — ref '+escapeHtml(_r):'')+'</option>';}).join('');
+  var corOpts=(m?m.cores:[]).map(function(x){var _r=(typeof repRefDe==='function')?(repRefDe(m.id,x.nome)||''):'';return '<option value="'+escapeHtml(x.nome)+'"'+(x.nome===_fabEt.cor?' selected':'')+'>'+escapeHtml(x.nome)+(_r?' — ref '+escapeHtml(_r):'')+'</option>';}).join('');
   var tams=(c&&c.tams)||[];
   var tot=0;
   var grade=tams.map(function(t){var k=_fabEt.mod+'|'+_fabEt.cor+'|'+t;var q=parseInt(_fabEt.q[k])||0;tot+=q;return '<span class="fabet-cel"><span>'+escapeHtml(t)+'</span><input type="number" min="0" inputmode="numeric" data-etk="'+escapeHtml(k)+'" value="'+(q||'')+'" class="'+(q?'tem':'')+'" oninput="fabEtQtd(this)"></span>';}).join('');
