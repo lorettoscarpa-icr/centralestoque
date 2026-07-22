@@ -1565,6 +1565,11 @@
   .pe-etqsel{flex:0 0 auto;max-width:60%}
   .fabet-locked{background:rgba(220,189,96,.10);border:1px solid var(--linha);border-radius:var(--r-sm);padding:8px 12px;font-size:var(--fs-sm);color:var(--areia)}
   .fabet-locked b{color:var(--ouro-claro)}
+  .rep-mod.pausado{opacity:.62}
+  .rep-paustag{color:var(--alerta)}
+  .rep-pausa{background:rgba(0,0,0,.2);border:1px solid var(--linha);color:var(--texto-fraco);border-radius:var(--r-pill);padding:4px 11px;font-family:'Barlow',sans-serif;font-size:var(--fs-mini);font-weight:700;cursor:pointer;white-space:nowrap;margin-right:6px}
+  .rep-pausa:hover{border-color:var(--ouro);color:var(--ouro-claro)}
+  .rep-pausa.on{background:var(--alerta);border-color:var(--alerta);color:var(--verde-escuro)}
   .etiqueta.tpl .bcw{background:#fff;padding:.7em .9em .3em;border-radius:.3em}
   .etiqueta.tpl .row{display:flex}
   /* T1 */
@@ -2486,8 +2491,8 @@ textarea.cons-field{min-height:80px;resize:vertical}
         <div class="av-form">
           <div class="av-full"><label>Modelo</label><input list="avModelos" id="ptModelo" autocomplete="off" placeholder="Digite ou escolha o modelo"></div>
           <div class="av-full"><label>Cor</label><select id="ptCor"></select><input id="ptCorTxt" class="hide" placeholder="Cor"></div>
-          <div><label>Número pe direito</label><select id="ptN1"></select><input id="ptN1Txt" class="hide" placeholder="No"></div>
           <div><label>Número pe esquerdo</label><select id="ptN2"></select><input id="ptN2Txt" class="hide" placeholder="No"></div>
+          <div><label>Número pe direito</label><select id="ptN1"></select><input id="ptN1Txt" class="hide" placeholder="No"></div>
         </div>
         <div id="ptEditBar" class="av-editbar hide">Editando lancamento &mdash; altere e salve.</div>
         <div class="av-acts"><button class="btn btn-ouro" id="ptAdd">Adicionar a fila + registrar</button><button class="btn btn-ghost" id="ptReg">Só registrar</button><button class="btn btn-ouro hide" id="ptSave">Salvar alteração</button><button class="btn btn-ghost hide" id="ptCancel">Cancelar</button></div>
@@ -5958,12 +5963,12 @@ function repRenderModelos(){
     .filter(m=>!soFixos||(repCfg[m.id]&&repCfg[m.id].fixo));
   let html=repCfgStatusHTML();
   mods.forEach(m=>{
-    const cf=repCfg[m.id]||{}; const fixo=!!cf.fixo; const est=repEstoqueModelo(m);
-    html+=`<div class="rep-mod${fixo?' on':''}">
+    const cf=repCfg[m.id]||{}; const fixo=!!cf.fixo; const pausado=fixo&&!!cf.pausado; const est=repEstoqueModelo(m);
+    html+=`<div class="rep-mod${fixo?' on':''}${pausado?' pausado':''}">
       <div class="rep-mod-top">
         <label class="rep-switch"><input type="checkbox" ${fixo?'checked':''} onchange="repToggleFixo('${m.id}',this.checked)"><span class="rep-slider"></span></label>
-        <div class="rep-mod-nome" onclick="repExpand('${m.id}')">${escapeHtml(m.nome)}<span class="rep-mod-meta">${m.cores.length} cor(es) &middot; estoque ${est}${fixo?' &middot; fixo':''}</span></div>
-        ${fixo?`<button class="rep-exp" onclick="repExpand('${m.id}')">${repAberto===m.id?'&#9650;':'&#9660;'}</button>`:''}
+        <div class="rep-mod-nome" onclick="repExpand('${m.id}')">${escapeHtml(m.nome)}<span class="rep-mod-meta">${m.cores.length} cor(es) &middot; estoque ${est}${fixo?(pausado?' &middot; <b class="rep-paustag">pausado</b>':' &middot; fixo'):''}</span></div>
+        ${fixo?`<button class="rep-pausa${pausado?' on':''}" onclick="event.stopPropagation();repTogglePausa('${m.id}')" title="${pausado?'Retomar reposicao deste modelo':'Pausar: fica fixo mas nao entra no pedido agora'}">${pausado?'&#9654; Retomar':'&#10073;&#10073; Pausar'}</button><button class="rep-exp" onclick="repExpand('${m.id}')">${repAberto===m.id?'&#9650;':'&#9660;'}</button>`:''}
       </div>`;
     if(fixo && repAberto===m.id){
       const coresOff=cf.coresOff||{};
@@ -6006,6 +6011,7 @@ function repFornOptions(sel){
   return o;
 }
 window.repToggleFixo=(id,v)=>{const cf=repCfgDe(id);cf.fixo=v;if(v){repAberto=id;if(!cf.fornId){const uf=repUltimaFabrica(id);if(uf)cf.fornId=uf;}if(!cf.custo){const uc=repUltimoCusto(id);if(uc.valor>0)cf.custo=uc.valor;}}repSalvar();repRenderModelos();};
+window.repTogglePausa=(id)=>{const cf=repCfgDe(id);cf.pausado=!cf.pausado;repSalvar();repRenderModelos();};
 window.repExpand=(id)=>{repAberto=(repAberto===id?null:id);repRenderModelos();};
 window.repSetForn=(id,v)=>{repCfgDe(id).fornId=v;repSalvar();};
 window.repSetCusto=(id,v)=>{repCfgDe(id).custo=parseFloat(v)||0;repSalvar();};
@@ -6035,7 +6041,7 @@ window.repDelForn=(k)=>{if(confirm('Remover esta fábrica? (desativar mantem o h
 function repGerar(){
   const porForn={};
   repCatalogo.forEach(m=>{
-    const cf=repCfg[m.id]; if(!cf||!cf.fixo)return;
+    const cf=repCfg[m.id]; if(!cf||!cf.fixo||cf.pausado)return;
     const fid=cf.fornId||'_sem';
     if(fid!=='_sem'&&repForn[fid]&&repForn[fid].off)return; // fábrica desativada: fora do pedido
     const coresOff=cf.coresOff||{};
