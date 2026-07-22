@@ -891,6 +891,21 @@
   .fab-top{text-align:center;padding:14px 0 18px;border-bottom:1px solid var(--linha);margin-bottom:18px}
   .fab-titulo{font-family:'Playfair Display',serif;font-size:30px;color:var(--ouro-claro,#dcbd60)}
   .fab-sub{font-family:'DM Mono',monospace;font-size:var(--fs-sm);color:rgba(251,249,238,.55);letter-spacing:.05em;text-transform:uppercase;margin-top:4px}
+  .fab-logos{display:flex;align-items:stretch;justify-content:center;max-width:640px;margin:0 auto 12px}
+  .fab-logo{flex:1;display:flex;align-items:center;padding:6px 20px;min-height:58px;max-height:92px}
+  .fab-logo-a{justify-content:flex-end;border-right:1px solid rgba(220,189,96,.35)}
+  .fab-logo-b{justify-content:flex-start}
+  .fab-logo img{max-height:76px;max-width:100%;object-fit:contain}
+  .fab-logo-txt{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--ouro-claro);letter-spacing:1px;line-height:1.1;text-align:center}
+  .fab-toprow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:640px;margin:0 auto}
+  .fab-toprow .fab-sub,.fab-toprow .fab-quem{margin:0}
+  .pe-logocfg{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
+  .pe-logofield{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+  .pe-logolbl{font-size:var(--fs-mini);text-transform:uppercase;letter-spacing:.05em;color:rgba(251,249,238,.55);font-family:'DM Mono',monospace}
+  .pe-logoprev{width:140px;height:58px;border:1px solid var(--linha);border-radius:var(--r-sm);background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:5px}
+  .pe-logoprev img{max-width:100%;max-height:100%;object-fit:contain}
+  .pe-logoprev.vazio{color:rgba(251,249,238,.35);font-size:var(--fs-sm)}
+  .pe-logobtns{display:flex;gap:6px;flex-wrap:wrap}
   .fab-sec{margin-bottom:24px}
   .fab-sech{font-size:var(--fs-base);color:var(--ouro);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;font-weight:600}
   .fab-mod{background:rgba(0,0,0,.16);border:1px solid var(--linha);border-radius:var(--r-md);padding:14px;margin-bottom:12px}
@@ -4353,11 +4368,11 @@ function aplicarLeaoRemoto(url){
 function renderLogo(){const h=logoData?`<img src="${logoData}">`:LEAO_SVG;$('logoPrev').innerHTML=h;$('crestHolder').innerHTML=h;}
 /* ===== Galeria da marca — le a pasta marca/ do GitHub (repo publico) ===== */
 const MARCA_API='https://api.github.com/repos/lorettoscarpa-icr/centralestoque/contents/marca?ref=main';
-let _marcaCache=null,_marcaCat='__all';
+let _marcaCache=null,_marcaCat='__all',_marcaPick=null;
 function marcaCat(name){var n=name.replace(/\.[a-z0-9]+$/i,'');n=n.replace(/[\s_-]*\d+$/,'').trim();return n||'Outros';}
 function marcaCatLabel(c){c=c.toLowerCase();return c.charAt(0).toUpperCase()+c.slice(1);}
-window.abrirGaleriaMarca=function(){const m=$('marcaModal');if(!m)return;m.classList.remove('hide');marcaCarregar(false);};
-window.fecharGaleriaMarca=function(){const m=$('marcaModal');if(m)m.classList.add('hide');};
+window.abrirGaleriaMarca=function(pickCb){_marcaPick=(typeof pickCb==='function')?pickCb:null;const m=$('marcaModal');if(!m)return;m.classList.remove('hide');marcaCarregar(false);};
+window.fecharGaleriaMarca=function(){_marcaPick=null;const m=$('marcaModal');if(m)m.classList.add('hide');};
 window.marcaCarregar=function(forcar){
   const box=$('marcaBox');if(!box)return;
   if(_marcaCache&&!forcar){marcaRender(_marcaCache);return;}
@@ -4394,34 +4409,45 @@ function marcaRender(imgs){
     if(_marcaCat!=='__all'&&marcaCat(f.name)!==_marcaCat)return '';
     const nome=escapeHtml(f.name),url=escapeHtml(f.download_url||'');
     const usada=(logoData&&f.download_url&&logoData.indexOf(f.download_url)===0)?' on':'';
+    const acaoBtn=_marcaPick
+      ?'<button class="m-use" type="button" onclick="marcaEscolher('+i+')">Escolher</button>'
+      :'<button class="m-use" type="button" onclick="marcaUsarLeao('+i+')">Usar leao</button>';
     return '<div class="marca-item'+usada+'" data-i="'+i+'">'
       +'<div class="marca-thumb"><img loading="lazy" src="'+url+'" alt="'+nome+'"></div>'
       +'<div class="marca-nome">'+nome+'</div>'
-      +'<div class="marca-acts"><button class="m-use" type="button" onclick="marcaUsarLeao('+i+')">Usar leao</button>'
+      +'<div class="marca-acts">'+acaoBtn
       +'<button type="button" onclick="marcaBaixar('+i+')">Baixar</button></div>'
       +'</div>';
   }).join('');
   box.innerHTML=html||'<div class="marca-empty">Nenhum arquivo nesta categoria.</div>';
 }
-window.marcaUsarLeao=function(i){
-  const f=_marcaCache&&_marcaCache[i];if(!f||!f.download_url)return;
-  toast('Preparando '+f.name+'…');
+function marcaFetchDataUrl(f,max,cb){
+  if(!f||!f.download_url)return;
   fetch(f.download_url).then(function(r){return r.blob();}).then(function(blob){
     const rd=new FileReader();
     rd.onload=function(){
-      if(/\.svg$/i.test(f.name)){marcaAplicarLeao(rd.result);return;}
+      if(/\.svg$/i.test(f.name)){cb(rd.result);return;}
       const img=new Image();
       img.onload=function(){
-        const max=400,esc=Math.min(1,max/Math.max(img.width,img.height));
+        const esc=Math.min(1,max/Math.max(img.width,img.height));
         const c=document.createElement('canvas');c.width=Math.round(img.width*esc);c.height=Math.round(img.height*esc);
         c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        try{marcaAplicarLeao(c.toDataURL('image/png'));}catch(e){marcaAplicarLeao(rd.result);}
+        try{cb(c.toDataURL('image/png'));}catch(e){cb(rd.result);}
       };
-      img.onerror=function(){marcaAplicarLeao(rd.result);};
+      img.onerror=function(){cb(rd.result);};
       img.src=rd.result;
     };
     rd.readAsDataURL(blob);
   }).catch(function(){toast('Nao consegui baixar essa imagem agora');});
+}
+window.marcaUsarLeao=function(i){
+  const f=_marcaCache&&_marcaCache[i];if(!f||!f.download_url)return;
+  toast('Preparando '+f.name+'…');
+  marcaFetchDataUrl(f,400,marcaAplicarLeao);
+};
+window.marcaEscolher=function(i){
+  const f=_marcaCache&&_marcaCache[i];if(!f||!_marcaPick)return;
+  const cb=_marcaPick;_marcaPick=null;fecharGaleriaMarca();cb(f);
 };
 function marcaAplicarLeao(dataUrl){
   logoData=dataUrl;try{localStorage.setItem('loretto_leao',logoData);}catch(e){}
@@ -4814,7 +4840,14 @@ function renderModoFabrica(fid){
     totalGeral;
   var _tabnav=_etHTML?('<div class="fab-subnav"><button class="fab-tab'+(_fabTab==='estoque'?' on':'')+'" data-tab="estoque" onclick="fabSetTab(\'estoque\')">Pronta-entrega</button><button class="fab-tab'+(_fabTab==='etiquetas'?' on':'')+'" data-tab="etiquetas" onclick="fabSetTab(\'etiquetas\')">&#127991; Etiquetas</button></div>'):'';
   var _estOn=(!_etHTML||_fabTab==='estoque');
-  host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div>'+(_FAB_PERFIL?'<div class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></div>':'')+'</div>'+
+  var _hcfg=(typeof peEtqConfig!=='undefined'&&peEtqConfig[fid])||{};
+  var _logoFab=_hcfg.fabLogo?'<img src="'+escapeHtml(_hcfg.fabLogo)+'" alt="">':'<span class="fab-logo-txt">'+escapeHtml(nomeF)+'</span>';
+  var _logoLoja=_hcfg.lorettoLogo?'<img src="'+escapeHtml(_hcfg.lorettoLogo)+'" alt="">':'<span class="fab-logo-txt">LORETTO SCARPA</span>';
+  var _topHTML='<div class="fab-top">'+
+    '<div class="fab-logos"><div class="fab-logo fab-logo-a">'+_logoFab+'</div><div class="fab-logo fab-logo-b">'+_logoLoja+'</div></div>'+
+    '<div class="fab-toprow"><span class="fab-sub">Pronta-entrega</span>'+(_FAB_PERFIL?'<span class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></span>':'')+'</div>'+
+  '</div>';
+  host.innerHTML='<div class="fab-wrap">'+_topHTML+
     _tabnav+
     '<div class="fab-pane'+(_estOn?' on':'')+'" id="fabPaneEstoque">'+_estoquePane+'</div>'+
     (_etHTML?('<div class="fab-pane'+(_fabTab==='etiquetas'?' on':'')+'" id="fabPaneEtiquetas">'+_etHTML+'</div>'):'')+
@@ -4885,13 +4918,34 @@ let peEtqConfig=(function(){try{return JSON.parse(localStorage.getItem('loretto_
 function peSalvarEtqConfig(){try{localStorage.setItem('loretto_pe_etq',JSON.stringify(peEtqConfig));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({etqConfig:peEtqConfig},{merge:true}).catch(function(){});}
 window.peSetEtqModelo=function(fid,v){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].modelo=v;peSalvarEtqConfig();};
 window.peSetEtqTam=function(fid,v){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].tamanho=v;peSalvarEtqConfig();};
+function peLogoDataUrl(src,name,max,cb){
+  if(/\.svg$/i.test(name||'')){cb(src);return;}
+  var img=new Image();
+  img.onload=function(){var esc=Math.min(1,max/Math.max(img.width,img.height));var c=document.createElement('canvas');c.width=Math.round(img.width*esc);c.height=Math.round(img.height*esc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);try{cb(c.toDataURL('image/png'));}catch(e){cb(src);}};
+  img.onerror=function(){cb(src);};
+  img.src=src;
+}
+window.peUploadFabLogo=function(fid,inp){var f=inp&&inp.files&&inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){peLogoDataUrl(r.result,f.name,300,function(d){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].fabLogo=d;peSalvarEtqConfig();peRender();toast('Logo da fábrica salvo');});};r.readAsDataURL(f);};
+window.peRemFabLogo=function(fid){if(peEtqConfig[fid]){delete peEtqConfig[fid].fabLogo;peSalvarEtqConfig();peRender();}};
+window.peRemLorettoLogo=function(fid){if(peEtqConfig[fid]){delete peEtqConfig[fid].lorettoLogo;peSalvarEtqConfig();peRender();}};
+window.peEscolherLorettoLogo=function(fid){if(typeof abrirGaleriaMarca!=='function'){toast('Galeria indisponível');return;}abrirGaleriaMarca(function(f){toast('Preparando '+f.name+'…');marcaFetchDataUrl(f,300,function(url){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].lorettoLogo=url;peSalvarEtqConfig();peRender();toast('Logo da Loretto definido');});});};
 function peEtqTplLabel(v){var m={padrao:'Padrão da loja',t1:'Modelo 1',t2:'Modelo 2',t3:'Modelo 3',t4:'Modelo 4',t5:'Modelo 5',t6:'Modelo 6',t7:'Modelo 7',t8:'Modelo 8',t9:'Modelo 9',t10:'Modelo 10',t11:'Modelo 11',t12:'Modelo 12',t13:'Modelo 13',t14:'Modelo 14'};return m[v]||v;}
 function peEtqConfigBox(fid){
   var cfg=peEtqConfig[fid]||{};var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14'];
   var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
   var tplSel='<select class="pe-etqsel" onchange="peSetEtqModelo(\''+fid+'\',this.value)">'+mods.map(function(v){return '<option value="'+v+'"'+(((cfg.modelo||'padrao')===v)?' selected':'')+'>'+peEtqTplLabel(v)+'</option>';}).join('')+'</select>';
   var tamSel='<select class="pe-etqsel" onchange="peSetEtqTam(\''+fid+'\',this.value)">'+tams.map(function(o){return '<option value="'+o[0]+'"'+(((cfg.tamanho||'80,50')===o[0])?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
-  return '<details class="pe-det"><summary>🏷️ Etiquetas desta fábrica</summary><div class="pe-etqcfg"><p class="pe-metahint">A fábrica imprime etiquetas só dos <b>modelos liberados acima</b>, sempre neste modelo e tamanho — ela não escolhe.</p><label class="pe-etqrow">Modelo de etiqueta '+tplSel+'</label><label class="pe-etqrow">Tamanho '+tamSel+'</label></div></details>';
+  var fabLogo=cfg.fabLogo?'<div class="pe-logoprev"><img src="'+escapeHtml(cfg.fabLogo)+'"></div>':'<div class="pe-logoprev vazio">sem logo</div>';
+  var lojaLogo=cfg.lorettoLogo?'<div class="pe-logoprev"><img src="'+escapeHtml(cfg.lorettoLogo)+'"></div>':'<div class="pe-logoprev vazio">sem logo</div>';
+  var logoCfg='<div class="pe-logocfg">'+
+    '<div class="pe-logofield"><span class="pe-logolbl">Logo da fábrica (cabeçalho)</span>'+fabLogo+
+      '<div class="pe-logobtns"><button class="btn sm" onclick="document.getElementById(\'peFabLogoInp-'+fid+'\').click()">Enviar PNG</button>'+(cfg.fabLogo?'<button class="btn btn-ghost sm" onclick="peRemFabLogo(\''+fid+'\')">Remover</button>':'')+'</div>'+
+      '<input type="file" id="peFabLogoInp-'+fid+'" accept="image/*" class="hide" onchange="peUploadFabLogo(\''+fid+'\',this)"></div>'+
+    '<div class="pe-logofield"><span class="pe-logolbl">Logo da Loretto (cabeçalho)</span>'+lojaLogo+
+      '<div class="pe-logobtns"><button class="btn sm" onclick="peEscolherLorettoLogo(\''+fid+'\')">Escolher da galeria</button>'+(cfg.lorettoLogo?'<button class="btn btn-ghost sm" onclick="peRemLorettoLogo(\''+fid+'\')">Remover</button>':'')+'</div></div>'+
+  '</div>'+
+  '<p class="pe-metahint">Aparecem lado a lado no topo do painel da fábrica. Prefira PNG com fundo transparente e cores claras/douradas — o fundo do cabeçalho é escuro.</p>';
+  return '<details class="pe-det"><summary>🏷️ Etiquetas e cabeçalho desta fábrica</summary><div class="pe-etqcfg"><p class="pe-metahint">A fábrica imprime etiquetas só dos <b>modelos liberados acima</b>, sempre neste modelo e tamanho — ela não escolhe.</p><label class="pe-etqrow">Modelo de etiqueta '+tplSel+'</label><label class="pe-etqrow">Tamanho '+tamSel+'</label>'+logoCfg+'</div></details>';
 }
 function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({fornModelos:peFornModelos},{merge:true}).catch(function(){});}
 function peEnsureForns(){
