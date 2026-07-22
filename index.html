@@ -3323,6 +3323,40 @@ function loadFirebase(cb){
   s1.onerror=function(){setSyncStatus('err','não carregou o Firebase');};
   document.head.appendChild(s1);
 }
+/* ===== Imagens na nuvem (Firebase Storage) =====
+   Sobe a imagem pro Storage e devolve o LINK (pequeno) em vez do base64 gigante.
+   Se falhar (regras nao configuradas, sem internet, etc.), AVISA e mantem a
+   imagem no aparelho (base64) para nada se perder. */
+function loadFirebaseStorage(cb){
+  loadFirebase(function(){
+    if(window.firebase&&window.firebase.storage){cb(true);return;}
+    var s=document.createElement('script');s.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js';
+    s.onload=function(){cb(!!(window.firebase&&window.firebase.storage));};
+    s.onerror=function(){cb(false);};
+    document.head.appendChild(s);
+  });
+}
+function nuvemImagem(dataUrl,path){
+  return new Promise(function(resolve){
+    var done=false;
+    function fim(res,aviso){if(done)return;done=true;clearTimeout(_to);if(aviso&&window.toast)toast(aviso);resolve(res);}
+    if(!dataUrl){resolve({url:dataUrl,cloud:false});return;}
+    if(/^https?:\/\//.test(String(dataUrl))){resolve({url:dataUrl,cloud:true});return;} // ja e link
+    // rede de seguranca: se a nuvem travar/nao responder, cai no aparelho e avisa
+    var _to=setTimeout(function(){fim({url:dataUrl,cloud:false},'A nuvem não respondeu — imagem salva só neste aparelho');},12000);
+    if(typeof navigator!=='undefined'&&navigator.onLine===false){fim({url:dataUrl,cloud:false},'Sem internet — imagem salva só neste aparelho');return;}
+    loadFirebaseStorage(function(ok){
+      if(!ok){fim({url:dataUrl,cloud:false},'Sem conexão com a nuvem — imagem salva só neste aparelho');return;}
+      try{
+        if(!firebase.apps.length)firebase.initializeApp(FIREBASE_FIXO);
+        var ref=firebase.storage().ref().child(path);
+        ref.putString(String(dataUrl),'data_url').then(function(snap){return snap.ref.getDownloadURL();})
+          .then(function(url){fim({url:url,cloud:true});})
+          .catch(function(e){fim({url:dataUrl,cloud:false},'⚠️ Imagem NÃO salva na nuvem'+((e&&e.code)?(' ('+e.code+')'):'')+' — ficou só neste aparelho. Falta configurar as regras do Storage.');});
+      }catch(e){fim({url:dataUrl,cloud:false},'⚠️ Imagem NÃO salva na nuvem — ficou só neste aparelho');}
+    });
+  });
+}
 function persistFila(){
   try{localStorage.setItem('loretto_fila',JSON.stringify(fila));}catch(e){}
   if(_fRef){_fRef.set({itens:fila,ts:Date.now()}).catch(function(){});}
@@ -4158,7 +4192,8 @@ if($('mImgFile'))$('mImgFile').addEventListener('change',function(){
       // remove scripts por seguranca (SVG pode conter JS)
       txt=txt.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/on\w+\s*=\s*("[^"]*"|'[^']*')/gi,'');
       mImgData='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(txt)));
-      updateImgPrev();toast('Imagem SVG definida');
+      updateImgPrev();var _h=$('mImgHint');if(_h)_h.textContent='Enviando imagem…';
+      nuvemImagem(mImgData,'modelos/'+Date.now()+'.svg').then(function(rr){mImgData=rr.url;updateImgPrev();if(rr.cloud)toast('Imagem SVG na nuvem');});
     };
     r.onerror=function(){toast('Não foi possível ler o SVG');};
     r.readAsText(f);
@@ -4171,8 +4206,8 @@ if($('mImgFile'))$('mImgFile').addEventListener('change',function(){
         const cv=document.createElement('canvas');cv.width=w;cv.height=h;
         cv.getContext('2d').drawImage(img,0,0,w,h);
         try{mImgData=cv.toDataURL('image/png');}catch(e){mImgData=String(r.result);}
-        if(mImgData.length>350000)toast('Imagem grande — considere um PNG menor ou SVG');
-        updateImgPrev();toast('Imagem definida');
+        updateImgPrev();var _h=$('mImgHint');if(_h)_h.textContent='Enviando imagem…';
+        nuvemImagem(mImgData,'modelos/'+Date.now()+'.png').then(function(rr){mImgData=rr.url;updateImgPrev();if(rr.cloud)toast('Imagem na nuvem');});
       };
       img.onerror=function(){toast('Arquivo de imagem inválido');};
       img.src=String(r.result);
@@ -6018,7 +6053,7 @@ window.repSetCusto=(id,v)=>{repCfgDe(id).custo=parseFloat(v)||0;repSalvar();};
 window.repSetRef=(id,cor,v)=>{const cf=repCfgDe(id);cf.refs=cf.refs||{};const t=String(v||'').trim();if(t)cf.refs[cor]=t;else delete cf.refs[cor];repSalvar();};
 window.repAplicarForn=(id)=>{const uf=repUltimaFabrica(id);if(uf){repCfgDe(id).fornId=uf;repSalvar();repRenderModelos();}};
 window.repAplicarCusto=(id)=>{const uc=repUltimoCusto(id);if(uc.valor>0){repCfgDe(id).custo=uc.valor;repSalvar();repRenderModelos();}};
-window.repSetFoto=(id,cor,inp)=>{const f=inp.files&&inp.files[0];if(!f)return;repFotoLer(f,function(d){repFotos[id]=repFotos[id]||{};repFotos[id][cor]=d;salvaFotos();repRenderModelos();if(repSub==='pedido')repRenderPedido();toast('Foto salva');});inp.value='';};
+window.repSetFoto=(id,cor,inp)=>{const f=inp.files&&inp.files[0];if(!f)return;repFotoLer(f,function(d){var path='rep_fotos/'+String(id).replace(/[^a-zA-Z0-9_-]/g,'_')+'_'+String(cor).replace(/[^a-zA-Z0-9]/g,'_')+'_'+Date.now()+'.jpg';nuvemImagem(d,path).then(function(r){repFotos[id]=repFotos[id]||{};repFotos[id][cor]=r.url;salvaFotos();repRenderModelos();if(repSub==='pedido')repRenderPedido();toast(r.cloud?'Foto salva na nuvem':'Foto salva (só neste aparelho)');});});inp.value='';};
 window.repRemoveFoto=(id,cor)=>{if(repFotos[id]){delete repFotos[id][cor];if(!Object.keys(repFotos[id]).length)delete repFotos[id];}salvaFotos();repRenderModelos();if(repSub==='pedido')repRenderPedido();};
 window.repSetGrade=(id,cor,tam,v)=>{repGradeU[id]=repGradeU[id]||{};repGradeU[id][cor]=repGradeU[id][cor]||{};const n=parseInt(v);if(n>0)repGradeU[id][cor][tam]=n;else delete repGradeU[id][cor][tam];salvaGradeU();};
 window.repToggleCor=(id,cor,off)=>{const cf=repCfgDe(id);if(off)cf.coresOff[cor]=1;else delete cf.coresOff[cor];repSalvar();repRenderModelos();};
