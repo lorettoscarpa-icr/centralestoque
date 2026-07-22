@@ -1570,6 +1570,11 @@
   .rep-pausa{background:rgba(0,0,0,.2);border:1px solid var(--linha);color:var(--texto-fraco);border-radius:var(--r-pill);padding:4px 11px;font-family:'Barlow',sans-serif;font-size:var(--fs-mini);font-weight:700;cursor:pointer;white-space:nowrap;margin-right:6px}
   .rep-pausa:hover{border-color:var(--ouro);color:var(--ouro-claro)}
   .rep-pausa.on{background:var(--alerta);border-color:var(--alerta);color:var(--verde-escuro)}
+  /* ===== Chevron padrao do sistema (substitui triangulos ▼▲▶ por chevron fino, igual ao ›) ===== */
+  .chev{display:inline-block;width:.52em;height:.52em;border:solid currentColor;border-width:0 .14em .14em 0;transform:rotate(45deg);vertical-align:middle;box-sizing:border-box;margin-bottom:.12em}
+  .chev.up{transform:rotate(-135deg);margin-bottom:-.06em}
+  .chev.right{transform:rotate(-45deg)}
+  .chev.left{transform:rotate(135deg)}
   .etiqueta.tpl .bcw{background:#fff;padding:.7em .9em .3em;border-radius:.3em}
   .etiqueta.tpl .row{display:flex}
   /* T1 */
@@ -1936,7 +1941,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
         </div>
         <div class="mini-prev"><div class="lbl">Previa</div><div class="prev-holder"><div class="etiqueta" id="preview"></div></div></div>
         <details class="etq-acc" id="etqCfgAcc">
-          <summary><span class="etq-acc-t">Configurações da etiqueta</span><span class="etq-acc-i">&#9662;</span></summary>
+          <summary><span class="etq-acc-t">Configurações da etiqueta</span><span class="etq-acc-i"><i class="chev"></i></span></summary>
           <div class="etq-acc-body">
           <div class="config-row" style="margin-top:14px">
             <div>
@@ -2026,7 +2031,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
       </div>
       <p class="cf-hint"><b>Como funciona:</b> escolha a fábrica, bipe os códigos de 18 dígitos; na primeira vez que uma ref/cor aparece, vincule o <b>Modelo</b> e a <b>Cor</b> na linha (o sistema memoriza esse código pra aquele modelo — inclusive quando a mesma peça vem com código diferente, é só vincular de novo). Depois clique em <b>Gerar CSV (entrada)</b> pra baixar o arquivo <b>código;quantidade</b> com o nosso código de barras.</p>
       <div class="cf-histbox">
-        <div class="cf-histbox-h" id="confHistHead"><span>&#128194; Conferências salvas <span id="confHistCt"></span></span><span class="cf-histbox-car" id="confHistCar">&#9660;</span></div>
+        <div class="cf-histbox-h" id="confHistHead"><span>&#128194; Conferências salvas <span id="confHistCt"></span></span><span class="cf-histbox-car" id="confHistCar"><i class="chev"></i></span></div>
         <div class="cf-histbox-list hide" id="confHistList"></div>
       </div>
     </div>
@@ -2197,7 +2202,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
         <summary>
           <span class="fec-acc-t">Planilha pra fábrica</span>
           <span class="fec-acc-s">gerar ou atualizar &middot; só quando entra modelo novo ou muda valor</span>
-          <span class="fec-acc-i">&#9662;</span>
+          <span class="fec-acc-i"><i class="chev"></i></span>
         </summary>
         <div class="fec-acc-body">
           <div class="fec-passos">
@@ -2480,7 +2485,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
         <div id="dfLista" class="av-lista"></div>
       </div>
       <div class="rep-card">
-        <div class="rep-card-h" id="dfDevHead" style="cursor:pointer"><h3>&#128230; Devolvidos para a fábrica <span id="dfDevCt" class="df-devct"></span></h3><span style="display:flex;align-items:center;gap:10px"><button class="btn btn-ghost btn-sm" title="Configurar valor do volume e transportadoras" onclick="event.stopPropagation();dfCfgAbrir()">&#9881; Config</button><span id="dfDevCar" style="color:var(--ouro)">&#9660;</span></span></div>
+        <div class="rep-card-h" id="dfDevHead" style="cursor:pointer"><h3>&#128230; Devolvidos para a fábrica <span id="dfDevCt" class="df-devct"></span></h3><span style="display:flex;align-items:center;gap:10px"><button class="btn btn-ghost btn-sm" title="Configurar valor do volume e transportadoras" onclick="event.stopPropagation();dfCfgAbrir()">&#9881; Config</button><span id="dfDevCar" style="color:var(--ouro)"><i class="chev"></i></span></span></div>
         <div id="dfDevLista" class="df-devlista hide"></div>
       </div>
     </section>
@@ -4347,7 +4352,7 @@ function renderRepoList(){
   fks.forEach(fk=>{const f=repoCfg[fk];
     html+=`<div class="repo-forn-sec">${escapeHtml(f.nome)} <button class="lnk-edit" onclick="editWa('${fk}')">${f.whatsapp?'grupo &#10003;':'+ grupo'}</button></div>`;
     Object.keys(f.modelos).forEach(mk=>{const md=f.modelos[mk];const modTot=modeloPedir(fk,mk);geral+=modTot;const open=repoOpen.has(fk+'|'+mk);
-      html+=`<div class="rep-mod-row" onclick="toggleMod('${fk}','${mk}')"><span class="rep-caret">${open?'&#9662;':'&#9656;'}</span><span class="rep-mod-nome">${escapeHtml(md.nome)}</span><span class="rep-mod-meta">${md.referencia?'ref '+escapeHtml(md.referencia):'<i>sem ref</i>'}${md.preco?' &middot; '+brl(md.preco):''}${modTot?' &middot; '+modTot+' a pedir':''}</span><button class="rep-gear" onclick="event.stopPropagation();abrirCfg('${fk}','${mk}')" title="Configurar">&#9881;</button></div>`;
+      html+=`<div class="rep-mod-row" onclick="toggleMod('${fk}','${mk}')"><span class="rep-caret">${open?'<i class="chev"></i>':'<i class="chev right"></i>'}</span><span class="rep-mod-nome">${escapeHtml(md.nome)}</span><span class="rep-mod-meta">${md.referencia?'ref '+escapeHtml(md.referencia):'<i>sem ref</i>'}${md.preco?' &middot; '+brl(md.preco):''}${modTot?' &middot; '+modTot+' a pedir':''}</span><button class="rep-gear" onclick="event.stopPropagation();abrirCfg('${fk}','${mk}')" title="Configurar">&#9881;</button></div>`;
       if(open){html+='<div class="rep-cores">';
         Object.keys(md.cores).forEach(ck=>{const cc=md.cores[ck];const tams=Object.keys(cc.meta).filter(t=>cc.meta[t]>0).sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0));
           html+=`<div class="rep-cor"><div class="rep-cor-nome">${cc.foto?`<img src="${cc.foto}">`:''}${escapeHtml(cc.cor)}</div>`;
@@ -4620,8 +4625,8 @@ function renderModoFabrica(fid){
       var resumoCor='<div class="fab-resumo"><span>Estoque: <b>'+_totE+'</b> pares'+(_custo?' · '+brMoney(_totE*_custo):'')+'</span><span>Produção: <b>'+_totP+'</b> pares'+(_custo?' · '+brMoney(_totP*_custo):'')+'</span>'+(_custo?'<span>Custo/par: <b>'+brMoney(_custo)+'</b></span>':'')+'</div>';
       var cref=repRefDe(m.id,co.nome);var cfoto=repFotoDe(m.id,co.nome);
       var head='<tr><th class="pe-glbl"></th>'+tams.map(function(t){return '<th>'+escapeHtml(t)+'</th>';}).join('')+'</tr>';
-      var estRow='<tr><td class="pe-glbl e">Estoque</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0;return '<td><span class="pe-step"><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="e" oninput="peFabAuto(\''+fid+'\')" onblur="peFabFlush(\''+fid+'\')" value="'+(e||'')+'"><span class="pe-stp"><button type="button" tabindex="-1" onclick="peStep(this,1,\''+fid+'\')">&#9650;</button><button type="button" tabindex="-1" onclick="peStep(this,-1,\''+fid+'\')">&#9660;</button></span></span></td>';}).join('')+'</tr>';
-      var prodRow='<tr><td class="pe-glbl p">Produzindo</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var pz=parseInt(prod[k])||0;return '<td><span class="pe-step"><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="p" oninput="peFabAuto(\''+fid+'\')" onblur="peFabFlush(\''+fid+'\')" value="'+(pz||'')+'"><span class="pe-stp"><button type="button" tabindex="-1" onclick="peStep(this,1,\''+fid+'\')">&#9650;</button><button type="button" tabindex="-1" onclick="peStep(this,-1,\''+fid+'\')">&#9660;</button></span></span></td>';}).join('')+'</tr>';
+      var estRow='<tr><td class="pe-glbl e">Estoque</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0;return '<td><span class="pe-step"><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="e" oninput="peFabAuto(\''+fid+'\')" onblur="peFabFlush(\''+fid+'\')" value="'+(e||'')+'"><span class="pe-stp"><button type="button" tabindex="-1" onclick="peStep(this,1,\''+fid+'\')"><i class="chev up"></i></button><button type="button" tabindex="-1" onclick="peStep(this,-1,\''+fid+'\')"><i class="chev"></i></button></span></span></td>';}).join('')+'</tr>';
+      var prodRow='<tr><td class="pe-glbl p">Produzindo</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var pz=parseInt(prod[k])||0;return '<td><span class="pe-step"><input class="pe-metai" type="number" min="0" inputmode="numeric" data-fk="'+escapeHtml(k)+'" data-tp="p" oninput="peFabAuto(\''+fid+'\')" onblur="peFabFlush(\''+fid+'\')" value="'+(pz||'')+'"><span class="pe-stp"><button type="button" tabindex="-1" onclick="peStep(this,1,\''+fid+'\')"><i class="chev up"></i></button><button type="button" tabindex="-1" onclick="peStep(this,-1,\''+fid+'\')"><i class="chev"></i></button></span></span></td>';}).join('')+'</tr>';
       var pedRow='<tr><td class="pe-glbl pe">Pedido</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var pd=parseInt(ped[k])||0;return '<td class="pe-gc'+(pd>0?' tem pe':'')+'">'+(pd||'\u00b7')+'</td>';}).join('')+'</tr>';
       var repRow='<tr><td class="pe-glbl rep">Repor</td>'+tams.map(function(t){var k=m.id+'|'+co.nome+'|'+t;var mv=meta[k]||0;var tem=(parseInt(est[k])||0)+(parseInt(prod[k])||0)-(parseInt(ped[k])||0);var fa=Math.max(0,mv-tem);return '<td class="pe-gc'+(fa>0?' falta':(mv?' okmeta':''))+'">'+(fa>0?'+'+fa:(mv?'ok':'\u00b7'))+'</td>';}).join('')+'</tr>';
       var refb=cref?'<span class="fab-ref">ref '+escapeHtml(cref)+'</span>':'';
@@ -4754,7 +4759,7 @@ function peFornsHTML(){
   var ks=Object.keys(repForn).sort(function(a,b){return (repForn[a].nome||'').localeCompare(repForn[b].nome||'');});
   var ativas=ks.filter(function(k){return repForn[k].pe!==false&&!repForn[k].off;}).length;
   if(!peFornsOpen){
-    return '<div class="pe-forns"><div class="pe-forns-h" onclick="peFornsToggle()"><span class="pe-cfg-ic">&#127981;</span> Fábricas que usam a pronta-entrega <span class="pe-forns-ct">'+ativas+' ativa(s)</span><span class="pe-forns-car">&#9660;</span></div></div>';
+    return '<div class="pe-forns"><div class="pe-forns-h" onclick="peFornsToggle()"><span class="pe-cfg-ic">&#127981;</span> Fábricas que usam a pronta-entrega <span class="pe-forns-ct">'+ativas+' ativa(s)</span><span class="pe-forns-car"><i class="chev"></i></span></div></div>';
   }
   var rows=ks.map(function(k){var ff=repForn[k];var on=ff.pe!==false&&!ff.off;var disp=ff.apelido||ff.nome||k;
     if(peFornEdit===k){
@@ -4770,7 +4775,7 @@ function peFornsHTML(){
       '<label class="rep-switch sm" title="Aparece na pronta-entrega"><input type="checkbox" '+(on?'checked':'')+(ff.off?' disabled':'')+' onchange="peFornPE(\''+k+'\',this.checked)"><span class="rep-slider"></span></label>'+
       '<button class="lnk-del" onclick="peFornDel(\''+k+'\')">remover</button></div>';
   }).join('');
-  return '<div class="pe-forns open"><div class="pe-forns-h" onclick="peFornsToggle()"><span class="pe-cfg-ic">&#127981;</span> Fábricas que usam a pronta-entrega <span class="pe-forns-ct">'+ativas+' ativa(s)</span><span class="pe-forns-car">&#9650;</span></div>'+
+  return '<div class="pe-forns open"><div class="pe-forns-h" onclick="peFornsToggle()"><span class="pe-cfg-ic">&#127981;</span> Fábricas que usam a pronta-entrega <span class="pe-forns-ct">'+ativas+' ativa(s)</span><span class="pe-forns-car"><i class="chev up"></i></span></div>'+
     '<div class="pe-forns-b"><p class="pe-forns-hint">Ligue só as fábricas que trabalham com o portal. As desligadas somem desta aba, mas continuam na Reposição.</p>'+rows+
     '<div class="pe-forns-add"><input type="text" id="peFornNome" placeholder="Nome da nova fábrica"><input type="text" id="peFornWa" placeholder="Link do grupo no WhatsApp (opcional)"><button class="btn btn-ouro sm" onclick="peFornAdd()">Adicionar fábrica</button></div></div></div>';
 }
@@ -6003,7 +6008,7 @@ function repRenderModelos(){
       <div class="rep-mod-top">
         <label class="rep-switch"><input type="checkbox" ${fixo?'checked':''} onchange="repToggleFixo('${m.id}',this.checked)"><span class="rep-slider"></span></label>
         <div class="rep-mod-nome" onclick="repExpand('${m.id}')">${escapeHtml(m.nome)}<span class="rep-mod-meta">${m.cores.length} cor(es) &middot; estoque ${est}${fixo?(pausado?' &middot; <b class="rep-paustag">pausado</b>':' &middot; fixo'):''}</span></div>
-        ${fixo?`<button class="rep-pausa${pausado?' on':''}" onclick="event.stopPropagation();repTogglePausa('${m.id}')" title="${pausado?'Retomar reposicao deste modelo':'Pausar: fica fixo mas nao entra no pedido agora'}">${pausado?'&#9654; Retomar':'&#10073;&#10073; Pausar'}</button><button class="rep-exp" onclick="repExpand('${m.id}')">${repAberto===m.id?'&#9650;':'&#9660;'}</button>`:''}
+        ${fixo?`<button class="rep-pausa${pausado?' on':''}" onclick="event.stopPropagation();repTogglePausa('${m.id}')" title="${pausado?'Retomar reposicao deste modelo':'Pausar: fica fixo mas nao entra no pedido agora'}">${pausado?'<i class="chev right"></i> Retomar':'&#10073;&#10073; Pausar'}</button><button class="rep-exp" onclick="repExpand('${m.id}')">${repAberto===m.id?'<i class="chev up"></i>':'<i class="chev"></i>'}</button>`:''}
       </div>`;
     if(fixo && repAberto===m.id){
       const coresOff=cf.coresOff||{};
