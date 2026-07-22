@@ -2804,7 +2804,8 @@ function tplEtiqueta(modelo,d,barId){
   const ilus=(_mm&&_mm.img)?('<img src="'+_mm.img+'" alt="">'):SHOE_SVG;
   const site='www.lorettoscarpa.com.br',marca='LORETTO SCARPA',shoe='<span class="shoe">'+ilus+'</span>';
   const BC='<span class="tbc"><svg id="'+barId+'"></svg></span>';
-  const PH='<span class="tph">a preencher</span>';
+  const ref=escapeHtml((d&&d.ref)||'');
+  const PH=ref?('<b>Ref '+ref+'</b>'):'<span class="tph">a preencher</span>';
   const pncor=nome+(cor?' · '+cor:'');
   switch(modelo){
     case 't1': return '<div class="b"><span>'+marca+'</span></div>'+
@@ -5450,7 +5451,8 @@ function peGradeParaEtiquetas(grade){
     if(!m) return;
     var c=(m.cores||[]).find(function(cc){return cc.nome===p[1];})||{nome:p[1]};
     var cod=(typeof getCodigo==='function')?getCodigo(m,c,p[2]):((m.prefixo||'')+(c.sigla||'')+p[2]);
-    itens.push({key:'pe-'+k,modId:m.id,nome:m.nome,cor:c.nome,numero:p[2],codigo:String(cod).toUpperCase(),qtd:q});
+    var _ref=(typeof repRefDe==='function')?(repRefDe(m.id,c.nome)||''):'';
+    itens.push({key:'pe-'+k,modId:m.id,nome:m.nome,cor:c.nome,numero:p[2],codigo:String(cod).toUpperCase(),ref:_ref,qtd:q});
   });
   return itens;
 }
