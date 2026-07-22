@@ -5753,9 +5753,7 @@ function fabEtSecHTML(){
   var custom='<span class="fabet-f'+(tamSel==='custom'?'':' hide')+'" id="fabEtCustom" style="flex-direction:row;align-items:center;gap:6px"><input class="mm" id="fabEtW" type="number" min="10" max="200" placeholder="larg" value="'+escapeHtml(cw)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5)">x</span><input class="mm" id="fabEtH" type="number" min="10" max="200" placeholder="alt" value="'+escapeHtml(ch)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5);font-size:12px">mm</span></span>';
   var tot=0;Object.keys(_fabEt.q).forEach(function(k){tot+=parseInt(_fabEt.q[k])||0;});
   return '<div class="fab-sec" id="fabEtBox">'+
-    '<div class="fab-sech">&#127991; Etiquetas Loretto</div>'+
     '<div class="fabet-cfg" style="flex-direction:column;align-items:stretch;gap:10px">'+
-      '<div class="fabet-locked">&#127991; Template padrao da Loretto: <b>'+peEtqTplLabel(fabEtCfg().modelo)+'</b> &middot; voce pode ajustar tamanho e layout abaixo &mdash; o template continua o mesmo.</div>'+
       '<div class="fabet-adj">'+
         '<span class="fabet-f"><label>Tamanho da etiqueta</label><select id="fabEtTam" onchange="fabEtTamCh()">'+opts+'</select></span>'+
         custom+
