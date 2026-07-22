@@ -893,7 +893,7 @@
   .fabet-printbar .fila-item{background:rgba(0,0,0,.2)}
   #fabricaMode{min-height:100vh;background:#283e1a;color:var(--areia);font-family:'Barlow',sans-serif}
   .fab-wrap{max-width:min(1500px,98vw);margin:0 auto;padding:20px 10px 60px}
-  .fab-top{text-align:center;padding:14px 0 18px;border-bottom:1px solid var(--linha);margin-bottom:18px}
+  .fab-top{position:relative;text-align:center;padding:14px 0 18px;border-bottom:1px solid var(--linha);margin-bottom:18px}
   .fab-titulo{font-family:'Playfair Display',serif;font-size:30px;color:var(--ouro-claro,#dcbd60)}
   .fab-sub{font-family:'DM Mono',monospace;font-size:var(--fs-sm);color:rgba(251,249,238,.55);letter-spacing:.05em;text-transform:uppercase;margin-top:4px}
   .fab-logos{display:flex;align-items:stretch;justify-content:center;max-width:640px;margin:0 auto 12px}
@@ -902,8 +902,9 @@
   .fab-logo-b{justify-content:flex-start}
   .fab-logo img{max-height:76px;max-width:100%;object-fit:contain}
   .fab-logo-txt{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--ouro-claro);letter-spacing:1px;line-height:1.1;text-align:center}
-  .fab-userrow{display:flex;justify-content:flex-end;margin-bottom:4px}
+  .fab-userrow{position:absolute;top:14px;right:0;z-index:2}
   .fab-top>.fab-sub{margin-top:8px}
+  @media(max-width:640px){.fab-userrow{position:static;display:flex;justify-content:flex-end;margin-bottom:8px}}
   .fab-userchip{display:inline-flex;align-items:center;gap:10px;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:var(--r-pill);padding:5px 6px 5px 15px}
   .fab-userchip-nome{font-family:'Barlow',sans-serif;font-weight:700;font-size:var(--fs-sm);color:var(--areia);letter-spacing:.3px;white-space:nowrap}
   .fab-userchip-x{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--linha);background:rgba(0,0,0,.15);color:var(--ouro-claro);cursor:pointer;transition:.15s;padding:0}
@@ -4855,7 +4856,7 @@ function renderModoFabrica(fid){
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">Salva sozinho &middot; preencha que salva automaticamente</span></div>':'')+'</div>'+
     totalGeral;
-  var _tabnav=_etHTML?('<div class="fab-subnav"><button class="fab-tab'+(_fabTab==='estoque'?' on':'')+'" data-tab="estoque" onclick="fabSetTab(\'estoque\')">Pronta-entrega</button><button class="fab-tab'+(_fabTab==='etiquetas'?' on':'')+'" data-tab="etiquetas" onclick="fabSetTab(\'etiquetas\')">&#127991; Etiquetas</button></div>'):'';
+  var _tabnav=_etHTML?('<div class="fab-subnav"><button class="fab-tab'+(_fabTab==='estoque'?' on':'')+'" data-tab="estoque" onclick="fabSetTab(\'estoque\')">Pronta-entrega</button><button class="fab-tab'+(_fabTab==='etiquetas'?' on':'')+'" data-tab="etiquetas" onclick="fabSetTab(\'etiquetas\')">Etiquetas</button></div>'):'';
   var _estOn=(!_etHTML||_fabTab==='estoque');
   var _hcfg=(typeof peEtqConfig!=='undefined'&&peEtqConfig[fid])||{};
   var _logoFab=_hcfg.fabLogo?'<img src="'+escapeHtml(_hcfg.fabLogo)+'" alt="">':'<span class="fab-logo-txt">'+escapeHtml(nomeF)+'</span>';
