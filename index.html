@@ -5698,7 +5698,7 @@ function peConfirmarEnvio(){
    mas so enxerga os modelos do pronta-entrega dela. O leao vem do nosso painel. */
 var _fabEt={mod:'',cor:'',q:{},last:null};
 var _fabTab='estoque';
-var FAB_ET_TAMS=[['80,50','80 x 50 mm (padrao loja)'],['60,40','60 x 40 mm'],['70,40','70 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
+var FAB_ET_TAMS=[['80,50','80 x 50 mm (padrao loja)'],['85,30','85 x 30 mm (Tarragona)'],['80,40','80 x 40 mm termica (Tchwm)'],['70,40','70 x 40 mm'],['60,40','60 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
 function fabEtMods(){
   if(!MODO_FABRICA||typeof peModelosDaFabrica!=='function')return [];
   var out=peModelosDaFabrica(MODO_FABRICA);
