@@ -3012,7 +3012,16 @@ function aplicaLayout(){const r=document.documentElement.style;
   r.setProperty('--etNumW',layout.numB?800:400);
 }
 function salvaLayout(){try{localStorage.setItem('loretto_layout',JSON.stringify(layout));}catch(e){}}
-function previewLayout(){if($('layoutPrev'))montaEtiqueta($('layoutPrev'),LAYOUT_SAMPLE,'bc-layout');}
+function previewLayout(){
+  if(!$('layoutPrev'))return;
+  var d=LAYOUT_SAMPLE;
+  if(typeof MODO_FABRICA!=='undefined'&&MODO_FABRICA){
+    // no modo fabrica a etiqueta leva referencia — mostra na previa do layout tambem
+    if(typeof _fabEt!=='undefined'&&_fabEt&&_fabEt.last&&_fabEt.last.ref)d=_fabEt.last;
+    else d=Object.assign({},LAYOUT_SAMPLE,{ref:'5505'});
+  }
+  montaEtiqueta($('layoutPrev'),d,'bc-layout');
+}
 function layoutSpans(){if($('vNum')){$('vNum').textContent=Math.round(layout.num*100)+'%';$('vLeao').textContent=Math.round(layout.leao*100)+'%';$('vBcH').textContent=layout.bcHeight+'px';$('vBcW').textContent=layout.bcW+'%';}}
 function preencheLayout(){$('lFont').value=layout.font;$('lNum').value=layout.num;$('lLeao').value=layout.leao;$('lBcH').value=layout.bcHeight;$('lBcW').value=layout.bcW;$('lBcAlign').value=layout.bcAlign;$('lNomeB').checked=layout.nomeB;$('lCorB').checked=layout.corB;$('lNumB').checked=layout.numB;layoutSpans();}
 function abrirLayout(){preencheLayout();aplicaLayout();previewLayout();$('layoutModal').classList.remove('hide');}
