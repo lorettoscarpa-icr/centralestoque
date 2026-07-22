@@ -237,6 +237,21 @@
   .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px}
   .modal{background:var(--verde-escuro);border:1px solid var(--ouro);border-radius:var(--r-md);padding:26px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
   .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  /* Galeria da marca */
+  .marca-intro{font-size:var(--fs-base);color:rgba(251,249,238,.62);line-height:1.5;margin:0 0 14px}
+  .marca-intro code{background:rgba(0,0,0,.3);padding:1px 6px;border-radius:4px;color:var(--ouro-claro);font-family:monospace}
+  .marca-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;overflow-y:auto;max-height:56vh;padding:2px}
+  .marca-item{border:1px solid var(--linha);border-radius:var(--r-sm);background:rgba(0,0,0,.12);display:flex;flex-direction:column;overflow:hidden}
+  .marca-item.on{outline:2px solid var(--ouro);outline-offset:-1px}
+  .marca-thumb{height:110px;display:flex;align-items:center;justify-content:center;padding:8px;background:repeating-conic-gradient(#e5e5e5 0% 25%,#fff 0% 50%) 0/18px 18px}
+  .marca-thumb img{max-width:100%;max-height:100%;object-fit:contain}
+  .marca-nome{font-size:12px;color:var(--areia);padding:6px 8px 2px;word-break:break-word;font-weight:600}
+  .marca-acts{display:flex;gap:6px;padding:6px 8px 8px;margin-top:auto}
+  .marca-acts button{flex:1;font-size:11px;padding:5px 4px;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:700;border:1px solid var(--linha);background:transparent;color:var(--areia);transition:.15s}
+  .marca-acts .m-use{background:var(--ouro);color:var(--verde-escuro);border-color:var(--ouro)}
+  .marca-acts button:hover{filter:brightness(1.08)}
+  .marca-empty,.marca-erro{grid-column:1/-1;text-align:center;color:rgba(251,249,238,.6);padding:30px 10px;line-height:1.6;font-size:var(--fs-base)}
+  .marca-erro{color:var(--alerta)}
   .modal-x{flex:0 0 auto;width:32px;height:32px;border-radius:50%;border:1px solid var(--linha);background:rgba(0,0,0,.18);color:var(--ouro-claro);font-size:var(--fs-2xl);line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.18s;margin:-4px -4px 0 0}
   .modal-x:hover{border-color:var(--ouro);color:var(--ouro);background:rgba(220,189,96,.14)}
   .modal h3{font-family:'Playfair Display',serif;font-weight:600;font-size:var(--fs-2xl);margin-bottom:10px}
@@ -1989,8 +2004,9 @@ textarea.cons-field{min-height:80px;resize:vertical}
             </div>
             <div>
               <label style="margin-top:0">Simbolo do leao</label>
-              <div style="display:flex;align-items:center;gap:12px">
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
                 <div class="logo-prev" id="logoPrev"></div>
+                <button class="file-btn" type="button" onclick="abrirGaleriaMarca()">Galeria da marca</button>
                 <button class="file-btn" id="uploadBtn">Enviar PNG</button>
               </div>
               <input type="file" id="logoFile" accept="image/*" class="hide">
@@ -2144,6 +2160,16 @@ textarea.cons-field{min-height:80px;resize:vertical}
     <div class="modal">
       <button class="modal-x" type="button" onclick="peAcessoModalFechar()" aria-label="Fechar">&times;</button>
       <div id="peAcessoBox"></div>
+    </div>
+  </div>
+
+  <div id="marcaModal" class="modal-bg hide" onclick="if(event.target===this)fecharGaleriaMarca()">
+    <div class="modal modal-lg">
+      <button class="modal-x" type="button" onclick="fecharGaleriaMarca()" aria-label="Fechar">&times;</button>
+      <div class="modal-head" style="margin-bottom:4px"><div class="modal-title">Galeria da marca</div></div>
+      <p class="marca-intro">Arquivos da pasta <code>marca/</code> no GitHub. Solte novos arquivos la e eles aparecem aqui &mdash; sem precisar subir de novo. Clique para usar como leao ou baixar o original.</p>
+      <div id="marcaBox" class="marca-grid"></div>
+      <div class="pe-modal-foot"><button class="btn" type="button" onclick="marcaCarregar(true)">Atualizar</button><button class="btn btn-ouro" type="button" onclick="fecharGaleriaMarca()">Fechar</button></div>
     </div>
   </div>
 
@@ -4292,6 +4318,76 @@ function aplicarLeaoRemoto(url){
   return true;
 }
 function renderLogo(){const h=logoData?`<img src="${logoData}">`:LEAO_SVG;$('logoPrev').innerHTML=h;$('crestHolder').innerHTML=h;}
+/* ===== Galeria da marca — le a pasta marca/ do GitHub (repo publico) ===== */
+const MARCA_API='https://api.github.com/repos/lorettoscarpa-icr/centralestoque/contents/marca?ref=main';
+let _marcaCache=null;
+window.abrirGaleriaMarca=function(){const m=$('marcaModal');if(!m)return;m.classList.remove('hide');marcaCarregar(false);};
+window.fecharGaleriaMarca=function(){const m=$('marcaModal');if(m)m.classList.add('hide');};
+window.marcaCarregar=function(forcar){
+  const box=$('marcaBox');if(!box)return;
+  if(_marcaCache&&!forcar){marcaRender(_marcaCache);return;}
+  box.innerHTML='<div class="marca-empty">Carregando…</div>';
+  fetch(MARCA_API,{headers:{'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){if(r.status===404)throw '404';if(!r.ok)throw r.status;return r.json();})
+    .then(function(list){
+      const imgs=(Array.isArray(list)?list:[]).filter(function(f){return f.type==='file'&&/\.(png|jpe?g|svg|webp|gif)$/i.test(f.name);});
+      imgs.sort(function(a,b){return a.name.localeCompare(b.name);});
+      _marcaCache=imgs;marcaRender(imgs);
+    })
+    .catch(function(err){
+      if(err==='404')box.innerHTML='<div class="marca-empty">A pasta <b>marca/</b> ainda nao tem arquivos.<br>Adicione as imagens da marca (PNG, SVG…) na pasta <code>marca/</code> do GitHub e clique em Atualizar.</div>';
+      else box.innerHTML='<div class="marca-erro">Nao consegui carregar do GitHub agora.<br>Verifique a conexao e tente Atualizar.</div>';
+    });
+};
+function marcaRender(imgs){
+  const box=$('marcaBox');if(!box)return;
+  if(!imgs.length){box.innerHTML='<div class="marca-empty">Nenhuma imagem na pasta <b>marca/</b> ainda.<br>Adicione arquivos no GitHub e clique em Atualizar.</div>';return;}
+  box.innerHTML=imgs.map(function(f,i){
+    const nome=escapeHtml(f.name),url=escapeHtml(f.download_url||'');
+    const usada=(logoData&&f.download_url&&logoData.indexOf(f.download_url)===0)?' on':'';
+    return '<div class="marca-item'+usada+'" data-i="'+i+'">'
+      +'<div class="marca-thumb"><img loading="lazy" src="'+url+'" alt="'+nome+'"></div>'
+      +'<div class="marca-nome">'+nome+'</div>'
+      +'<div class="marca-acts"><button class="m-use" type="button" onclick="marcaUsarLeao('+i+')">Usar leao</button>'
+      +'<button type="button" onclick="marcaBaixar('+i+')">Baixar</button></div>'
+      +'</div>';
+  }).join('');
+}
+window.marcaUsarLeao=function(i){
+  const f=_marcaCache&&_marcaCache[i];if(!f||!f.download_url)return;
+  toast('Preparando '+f.name+'…');
+  fetch(f.download_url).then(function(r){return r.blob();}).then(function(blob){
+    const rd=new FileReader();
+    rd.onload=function(){
+      if(/\.svg$/i.test(f.name)){marcaAplicarLeao(rd.result);return;}
+      const img=new Image();
+      img.onload=function(){
+        const max=400,esc=Math.min(1,max/Math.max(img.width,img.height));
+        const c=document.createElement('canvas');c.width=Math.round(img.width*esc);c.height=Math.round(img.height*esc);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        try{marcaAplicarLeao(c.toDataURL('image/png'));}catch(e){marcaAplicarLeao(rd.result);}
+      };
+      img.onerror=function(){marcaAplicarLeao(rd.result);};
+      img.src=rd.result;
+    };
+    rd.readAsDataURL(blob);
+  }).catch(function(){toast('Nao consegui baixar essa imagem agora');});
+};
+function marcaAplicarLeao(dataUrl){
+  logoData=dataUrl;try{localStorage.setItem('loretto_leao',logoData);}catch(e){}
+  renderLogo();syncPushLeao();
+  if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');
+  if(_marcaCache)marcaRender(_marcaCache);
+  toast('Leao atualizado — as fabricas passam a usar este simbolo');
+}
+window.marcaBaixar=function(i){
+  const f=_marcaCache&&_marcaCache[i];if(!f||!f.download_url)return;
+  fetch(f.download_url).then(function(r){return r.blob();}).then(function(blob){
+    const u=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(u);},4000);
+  }).catch(function(){toast('Nao consegui baixar agora');});
+};
 function fecharMenu(){const sh=$('appShell');if(sh)sh.classList.remove('menu-open');}
 document.querySelectorAll('.side-item').forEach(t=>t.addEventListener('click',()=>{
   document.querySelectorAll('.side-item').forEach(x=>x.classList.remove('active'));
