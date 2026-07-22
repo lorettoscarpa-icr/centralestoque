@@ -879,6 +879,13 @@
   .fabet-adj{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-top:2px}
   .fabet-adjbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
   .fabet-adjbtns .btn{padding:9px 14px;font-size:var(--fs-base)}
+  .fabet-help{font-size:var(--fs-base);color:rgba(251,249,238,.6);line-height:1.5;margin:2px 0 14px}
+  .fabet-printbar{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-top:18px;border-top:1px solid var(--linha);padding-top:16px}
+  .fabet-fila-wrap{flex:1;min-width:280px}
+  .fabet-fila-h{font-family:'Playfair Display',serif;font-size:var(--fs-lg);color:var(--ouro-claro);margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #fabEtFila{display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow-y:auto;margin:0 -4px;padding:0 4px}
+  .fabet-fila-vazia{font-size:var(--fs-base);color:rgba(251,249,238,.45);padding:14px 0}
+  .fabet-printbar .fila-item{background:rgba(0,0,0,.2)}
   #fabricaMode{min-height:100vh;background:#283e1a;color:var(--areia);font-family:'Barlow',sans-serif}
   .fab-wrap{max-width:min(1500px,98vw);margin:0 auto;padding:20px 10px 60px}
   .fab-top{text-align:center;padding:14px 0 18px;border-bottom:1px solid var(--linha);margin-bottom:18px}
@@ -5558,60 +5565,103 @@ function peConfirmarEnvio(){
 /* ===== Etiquetas Loretto no painel da fabrica =====
    A fabrica configura o TAMANHO e o LAYOUT no aparelho dela (igual a nossa tela),
    mas so enxerga os modelos do pronta-entrega dela. O leao vem do nosso painel. */
-var _fabEt={mod:'',cor:'',q:{}};
+var _fabEt={mod:'',cor:'',q:{},last:null};
 var _fabTab='estoque';
 var FAB_ET_TAMS=[['80,50','80 x 50 mm (padrao loja)'],['60,40','60 x 40 mm'],['70,40','70 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
 function fabEtMods(){return (typeof peModelosDaFabrica==='function'&&MODO_FABRICA)?peModelosDaFabrica(MODO_FABRICA):[];}
 function fabEtModAtual(){var ms=fabEtMods();return ms.find(function(m){return m.id===_fabEt.mod;})||ms[0]||null;}
 function fabEtCorAtual(){var m=fabEtModAtual();if(!m)return null;return (m.cores||[]).find(function(c){return c.nome===_fabEt.cor;})||m.cores[0]||null;}
+function _fabEsc(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+function fabEtItem(mid,cor,tam){
+  var m=(repCatalogo||[]).find(function(x){return x.id===mid;});
+  var cc=m?((m.cores||[]).find(function(x){return x.nome===cor;})||{nome:cor}):{nome:cor};
+  var cod=(typeof getCodigo==='function'&&m)?getCodigo(m,cc,tam):'';
+  var ref=(typeof repRefDe==='function')?(repRefDe(mid,cor)||''):'';
+  return {key:mid+'|'+cor+'|'+tam,modId:mid,nome:(m?m.nome:''),cor:cor,numero:tam,codigo:String(cod||'').toUpperCase(),ref:ref};
+}
+function fabEtModsHTML(){
+  var ms=fabEtMods();
+  if(!ms.length)return '<div class="fab-vazio">Nenhum modelo disponivel para etiquetas.</div>';
+  return ms.map(function(m){
+    var cores=(m.cores||[]).map(function(c){
+      var ref=(typeof repRefDe==='function')?(repRefDe(m.id,c.nome)||''):'';
+      var foto=(typeof repFotoDe==='function')?(repFotoDe(m.id,c.nome)||''):'';
+      var fotob=foto?'<img src="'+escapeHtml(foto)+'">':'<span class="fab-noimg">&#128095;</span>';
+      var refb=ref?'<span class="fab-ref">ref '+escapeHtml(ref)+'</span>':'';
+      var btns=(c.tams||[]).map(function(t){
+        var k=m.id+'|'+c.nome+'|'+t;var q=parseInt(_fabEt.q[k])||0;
+        return '<button class="tam-btn" onclick="fabEtAdd(\''+_fabEsc(m.id)+'\',\''+_fabEsc(c.nome)+'\',\''+_fabEsc(t)+'\')">'+escapeHtml(t)+(q?'<span class="cnt">'+q+'</span>':'')+'</button>';
+      }).join('');
+      return '<div class="fab-cor"><div class="fab-cor-foto">'+fotob+'</div><div class="fab-cor-main"><div class="fab-corh"><span class="fab-corn">'+escapeHtml(c.nome)+'</span>'+refb+'</div><div class="tamanhos">'+(btns||'<span class="fabet-tot">Sem numeracao.</span>')+'</div></div></div>';
+    }).join('');
+    return '<div class="fab-mod"><div class="fab-modh">'+escapeHtml(m.nome)+'</div>'+cores+'</div>';
+  }).join('');
+}
+function fabEtFilaHTML(){
+  var keys=Object.keys(_fabEt.q).filter(function(k){return (parseInt(_fabEt.q[k])||0)>0;});
+  if(!keys.length)return '<div class="fabet-fila-vazia">Toque nas numeracoes dos modelos acima para montar a fila.</div>';
+  return keys.map(function(k){
+    var p=k.split('|');var it=fabEtItem(p[0],p[1],p[2]);var q=parseInt(_fabEt.q[k])||0;
+    return '<div class="fila-item"><div class="fi-info"><div class="fi-nome">'+escapeHtml(it.nome)+' · '+escapeHtml(it.cor)+'</div><div class="fi-meta">'+escapeHtml(it.codigo)+' · nº '+escapeHtml(it.numero)+(it.ref?' · ref '+escapeHtml(it.ref):'')+'</div></div><div class="qtd-ctrl"><button onclick="fabEtQ(\''+_fabEsc(k)+'\',-1)">&minus;</button><input type="text" value="'+q+'" onchange="fabEtQset(\''+_fabEsc(k)+'\',this.value)"><button onclick="fabEtQ(\''+_fabEsc(k)+'\',1)">+</button></div><button class="fi-x" onclick="fabEtRem(\''+_fabEsc(k)+'\')">&times;</button></div>';
+  }).join('');
+}
 function fabEtSecHTML(){
   var ms=fabEtMods();
   if(!ms.length)return '';
-  var m=fabEtModAtual(),c=fabEtCorAtual();
-  if(m&&_fabEt.mod!==m.id)_fabEt.mod=m.id;
-  if(c&&_fabEt.cor!==c.nome)_fabEt.cor=c.nome;
-  var tamSel=fabEtSizeEff();
-  var opts=FAB_ET_TAMS.map(function(t){return '<option value="'+t[0]+'"'+(t[0]===tamSel?' selected':'')+'>'+t[1]+'</option>';}).join('');
+  var tamSel=fabEtSizeEff();var tamPad=fabEtCfg().tamanho;
+  var opts=FAB_ET_TAMS.map(function(t){var lbl=t[1].replace(/\s*\(padrao loja\)/,'');if(t[0]===tamPad)lbl+=' (padrao da Loretto)';return '<option value="'+t[0]+'"'+(t[0]===tamSel?' selected':'')+'>'+lbl+'</option>';}).join('');
   var _fc='';try{_fc=localStorage.getItem('loretto_fab_et_custom')||'';}catch(e){}
   var cw=(_fc.split(',')[0])||'',ch=(_fc.split(',')[1])||'';
   var custom='<span class="fabet-f'+(tamSel==='custom'?'':' hide')+'" id="fabEtCustom" style="flex-direction:row;align-items:center;gap:6px"><input class="mm" id="fabEtW" type="number" min="10" max="200" placeholder="larg" value="'+escapeHtml(cw)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5)">x</span><input class="mm" id="fabEtH" type="number" min="10" max="200" placeholder="alt" value="'+escapeHtml(ch)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5);font-size:12px">mm</span></span>';
-  var modOpts=ms.map(function(x){var _r=(typeof repRefDe==='function'&&x.cores&&x.cores[0])?(repRefDe(x.id,x.cores[0].nome)||''):'';return '<option value="'+escapeHtml(x.id)+'"'+(x.id===_fabEt.mod?' selected':'')+'>'+escapeHtml(x.nome)+(_r?' — ref '+escapeHtml(_r):'')+'</option>';}).join('');
-  var corOpts=(m?m.cores:[]).map(function(x){var _r=(typeof repRefDe==='function')?(repRefDe(m.id,x.nome)||''):'';return '<option value="'+escapeHtml(x.nome)+'"'+(x.nome===_fabEt.cor?' selected':'')+'>'+escapeHtml(x.nome)+(_r?' — ref '+escapeHtml(_r):'')+'</option>';}).join('');
-  var tams=(c&&c.tams)||[];
-  var tot=0;
-  var grade=tams.map(function(t){var k=_fabEt.mod+'|'+_fabEt.cor+'|'+t;var q=parseInt(_fabEt.q[k])||0;tot+=q;return '<span class="fabet-cel"><span>'+escapeHtml(t)+'</span><input type="number" min="0" inputmode="numeric" data-etk="'+escapeHtml(k)+'" value="'+(q||'')+'" class="'+(q?'tem':'')+'" oninput="fabEtQtd(this)"></span>';}).join('');
+  var tot=0;Object.keys(_fabEt.q).forEach(function(k){tot+=parseInt(_fabEt.q[k])||0;});
   return '<div class="fab-sec" id="fabEtBox">'+
     '<div class="fab-sech">&#127991; Etiquetas Loretto</div>'+
     '<div class="fabet-cfg" style="flex-direction:column;align-items:stretch;gap:10px">'+
-      '<div class="fabet-locked">&#127991; Template padrão da Loretto: <b>'+peEtqTplLabel(fabEtCfg().modelo)+'</b> &middot; você pode ajustar tamanho e layout abaixo &mdash; o template continua o mesmo.</div>'+
+      '<div class="fabet-locked">&#127991; Template padrao da Loretto: <b>'+peEtqTplLabel(fabEtCfg().modelo)+'</b> &middot; voce pode ajustar tamanho e layout abaixo &mdash; o template continua o mesmo.</div>'+
       '<div class="fabet-adj">'+
         '<span class="fabet-f"><label>Tamanho da etiqueta</label><select id="fabEtTam" onchange="fabEtTamCh()">'+opts+'</select></span>'+
         custom+
-        '<div class="fabet-adjbtns"><button class="btn" onclick="fabEtLayout()">&#9881; Ajustar layout</button><button class="btn btn-ghost" onclick="fabEtReset()">Voltar ao padrão</button></div>'+
+        '<div class="fabet-adjbtns"><button class="btn" onclick="fabEtLayout()">&#9881; Ajustar layout</button><button class="btn btn-ghost" onclick="fabEtReset()">Voltar ao padrao</button></div>'+
       '</div>'+
     '</div>'+
-    '<div class="fabet-row">'+
+    '<div class="fabet-help">Toque na numeracao que quer imprimir &mdash; ela entra na fila. Confira a previa e clique em Imprimir.</div>'+
+    '<div id="fabEtMods">'+fabEtModsHTML()+'</div>'+
+    '<div class="fabet-printbar">'+
       '<div class="fabet-prev"><div class="etiqueta" id="fabEtPrev"></div></div>'+
-      '<div class="fabet-ger">'+
-        '<span class="fabet-f"><label>Modelo</label><select id="fabEtMod" onchange="fabEtSetMod(this.value)">'+modOpts+'</select></span>'+
-        '<span class="fabet-f"><label>Cor</label><select id="fabEtCor" onchange="fabEtSetCor(this.value)">'+corOpts+'</select></span>'+
-        '<span class="fabet-f"><label>Quantidade por numeracao</label><div class="fabet-grade">'+(grade||'<span class="fabet-tot">Sem numeracao cadastrada.</span>')+'</div></span>'+
-        '<div class="fabet-row" style="align-items:center;gap:10px"><button class="btn btn-ouro" onclick="fabEtImprimir()">&#127991; Imprimir etiquetas</button><span class="fabet-tot" id="fabEtTot">'+(tot?tot+' etiqueta(s)':'\u00b7')+'</span><button class="btn" onclick="fabEtLimpar()">Limpar</button></div>'+
+      '<div class="fabet-fila-wrap">'+
+        '<div class="fabet-fila-h">Fila de impressao <span class="fabet-tot" id="fabEtTot">'+(tot?tot+' etiqueta(s)':'·')+'</span></div>'+
+        '<div id="fabEtFila">'+fabEtFilaHTML()+'</div>'+
+        '<div class="fabet-row" style="align-items:center;gap:10px;margin-top:12px"><button class="btn btn-ouro" onclick="fabEtImprimir()">&#127991; Imprimir etiquetas</button><button class="btn" onclick="fabEtLimpar()">Limpar fila</button></div>'+
       '</div>'+
     '</div>'+
     '<div class="fabet-nota">O tamanho e o layout ficam salvos neste aparelho. O simbolo do leao vem do painel da Loretto. Imprima em 100% (tamanho real) e margens: nenhuma.</div>'+
   '</div>';
 }
+function fabEtRefreshList(){
+  if($('fabEtMods'))$('fabEtMods').innerHTML=fabEtModsHTML();
+  if($('fabEtFila'))$('fabEtFila').innerHTML=fabEtFilaHTML();
+  var tot=0;Object.keys(_fabEt.q).forEach(function(k){tot+=parseInt(_fabEt.q[k])||0;});
+  if($('fabEtTot'))$('fabEtTot').textContent=tot?tot+' etiqueta(s)':'·';
+}
+window.fabEtAdd=function(mid,cor,tam){
+  var k=mid+'|'+cor+'|'+tam;
+  _fabEt.q[k]=(parseInt(_fabEt.q[k])||0)+1;
+  _fabEt.last=fabEtItem(mid,cor,tam);
+  fabEtPreview();
+  fabEtRefreshList();
+};
+window.fabEtQ=function(k,d){var n=(parseInt(_fabEt.q[k])||0)+d;if(n<=0)delete _fabEt.q[k];else _fabEt.q[k]=n;fabEtRefreshList();};
+window.fabEtQset=function(k,v){var n=parseInt(v);if(isNaN(n)||n<1)delete _fabEt.q[k];else _fabEt.q[k]=n;fabEtRefreshList();};
+window.fabEtRem=function(k){delete _fabEt.q[k];fabEtRefreshList();};
 function fabEtPreview(){
   var el=$('fabEtPrev');if(!el)return;
-  var m=fabEtModAtual(),c=fabEtCorAtual();if(!m||!c){el.innerHTML='';return;}
   if(typeof fabAplicarEtqConfig==='function')fabAplicarEtqConfig();
-  var t=(c.tams&&c.tams[0])||'40';
-  var cat=(repCatalogo||[]).find(function(x){return x.id===m.id;});
-  var cc=cat?((cat.cores||[]).find(function(x){return x.nome===c.nome;})||{nome:c.nome}):{nome:c.nome};
-  var cod=(typeof getCodigo==='function'&&cat)?getCodigo(cat,cc,t):'';
-  montaEtiqueta(el,{nome:m.nome,cor:c.nome,numero:t,codigo:String(cod||'').toUpperCase()},'bc-fabet');
+  var it=_fabEt.last;
+  if(!it){var ms=fabEtMods();if(ms.length){var m=ms[0],c=(m.cores||[])[0];if(c&&c.tams&&c.tams.length)it=fabEtItem(m.id,c.nome,c.tams[0]);}}
+  if(!it){el.innerHTML='';return;}
+  montaEtiqueta(el,it,'bc-fabet');
 }
+
 window.fabEtTamCh=function(){
   var v=$('fabEtTam')?$('fabEtTam').value:'80,50';
   if($('tamanho'))$('tamanho').value=v;
@@ -5646,7 +5696,7 @@ window.fabEtQtd=function(inp){
   var tot=0;Object.keys(_fabEt.q).forEach(function(x){tot+=_fabEt.q[x];});
   if($('fabEtTot'))$('fabEtTot').textContent=tot?tot+' etiqueta(s)':'\u00b7';
 };
-window.fabEtLimpar=function(){_fabEt.q={};renderModoFabrica(MODO_FABRICA);};
+window.fabEtLimpar=function(){_fabEt.q={};_fabEt.last=null;fabEtRefreshList();fabEtPreview();};
 function fabEtCfg(){var c=(typeof peEtqConfig!=='undefined'&&MODO_FABRICA&&peEtqConfig[MODO_FABRICA])||{};return {modelo:c.modelo||'padrao',tamanho:c.tamanho||'80,50'};}
 function fabEtSizeEff(){var o=null;try{o=localStorage.getItem('loretto_fab_et_tam');}catch(e){}return o||fabEtCfg().tamanho;}
 function fabAplicarEtqConfig(){
