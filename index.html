@@ -902,8 +902,13 @@
   .fab-logo-b{justify-content:flex-start}
   .fab-logo img{max-height:76px;max-width:100%;object-fit:contain}
   .fab-logo-txt{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--ouro-claro);letter-spacing:1px;line-height:1.1;text-align:center}
-  .fab-toprow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:640px;margin:0 auto}
-  .fab-toprow .fab-sub,.fab-toprow .fab-quem{margin:0}
+  .fab-userrow{display:flex;justify-content:flex-end;margin-bottom:4px}
+  .fab-top>.fab-sub{margin-top:8px}
+  .fab-userchip{display:inline-flex;align-items:center;gap:10px;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:var(--r-pill);padding:5px 6px 5px 15px}
+  .fab-userchip-nome{font-family:'Barlow',sans-serif;font-weight:700;font-size:var(--fs-sm);color:var(--areia);letter-spacing:.3px;white-space:nowrap}
+  .fab-userchip-x{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--linha);background:rgba(0,0,0,.15);color:var(--ouro-claro);cursor:pointer;transition:.15s;padding:0}
+  .fab-userchip-x:hover{border-color:var(--ouro);color:var(--ouro)}
+  .fab-userchip-x svg{width:15px;height:15px}
   .pe-logocfg{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
   .pe-logofield{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
   .pe-logolbl{font-size:var(--fs-mini);text-transform:uppercase;letter-spacing:.05em;color:rgba(251,249,238,.55);font-family:'DM Mono',monospace}
@@ -4856,8 +4861,9 @@ function renderModoFabrica(fid){
   var _logoFab=_hcfg.fabLogo?'<img src="'+escapeHtml(_hcfg.fabLogo)+'" alt="">':'<span class="fab-logo-txt">'+escapeHtml(nomeF)+'</span>';
   var _logoLoja=_hcfg.lorettoLogo?'<img src="'+escapeHtml(_hcfg.lorettoLogo)+'" alt="">':'<span class="fab-logo-txt">LORETTO SCARPA</span>';
   var _topHTML='<div class="fab-top">'+
+    (_FAB_PERFIL?'<div class="fab-userrow"><div class="fab-userchip"><span class="fab-userchip-nome">'+escapeHtml(_FAB_PERFIL)+'</span><button class="fab-userchip-x" type="button" onclick="peFabTrocarPerfil(\''+fid+'\')" title="Trocar de usuário"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button></div></div>':'')+
     '<div class="fab-logos"><div class="fab-logo fab-logo-a">'+_logoFab+'</div><div class="fab-logo fab-logo-b">'+_logoLoja+'</div></div>'+
-    '<div class="fab-toprow"><span class="fab-sub">Pronta-entrega</span>'+(_FAB_PERFIL?'<span class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></span>':'')+'</div>'+
+    '<div class="fab-sub">Pronta-entrega</div>'+
   '</div>';
   host.innerHTML='<div class="fab-wrap">'+_topHTML+
     _tabnav+
