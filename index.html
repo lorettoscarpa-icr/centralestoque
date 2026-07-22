@@ -1559,6 +1559,11 @@
   .modimg-prev img{max-width:100%;max-height:100%;object-fit:contain}
   .modimg-acts{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
   .modimg-hint{font-size:var(--fs-micro);color:var(--texto-fraco)}
+  .pe-etqcfg{padding:4px 0}
+  .pe-etqrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;font-size:var(--fs-sm)}
+  .pe-etqsel{flex:0 0 auto;max-width:60%}
+  .fabet-locked{background:rgba(220,189,96,.10);border:1px solid var(--linha);border-radius:var(--r-sm);padding:8px 12px;font-size:var(--fs-sm);color:var(--areia)}
+  .fabet-locked b{color:var(--ouro-claro)}
   .etiqueta.tpl .bcw{background:#fff;padding:.7em .9em .3em;border-radius:.3em}
   .etiqueta.tpl .row{display:flex}
   /* T1 */
@@ -4503,7 +4508,7 @@ function iniciarModoFabrica(fid,chave){
         }
         if(_fdb){_fdb.collection('ls_pe_tokens').doc('loja').get().then(function(snp){
           var td=(snp.exists&&snp.data())||{};var pessoas=td.pessoas||{};
-          _peAcesso=pessoas;peFornModelos=td.fornModelos||peFornModelos||{};_peTokens=Object.assign({},_peTokens,td.tokens||{});
+          _peAcesso=pessoas;peFornModelos=td.fornModelos||peFornModelos||{};peEtqConfig=td.etqConfig||peEtqConfig||{};_peTokens=Object.assign({},_peTokens,td.tokens||{});
           _autorizar(pessoas);
         }).catch(function(){_FAB_REJEITADO='Não consegui verificar o acesso. Tente de novo.';_MODO_FAB_OK=false;try{firebase.auth().signOut();}catch(e){}});}
         else { _MODO_FAB_OK=true;renderModoFabrica(MODO_FABRICA); }
@@ -4588,7 +4593,7 @@ function renderModoFabrica(fid){
   var custoMap={};mods.forEach(function(m){custoMap[m.id]=m.custo||0;});
   function envValor(g){var v=0;Object.keys(g||{}).forEach(function(k){v+=(parseInt(g[k])||0)*(custoMap[k.split('|')[0]]||0);});return v;}
   var ordens=(cache.ordens||[]);var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
-  var pedHTML=peds.length?peds.map(function(o){var _t=0;Object.keys(o.grade||{}).forEach(function(k){_t+=parseInt(o.grade[k])||0;});var _v=envValor(o.grade);var quem=(o.por&&o.por!=='(migrado)')?'<span class="fab-histby">'+escapeHtml(o.por)+'</span>':'';return '<details class="fab-hist fab-hist-ped"><summary class="fab-histh"><span class="fab-histl"><b>Pedido de '+fmtData(o.criadoEm)+'</b>'+quem+'</span><span class="fab-histtot">'+_t+' pares'+(_v?' \u00b7 '+brMoney(_v):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,o.grade||{},custoMap)+'</div></details>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
+  var pedHTML=peds.length?peds.map(function(o){var _t=0;Object.keys(o.grade||{}).forEach(function(k){_t+=parseInt(o.grade[k])||0;});var _v=envValor(o.grade);var quem=(o.por&&o.por!=='(migrado)')?'<span class="fab-histby">'+escapeHtml(o.por)+'</span>':'';return '<details class="fab-hist fab-hist-ped"><summary class="fab-histh"><span class="fab-histl"><b>Pedido de '+fmtData(o.criadoEm)+'</b>'+quem+'</span><span class="fab-histtot">'+_t+' pares'+(_v?' \u00b7 '+brMoney(_v):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,o.grade||{},custoMap)+'<div class="fab-acts"><button class="fab-act ok" style="font-size:var(--fs-md)" onclick="event.stopPropagation();fabImprimirPedido(\''+fid+'\',\''+o.id+'\')">&#127991; Imprimir etiquetas deste pedido</button></div></div></details>';}).join(''):'<div class="fab-vazio">Nenhum pedido da loja no momento.</div>';
   var prods=(cache.ordens||[]).filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||0)-(b.producaoEm||0);});
   var prodHTML=prods.length?prods.map(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;return '<div class="fab-prod"><div class="fab-pedh"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span>'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto (entra no estoque)</button></div>';}).join(''):'<div class="fab-vazio">Nada em produção.</div>';
   var gE=0,gP=0,gVE=0,gVP=0;mods.forEach(function(m){var c=m.custo||0;m.cores.forEach(function(co){(co.tams||[]).forEach(function(t){var k=m.id+'|'+co.nome+'|'+t;var e=parseInt(est[k])||0,pz=parseInt(prod[k])||0;gE+=e;gP+=pz;gVE+=e*c;gVP+=pz*c;});});});
@@ -4670,6 +4675,18 @@ const PE_PADRAO=[{fid:'manutt',nome:'Manutt'},{fid:'tchwm',nome:'Tchwm Shoes'},{
 let peView='lista';var PE_CRIT_PCT=50;let peFornsOpen=false;let peFornEdit=null;
 let peFornModelos=(function(){try{return JSON.parse(localStorage.getItem('loretto_pe_forn_modelos')||'{}')||{};}catch(e){return {};}})();
 let _peCadFid=null;
+let peEtqConfig=(function(){try{return JSON.parse(localStorage.getItem('loretto_pe_etq')||'{}')||{};}catch(e){return {};}})();
+function peSalvarEtqConfig(){try{localStorage.setItem('loretto_pe_etq',JSON.stringify(peEtqConfig));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({etqConfig:peEtqConfig},{merge:true}).catch(function(){});}
+window.peSetEtqModelo=function(fid,v){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].modelo=v;peSalvarEtqConfig();};
+window.peSetEtqTam=function(fid,v){if(!peEtqConfig[fid])peEtqConfig[fid]={};peEtqConfig[fid].tamanho=v;peSalvarEtqConfig();};
+function peEtqTplLabel(v){var m={padrao:'Padrão da loja',t1:'Modelo 1',t2:'Modelo 2',t3:'Modelo 3',t4:'Modelo 4',t5:'Modelo 5',t6:'Modelo 6',t7:'Modelo 7',t8:'Modelo 8',t9:'Modelo 9',t10:'Modelo 10',t11:'Modelo 11',t12:'Modelo 12',t13:'Modelo 13',t14:'Modelo 14'};return m[v]||v;}
+function peEtqConfigBox(fid){
+  var cfg=peEtqConfig[fid]||{};var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14'];
+  var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
+  var tplSel='<select class="pe-etqsel" onchange="peSetEtqModelo(\''+fid+'\',this.value)">'+mods.map(function(v){return '<option value="'+v+'"'+(((cfg.modelo||'padrao')===v)?' selected':'')+'>'+peEtqTplLabel(v)+'</option>';}).join('')+'</select>';
+  var tamSel='<select class="pe-etqsel" onchange="peSetEtqTam(\''+fid+'\',this.value)">'+tams.map(function(o){return '<option value="'+o[0]+'"'+(((cfg.tamanho||'80,50')===o[0])?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
+  return '<details class="pe-det"><summary>🏷️ Etiquetas desta fábrica</summary><div class="pe-etqcfg"><p class="pe-metahint">A fábrica imprime etiquetas só dos <b>modelos liberados acima</b>, sempre neste modelo e tamanho — ela não escolhe.</p><label class="pe-etqrow">Modelo de etiqueta '+tplSel+'</label><label class="pe-etqrow">Tamanho '+tamSel+'</label></div></details>';
+}
 function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({fornModelos:peFornModelos},{merge:true}).catch(function(){});}
 function peEnsureForns(){
   if(!repForn)repInit();
@@ -4744,10 +4761,10 @@ function peCarregarEstoques(){
   _db.collection('ls_pe_tokens').doc('loja').get().then(function(snp){
     var _td=(snp.exists&&snp.data())||{};
     _peTokens=Object.assign({},_peTokens,_td.tokens||{});
-    if(MODO_FABRICA){ _peAcesso=_td.pessoas||_peAcesso||{}; peFornModelos=_td.fornModelos||peFornModelos||{}; }
-    else { _peAcesso=Object.assign({},_td.pessoas||{},_peAcesso||{}); peFornModelos=Object.assign({},_td.fornModelos||{},peFornModelos||{}); }
+    if(MODO_FABRICA){ _peAcesso=_td.pessoas||_peAcesso||{}; peFornModelos=_td.fornModelos||peFornModelos||{}; peEtqConfig=_td.etqConfig||peEtqConfig||{}; }
+    else { _peAcesso=Object.assign({},_td.pessoas||{},_peAcesso||{}); peFornModelos=Object.assign({},_td.fornModelos||{},peFornModelos||{}); peEtqConfig=Object.assign({},_td.etqConfig||{},peEtqConfig||{}); }
     try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens));localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}
-    if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_peAcesso,fornModelos:peFornModelos},{merge:true});}catch(e){}}
+    if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_peAcesso,fornModelos:peFornModelos,etqConfig:peEtqConfig},{merge:true});}catch(e){}}
     if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
     if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',lotesProducao:(d&&d.lotesProducao)||[],_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&(ae.getAttribute('data-fk')||ae.getAttribute('data-etk')||(ae.closest&&ae.closest('#fabEtBox')))))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}}
   }).catch(function(){}).then(function(){
@@ -4897,6 +4914,7 @@ function peRenderFabrica(c,fid){
     '<button class="btn sm" onclick="peSalvarMetas(\''+f.fid+'\')">Salvar metas</button></div>'+
     pedidoBox+
     peOrdensPainel(f.fid)+
+    peEtqConfigBox(f.fid)+
     (hist?'<div class="pe-histbox"><b>Últimas alterações da fábrica:</b>'+hist+'</div>':'')+
     (modelos.length?'<details class="pe-det" open><summary>Grade e metas por numeração</summary><div class="pe-metahint">Defina a meta de cada numeração na linha <b>Meta</b> e toque em <b>Salvar metas</b>. A fábrica vê só quanto repor — nunca a meta.</div>'+grade+'</details>':grade)+'</div>';
 }
@@ -5372,11 +5390,7 @@ function fabEtSecHTML(){
   var grade=tams.map(function(t){var k=_fabEt.mod+'|'+_fabEt.cor+'|'+t;var q=parseInt(_fabEt.q[k])||0;tot+=q;return '<span class="fabet-cel"><span>'+escapeHtml(t)+'</span><input type="number" min="0" inputmode="numeric" data-etk="'+escapeHtml(k)+'" value="'+(q||'')+'" class="'+(q?'tem':'')+'" oninput="fabEtQtd(this)"></span>';}).join('');
   return '<div class="fab-sec" id="fabEtBox">'+
     '<div class="fab-sech">&#127991; Etiquetas Loretto</div>'+
-    '<div class="fabet-cfg">'+
-      '<span class="fabet-f"><label>Tamanho da etiqueta</label><select id="fabEtTam" onchange="fabEtTamCh()">'+opts+'</select></span>'+
-      custom+
-      '<span class="fabet-f"><button class="btn" onclick="fabEtLayout()">&#9881; Editar layout</button></span>'+
-    '</div>'+
+    '<div class="fabet-cfg"><div class="fabet-locked">&#128274; Etiqueta definida pela Loretto: <b>'+peEtqTplLabel(fabEtCfg().modelo)+'</b> &middot; <b>'+fabEtCfg().tamanho.replace(',','&times;')+' mm</b></div></div>'+
     '<div class="fabet-row">'+
       '<div class="fabet-prev"><div class="etiqueta" id="fabEtPrev"></div></div>'+
       '<div class="fabet-ger">'+
@@ -5392,6 +5406,7 @@ function fabEtSecHTML(){
 function fabEtPreview(){
   var el=$('fabEtPrev');if(!el)return;
   var m=fabEtModAtual(),c=fabEtCorAtual();if(!m||!c){el.innerHTML='';return;}
+  if(typeof fabAplicarEtqConfig==='function')fabAplicarEtqConfig();
   var t=(c.tams&&c.tams[0])||'40';
   var cat=(repCatalogo||[]).find(function(x){return x.id===m.id;});
   var cc=cat?((cat.cores||[]).find(function(x){return x.nome===c.nome;})||{nome:c.nome}):{nome:c.nome};
@@ -5417,9 +5432,13 @@ window.fabEtQtd=function(inp){
   if($('fabEtTot'))$('fabEtTot').textContent=tot?tot+' etiqueta(s)':'\u00b7';
 };
 window.fabEtLimpar=function(){_fabEt.q={};renderModoFabrica(MODO_FABRICA);};
+function fabEtCfg(){var c=(typeof peEtqConfig!=='undefined'&&MODO_FABRICA&&peEtqConfig[MODO_FABRICA])||{};return {modelo:c.modelo||'padrao',tamanho:c.tamanho||'80,50'};}
+function fabAplicarEtqConfig(){var c=fabEtCfg();etqModelo=c.modelo;var sel=$('tamanho');if(sel){var ok=false;for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===c.tamanho){ok=true;break;}}if(ok)sel.value=c.tamanho;}if(typeof aplicaTamanho==='function')aplicaTamanho();}
+window.fabImprimirPedido=function(fid,oid){var cache=_peEstoqueCache[fid]||{};var o=(cache.ordens||[]).find(function(x){return x.id===oid;});if(!o||!o.grade){toast('Pedido nao encontrado');return;}var tot=0;Object.keys(o.grade).forEach(function(k){tot+=parseInt(o.grade[k])||0;});fabAplicarEtqConfig();toast('Gerando '+tot+' etiqueta(s) do pedido...');peImprimirEtiquetas(o.grade);};
 window.fabEtImprimir=function(){
   var g={};Object.keys(_fabEt.q).forEach(function(k){if(_fabEt.q[k]>0)g[k]=_fabEt.q[k];});
   if(!Object.keys(g).length){toast('Preencha a quantidade por numeracao');return;}
+  fabAplicarEtqConfig();
   peImprimirEtiquetas(g);
 };
 function peGradeParaEtiquetas(grade){
