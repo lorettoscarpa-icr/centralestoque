@@ -5698,7 +5698,7 @@ function peConfirmarEnvio(){
    mas so enxerga os modelos do pronta-entrega dela. O leao vem do nosso painel. */
 var _fabEt={mod:'',cor:'',q:{},last:null};
 var _fabTab='estoque';
-var FAB_ET_TAMS=[['80,50','80 x 50 mm (padrao loja)'],['85,30','85 x 30 mm (Tarragona)'],['80,40','80 x 40 mm termica (Tchwm)'],['70,40','70 x 40 mm'],['60,40','60 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
+var FAB_ET_TAMS=[['80,50','80 x 50 mm'],['85,30','85 x 30 mm'],['80,40','80 x 40 mm'],['70,40','70 x 40 mm'],['60,40','60 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
 function fabEtMods(){
   if(!MODO_FABRICA||typeof peModelosDaFabrica!=='function')return [];
   var out=peModelosDaFabrica(MODO_FABRICA);
@@ -5753,8 +5753,8 @@ function fabEtFilaHTML(){
 function fabEtSecHTML(){
   var ms=fabEtMods();
   if(!ms.length)return '';
-  var tamSel=fabEtSizeEff();var tamPad=fabEtCfg().tamanho;
-  var opts=FAB_ET_TAMS.map(function(t){var lbl=t[1].replace(/\s*\(padrao loja\)/,'');if(t[0]===tamPad)lbl+=' (padrao da Loretto)';return '<option value="'+t[0]+'"'+(t[0]===tamSel?' selected':'')+'>'+lbl+'</option>';}).join('');
+  var tamSel=fabEtSizeEff();
+  var opts=FAB_ET_TAMS.map(function(t){return '<option value="'+t[0]+'"'+(t[0]===tamSel?' selected':'')+'>'+t[1]+'</option>';}).join('');
   var _fc='';try{_fc=localStorage.getItem('loretto_fab_et_custom')||'';}catch(e){}
   var cw=(_fc.split(',')[0])||'',ch=(_fc.split(',')[1])||'';
   var custom='<span class="fabet-f'+(tamSel==='custom'?'':' hide')+'" id="fabEtCustom" style="flex-direction:row;align-items:center;gap:6px"><input class="mm" id="fabEtW" type="number" min="10" max="200" placeholder="larg" value="'+escapeHtml(cw)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5)">x</span><input class="mm" id="fabEtH" type="number" min="10" max="200" placeholder="alt" value="'+escapeHtml(ch)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5);font-size:12px">mm</span></span>';
