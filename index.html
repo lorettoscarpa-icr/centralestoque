@@ -870,6 +870,15 @@
   .fabet-cel input.tem{border-color:var(--ouro);color:var(--ouro-claro)}
   .fabet-tot{font-size:var(--fs-sm);color:rgba(251,249,238,.6);font-family:'DM Mono',monospace}
   .fabet-nota{font-size:var(--fs-sm);color:rgba(251,249,238,.45);line-height:1.5;margin-top:8px}
+  .fab-subnav{display:flex;gap:4px;max-width:min(1500px,98vw);margin:0 auto 22px;border-bottom:1px solid var(--linha)}
+  .fab-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:rgba(251,249,238,.5);padding:11px 22px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:700;font-size:var(--fs-md);letter-spacing:.4px;margin-bottom:-1px;border-radius:0;transition:.15s}
+  .fab-tab.on{color:var(--ouro-claro);border-bottom-color:var(--ouro)}
+  .fab-tab:not(.on):hover{color:var(--areia)}
+  .fab-pane{display:none}
+  .fab-pane.on{display:block}
+  .fabet-adj{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-top:2px}
+  .fabet-adjbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+  .fabet-adjbtns .btn{padding:9px 14px;font-size:var(--fs-base)}
   #fabricaMode{min-height:100vh;background:#283e1a;color:var(--areia);font-family:'Barlow',sans-serif}
   .fab-wrap{max-width:min(1500px,98vw);margin:0 auto;padding:20px 10px 60px}
   .fab-top{text-align:center;padding:14px 0 18px;border-bottom:1px solid var(--linha);margin-bottom:18px}
@@ -3003,7 +3012,7 @@ function abrirLayout(){preencheLayout();aplicaLayout();previewLayout();$('layout
 function lerLayout(){layout.font=$('lFont').value;layout.num=parseFloat($('lNum').value);layout.leao=parseFloat($('lLeao').value);layout.bcHeight=parseInt($('lBcH').value,10);layout.bcW=parseInt($('lBcW').value,10);layout.bcAlign=$('lBcAlign').value;layout.nomeB=$('lNomeB').checked;layout.corB=$('lCorB').checked;layout.numB=$('lNumB').checked;layoutSpans();aplicaLayout();salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
 function resetLayout(){layout=Object.assign({},LAYOUT_PADRAO);preencheLayout();aplicaLayout();salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
 if($('layoutOpen'))$('layoutOpen').addEventListener('click',abrirLayout);
-if($('layoutClose'))$('layoutClose').addEventListener('click',()=>$('layoutModal').classList.add('hide'));
+if($('layoutClose'))$('layoutClose').addEventListener('click',()=>{$('layoutModal').classList.add('hide');if(typeof MODO_FABRICA!=='undefined'&&MODO_FABRICA&&typeof fabEtPreview==='function')fabEtPreview();});
 if($('layoutReset'))$('layoutReset').addEventListener('click',resetLayout);
 if($('layoutModal'))$('layoutModal').addEventListener('click',e=>{if(e.target.id==='layoutModal')$('layoutModal').classList.add('hide');});
 ['lFont','lNum','lLeao','lBcH','lBcW','lBcAlign','lNomeB','lCorB','lNumB'].forEach(id=>{const el=$(id);if(el){el.addEventListener('input',lerLayout);el.addEventListener('change',lerLayout);}});
@@ -4780,13 +4789,19 @@ function renderModoFabrica(fid){
   var envs=(cache.ordens||[]).filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});
   var envsShow=_peVerMaisHist?envs:envs.slice(0,3);
   var histHTML=envs.length?(envsShow.map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+((o.correcoes&&o.correcoes.length)?' <span class="fab-corrbadge">corrigido</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+_peCorrecoesHTML(o)+'<div class="fab-acts">'+(o.romaneio?'<button class="fab-act ghost" onclick="event.stopPropagation();peVerRomaneio(\''+o.romaneio.ref+'\')">&#128206; ver romaneio'+(o.romaneio.nome?' ('+escapeHtml(o.romaneio.nome)+')':'')+'</button>':'')+'<button class="fab-act ghost" onclick="event.stopPropagation();peCorrigirEnvio(\''+fid+'\',\''+o.id+'\')">&#9998; corrigir envio</button></div></div></details>';}).join('')+(envs.length>3?'<button class="fab-vermais" onclick="peVerMais(\'hist\')">'+(_peVerMaisHist?'ver menos':'ver mais ('+(envs.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada enviado ainda.</div>';
-  host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div>'+(_FAB_PERFIL?'<div class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></div>':'')+'</div>'+
+  var _etHTML=fabEtSecHTML();
+  var _estoquePane=
     '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><span class="fab-sech-btns"><button class="btn fab-prod-top" onclick="peProduzirAbrir(\''+fid+'\')">Produzir</button><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></span></div>'+pedHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Em produção'+(atrasados?' <span class="fab-atraso-cnt">&#9888; '+atrasados+' em atraso</span>':'')+'</div>'+emProdHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">Salva sozinho &middot; preencha que salva automaticamente</span></div>':'')+'</div>'+
-    totalGeral+
-    fabEtSecHTML()+
+    totalGeral;
+  var _tabnav=_etHTML?('<div class="fab-subnav"><button class="fab-tab'+(_fabTab==='estoque'?' on':'')+'" data-tab="estoque" onclick="fabSetTab(\'estoque\')">Pronta-entrega</button><button class="fab-tab'+(_fabTab==='etiquetas'?' on':'')+'" data-tab="etiquetas" onclick="fabSetTab(\'etiquetas\')">&#127991; Etiquetas</button></div>'):'';
+  var _estOn=(!_etHTML||_fabTab==='estoque');
+  host.innerHTML='<div class="fab-wrap"><div class="fab-top"><div class="fab-titulo">'+escapeHtml(nomeF)+'</div><div class="fab-sub">Pronta-entrega · Loretto Scarpa</div>'+(_FAB_PERFIL?'<div class="fab-quem">Usando como <b>'+escapeHtml(_FAB_PERFIL)+'</b> · <a onclick="peFabTrocarPerfil(\''+fid+'\')">trocar</a></div>':'')+'</div>'+
+    _tabnav+
+    '<div class="fab-pane'+(_estOn?' on':'')+'" id="fabPaneEstoque">'+_estoquePane+'</div>'+
+    (_etHTML?('<div class="fab-pane'+(_fabTab==='etiquetas'?' on':'')+'" id="fabPaneEtiquetas">'+_etHTML+'</div>'):'')+
     '<div class="fab-rodape">Loretto Scarpa · '+PE_FAB_VER+'</div></div>';
   fabEtPreview();
 }
@@ -5544,6 +5559,7 @@ function peConfirmarEnvio(){
    A fabrica configura o TAMANHO e o LAYOUT no aparelho dela (igual a nossa tela),
    mas so enxerga os modelos do pronta-entrega dela. O leao vem do nosso painel. */
 var _fabEt={mod:'',cor:'',q:{}};
+var _fabTab='estoque';
 var FAB_ET_TAMS=[['80,50','80 x 50 mm (padrao loja)'],['60,40','60 x 40 mm'],['70,40','70 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
 function fabEtMods(){return (typeof peModelosDaFabrica==='function'&&MODO_FABRICA)?peModelosDaFabrica(MODO_FABRICA):[];}
 function fabEtModAtual(){var ms=fabEtMods();return ms.find(function(m){return m.id===_fabEt.mod;})||ms[0]||null;}
@@ -5554,9 +5570,10 @@ function fabEtSecHTML(){
   var m=fabEtModAtual(),c=fabEtCorAtual();
   if(m&&_fabEt.mod!==m.id)_fabEt.mod=m.id;
   if(c&&_fabEt.cor!==c.nome)_fabEt.cor=c.nome;
-  var tamSel=(($('tamanho')&&$('tamanho').value)||'80,50');
+  var tamSel=fabEtSizeEff();
   var opts=FAB_ET_TAMS.map(function(t){return '<option value="'+t[0]+'"'+(t[0]===tamSel?' selected':'')+'>'+t[1]+'</option>';}).join('');
-  var cw=($('customW')&&$('customW').value)||'',ch=($('customH')&&$('customH').value)||'';
+  var _fc='';try{_fc=localStorage.getItem('loretto_fab_et_custom')||'';}catch(e){}
+  var cw=(_fc.split(',')[0])||'',ch=(_fc.split(',')[1])||'';
   var custom='<span class="fabet-f'+(tamSel==='custom'?'':' hide')+'" id="fabEtCustom" style="flex-direction:row;align-items:center;gap:6px"><input class="mm" id="fabEtW" type="number" min="10" max="200" placeholder="larg" value="'+escapeHtml(cw)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5)">x</span><input class="mm" id="fabEtH" type="number" min="10" max="200" placeholder="alt" value="'+escapeHtml(ch)+'" oninput="fabEtTamCh()"><span style="color:rgba(251,249,238,.5);font-size:12px">mm</span></span>';
   var modOpts=ms.map(function(x){var _r=(typeof repRefDe==='function'&&x.cores&&x.cores[0])?(repRefDe(x.id,x.cores[0].nome)||''):'';return '<option value="'+escapeHtml(x.id)+'"'+(x.id===_fabEt.mod?' selected':'')+'>'+escapeHtml(x.nome)+(_r?' — ref '+escapeHtml(_r):'')+'</option>';}).join('');
   var corOpts=(m?m.cores:[]).map(function(x){var _r=(typeof repRefDe==='function')?(repRefDe(m.id,x.nome)||''):'';return '<option value="'+escapeHtml(x.nome)+'"'+(x.nome===_fabEt.cor?' selected':'')+'>'+escapeHtml(x.nome)+(_r?' — ref '+escapeHtml(_r):'')+'</option>';}).join('');
@@ -5565,7 +5582,14 @@ function fabEtSecHTML(){
   var grade=tams.map(function(t){var k=_fabEt.mod+'|'+_fabEt.cor+'|'+t;var q=parseInt(_fabEt.q[k])||0;tot+=q;return '<span class="fabet-cel"><span>'+escapeHtml(t)+'</span><input type="number" min="0" inputmode="numeric" data-etk="'+escapeHtml(k)+'" value="'+(q||'')+'" class="'+(q?'tem':'')+'" oninput="fabEtQtd(this)"></span>';}).join('');
   return '<div class="fab-sec" id="fabEtBox">'+
     '<div class="fab-sech">&#127991; Etiquetas Loretto</div>'+
-    '<div class="fabet-cfg"><div class="fabet-locked">&#128274; Etiqueta definida pela Loretto: <b>'+peEtqTplLabel(fabEtCfg().modelo)+'</b> &middot; <b>'+fabEtCfg().tamanho.replace(',','&times;')+' mm</b></div></div>'+
+    '<div class="fabet-cfg" style="flex-direction:column;align-items:stretch;gap:10px">'+
+      '<div class="fabet-locked">&#127991; Template padrão da Loretto: <b>'+peEtqTplLabel(fabEtCfg().modelo)+'</b> &middot; você pode ajustar tamanho e layout abaixo &mdash; o template continua o mesmo.</div>'+
+      '<div class="fabet-adj">'+
+        '<span class="fabet-f"><label>Tamanho da etiqueta</label><select id="fabEtTam" onchange="fabEtTamCh()">'+opts+'</select></span>'+
+        custom+
+        '<div class="fabet-adjbtns"><button class="btn" onclick="fabEtLayout()">&#9881; Ajustar layout</button><button class="btn btn-ghost" onclick="fabEtReset()">Voltar ao padrão</button></div>'+
+      '</div>'+
+    '</div>'+
     '<div class="fabet-row">'+
       '<div class="fabet-prev"><div class="etiqueta" id="fabEtPrev"></div></div>'+
       '<div class="fabet-ger">'+
@@ -5593,10 +5617,26 @@ window.fabEtTamCh=function(){
   if($('tamanho'))$('tamanho').value=v;
   var cu=$('fabEtCustom');if(cu)cu.classList.toggle('hide',v!=='custom');
   if(v==='custom'){if($('customW')&&$('fabEtW'))$('customW').value=$('fabEtW').value||'';if($('customH')&&$('fabEtH'))$('customH').value=$('fabEtH').value||'';}
-  aplicaTamanho();try{salvaTamanho();}catch(e){}
+  try{localStorage.setItem('loretto_fab_et_tam',v);localStorage.setItem('loretto_fab_et_custom',(($('fabEtW')&&$('fabEtW').value)||'')+','+(($('fabEtH')&&$('fabEtH').value)||''));}catch(e){}
+  aplicaTamanho();
   fabEtPreview();
 };
 window.fabEtLayout=function(){abrirLayout();};
+window.fabEtReset=function(){
+  try{localStorage.removeItem('loretto_fab_et_tam');localStorage.removeItem('loretto_fab_et_custom');}catch(e){}
+  if(typeof layout!=='undefined'){layout=Object.assign({},LAYOUT_PADRAO);try{salvaLayout();}catch(e){}if(typeof aplicaLayout==='function')aplicaLayout();}
+  if(typeof toast==='function')toast('Etiqueta voltou ao padrão da Loretto');
+  renderModoFabrica(MODO_FABRICA);
+};
+window.fabSetTab=function(t){
+  _fabTab=t;
+  document.querySelectorAll('#fabricaMode .fab-tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tab')===t);});
+  var pe=document.getElementById('fabPaneEstoque'),pt=document.getElementById('fabPaneEtiquetas');
+  if(pe)pe.classList.toggle('on',t==='estoque');
+  if(pt)pt.classList.toggle('on',t==='etiquetas');
+  if(t==='etiquetas'&&typeof fabEtPreview==='function')fabEtPreview();
+  try{window.scrollTo(0,0);}catch(e){}
+};
 window.fabEtSetMod=function(v){_fabEt.mod=v;var m=fabEtModAtual();_fabEt.cor=(m&&m.cores[0]&&m.cores[0].nome)||'';renderModoFabrica(MODO_FABRICA);};
 window.fabEtSetCor=function(v){_fabEt.cor=v;renderModoFabrica(MODO_FABRICA);};
 window.fabEtQtd=function(inp){
@@ -5608,7 +5648,16 @@ window.fabEtQtd=function(inp){
 };
 window.fabEtLimpar=function(){_fabEt.q={};renderModoFabrica(MODO_FABRICA);};
 function fabEtCfg(){var c=(typeof peEtqConfig!=='undefined'&&MODO_FABRICA&&peEtqConfig[MODO_FABRICA])||{};return {modelo:c.modelo||'padrao',tamanho:c.tamanho||'80,50'};}
-function fabAplicarEtqConfig(){var c=fabEtCfg();etqModelo=c.modelo;var sel=$('tamanho');if(sel){var ok=false;for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===c.tamanho){ok=true;break;}}if(ok)sel.value=c.tamanho;}if(typeof aplicaTamanho==='function')aplicaTamanho();}
+function fabEtSizeEff(){var o=null;try{o=localStorage.getItem('loretto_fab_et_tam');}catch(e){}return o||fabEtCfg().tamanho;}
+function fabAplicarEtqConfig(){
+  var c=fabEtCfg();
+  etqModelo=c.modelo;                       // template: SEMPRE o padrão da Loretto
+  var size=fabEtSizeEff();                   // tamanho: ajuste da fábrica (ou o da Loretto)
+  var sel=$('tamanho');
+  if(sel){var ok=false;for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===size){ok=true;break;}}if(ok)sel.value=size;}
+  if(size==='custom'){var cd=null;try{cd=localStorage.getItem('loretto_fab_et_custom');}catch(e){}if(cd){var pp=cd.split(',');if($('customW'))$('customW').value=pp[0]||'';if($('customH'))$('customH').value=pp[1]||'';}}
+  if(typeof aplicaTamanho==='function')aplicaTamanho();
+}
 window.fabImprimirPedido=function(fid,oid){var cache=_peEstoqueCache[fid]||{};var o=(cache.ordens||[]).find(function(x){return x.id===oid;});if(!o||!o.grade){toast('Pedido nao encontrado');return;}var tot=0;Object.keys(o.grade).forEach(function(k){tot+=parseInt(o.grade[k])||0;});fabAplicarEtqConfig();toast('Gerando '+tot+' etiqueta(s) do pedido...');peImprimirEtiquetas(o.grade);};
 window.fabEtImprimir=function(){
   var g={};Object.keys(_fabEt.q).forEach(function(k){if(_fabEt.q[k]>0)g[k]=_fabEt.q[k];});
