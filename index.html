@@ -7821,7 +7821,13 @@ var _romPreco={}; // {modId:valor}  preco que VOCE define aqui, antes de gerar (
 var ROM_TAMS=[37,38,39,40,41,42,43,44];
 function romColLetra(n){var s='';while(n>0){var m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=(n-m-1)/26;}return s;}
 
-function romCat(){try{return (window.LS_catalogo?window.LS_catalogo():[])||[];}catch(e){return [];}}
+function romCat(){
+  var out=[],seen={};
+  function add(arr){(arr||[]).forEach(function(m){if(m&&m.id&&!seen[m.id]){seen[m.id]=1;out.push(m);}});}
+  try{ add(window.LS_catalogo?window.LS_catalogo():[]); }catch(e){}
+  try{ if(typeof repCatalogo!=='undefined'&&repCatalogo)add(repCatalogo); }catch(e){}
+  return out;
+}
 function romFabs(){try{return (window.LS_fornecedores?window.LS_fornecedores():[])||[];}catch(e){return [];}}
 function romCusto(m){
   try{ if(typeof repCfg!=='undefined'&&repCfg&&repCfg[m.id]&&repCfg[m.id].custo)return Number(repCfg[m.id].custo)||0; }catch(e){}
@@ -7907,6 +7913,7 @@ async function romGerarXlsx(){
   var fab=(romFabs().find(function(f){return f.fid===fid;})||{}).nome||fid;
   var cat=romCat(), mods=[];
   mids.forEach(function(id){var m=cat.find(function(x){return x.id===id;});if(m)mods.push(m);});
+  if(!mods.length){toast('Os modelos marcados não foram encontrados no catálogo. Remarque e tente de novo.');return;}
   mods.sort(function(a,b){return a.nome.localeCompare(b.nome);});
   // cores: uniao das cores dos modelos marcados
   var cores=[]; mods.forEach(function(m){(m.cores||[]).forEach(function(c){if(!c.off&&cores.indexOf(c.nome)<0)cores.push(c.nome);});});
