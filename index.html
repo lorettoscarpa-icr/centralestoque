@@ -2360,7 +2360,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
           <button class="rom-mini" id="romNenhum" type="button">Limpar</button>
         </div>
         <div class="rom-lista" id="romLista"></div>
-        <p class="rom-hint">Marque os modelos e, em cada um, <b>escolha as cores</b> que vão na planilha. Ela sai com uma linha <b>já preenchida</b> por modelo+cor (travada) e o <b>valor do par puxado do sistema</b> — a fábrica <b>só digita a quantidade</b>. Sem lista suspensa e sem linha em branco: não dá pra repetir modelo/cor nem errar a cor. Como volta com os nossos nomes, o batimento no acerto é direto.</p>
+        <p class="rom-hint">Marque os modelos e, em cada um, <b>escolha as cores</b> que a fábrica vai poder lançar. A planilha sai com a <b>seta ▼</b> pra escolher modelo e cor (só os que você marcou), <b>valor do par puxado do sistema</b> e contas automáticas. Se a fábrica repetir o mesmo <b>modelo+cor</b>, a linha fica <b>vermelha na hora</b> e acende um aviso no topo — não passa duplicado sem perceber. Como volta com os nossos nomes, o batimento no acerto é direto.</p>
       </div>
       </div>
         </div>
@@ -8015,9 +8015,7 @@ async function romGerarXlsx(){
   // só os modelos que têm ao menos uma cor marcada pra planilha
   mods=mods.filter(function(m){return romCoresSel(m).length>0;});
   if(!mods.length){toast('Marque ao menos uma cor (aparecem quando você inclui o modelo).');return;}
-  // linhas que já vêm PREENCHIDAS (modelo + cor). A fábrica só digita as quantidades.
-  var preRows=[]; mods.forEach(function(m){romCoresSel(m).forEach(function(cor){preRows.push({modelo:m.nome,cor:cor});});});
-  // cores: união das cores MARCADAS (alimenta as listas das linhas extras em branco)
+  // cores: união das cores MARCADAS — é o que vai na seta de COR (lista curta, só o que você quer)
   var cores=[]; mods.forEach(function(m){romCoresSel(m).forEach(function(cn){if(cores.indexOf(cn)<0)cores.push(cn);});});
   cores.sort();
 
@@ -8036,7 +8034,7 @@ async function romGerarXlsx(){
     lz.getCell('A'+(i+2)).value=m.nome;
     var p=romPrecoFinal(m);
     lz.getCell('B'+(i+2)).value=p>0?p:null; lz.getCell('B'+(i+2)).numFmt='#,##0.00';
-    var cs=(m.cores||[]).filter(function(c){return !c.off;}).map(function(c){return c.nome;});
+    var cs=romCoresSel(m);   // só as cores que você marcou (a seta de COR mostra só essas)
     var col=romColLetra(4+i);   // D, E, F, ...
     lz.getCell(col+'1').value='cores · '+m.nome;
     lz.getCell(col+'1').font={name:'Arial',size:9,bold:true,color:{argb:CINZA}};
@@ -8057,9 +8055,9 @@ async function romGerarXlsx(){
   function merge(r,c1,c2){ws.mergeCells(r,c1,r,c2);}
   // Topo enxuto (só isto fica congelado): título, fábrica, dica de 1 linha, TOTAL e cabeçalho.
   // O passo a passo e o exemplo vão PARA BAIXO da tabela, pra não ocupar a tela em monitor pequeno.
-  // Uma linha por MODELO+COR já preenchida (e travada): a fábrica só digita as quantidades.
-  // Sem lista suspensa e sem linha em branco => impossível repetir modelo/cor ou errar a cor.
-  var TR=6, HDR=7, LIN0=8, NLIN=preRows.length, LINF=LIN0+NLIN-1, FIM=LINF;
+  // Linhas em branco com a seta ▼ (modelo/cor). Se repetir modelo+cor, a linha fica vermelha
+  // na hora (formatação condicional) e um aviso acende no topo.
+  var TR=6, HDR=7, LIN0=8, NLIN=60, LINF=LIN0+NLIN-1, FIM=LINF;
 
   merge(1,1,ULT);
   var t=ws.getCell('A1'); t.value='ROMANEIO DE ENTREGA';
@@ -8101,7 +8099,7 @@ async function romGerarXlsx(){
 
   // dica curtinha numa linha só (o passo a passo e o exemplo ficam embaixo da tabela)
   merge(5,1,ULT); var hint=ws.getCell('A5');
-  hint.value='As linhas já vêm com o MODELO e a COR prontos.  Você só digita os pares nas numerações AMARELAS (37 a 44).  O VALOR e as contas são automáticos.  (Passo a passo embaixo da tabela.)';
+  hint.value='MODELO e COR: clique na célula e escolha na seta ▼.  Numerações (37 a 44): digite os pares.  As contas são automáticas.  Se repetir o mesmo MODELO+COR, a linha fica VERMELHA — apague a repetida.';
   hint.font={name:'Arial',size:10,bold:true,color:{argb:VERDE}}; hint.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDFCF5'}};
   hint.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(5).height=18;
 
@@ -8144,18 +8142,13 @@ async function romGerarXlsx(){
   var nMod=Math.max(mods.length,1)+1, nCor=Math.max(cores.length,1)+1;
   for(var r=LIN0;r<=LINF;r++){
     ws.getRow(r).height=20;
-    var pr=preRows[r-LIN0]||{};
     for(var j=1;j<=ULT;j++){
       var c=ws.getCell(r,j);
       c.font={name:'Arial',size:11};
       c.alignment={horizontal:(j<=2?'left':'center'),vertical:'middle'};
       c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
-      // colunas 1-2 (modelo/cor) já vêm prontas e travadas: cinza. numerações (3-10): amarelo. contas: cinza.
-      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:((j>=3&&j<=10)?AMARELO:CALC)}};
+      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:(j<=10?AMARELO:CALC)}};
     }
-    ws.getCell(r,1).value=pr.modelo||''; ws.getCell(r,2).value=pr.cor||'';
-    ws.getCell(r,1).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
-    ws.getCell(r,2).font={name:'Arial',size:11,color:{argb:VERDE}};
     ws.getCell(r,11).value={formula:'IF(SUM(C'+r+':J'+r+')=0,"",SUM(C'+r+':J'+r+'))'};
     ws.getCell(r,11).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
     // valor do par: puxa do nosso sistema pelo modelo escolhido
@@ -8169,14 +8162,14 @@ async function romGerarXlsx(){
   // ---- passo a passo + exemplo: EMBAIXO da tabela (fora da área congelada) ----
   var GB=LINF+3;
   merge(GB,1,ULT);
-  var ih=ws.getCell(GB,1); ih.value='COMO PREENCHER  (é rapidinho)';
+  var ih=ws.getCell(GB,1); ih.value='COMO PREENCHER  (é rapidinho, só 3 passos)';
   ih.font={name:'Arial',size:12,bold:true,color:{argb:CREME}}; ih.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF5A7A3A'}};
   ih.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(GB).height=22;
   var INS=[
-    'As linhas já vêm com o MODELO e a COR escritos — você não escolhe nada, é só preencher.',
-    'Nas numerações (37 a 44):  digite quantos pares está mandando de cada linha.  O que não tiver, deixe em branco.',
-    'O VALOR DO PAR e as contas aparecem sozinhos — não precisa somar nada.',
-    'Precisa de uma cor que não está aqui?  Fale com a Loretto que a gente manda a planilha certinha.'
+    '1)  MODELO e COR:  clique na célula, aparece a seta ▼ do lado.  Clique nela e escolha da lista.',
+    '2)  Numerações (37 a 44):  digite quantos pares está mandando.  O que não tiver, deixe em branco.',
+    '3)  O VALOR DO PAR e as contas aparecem sozinhos — não precisa somar nada.',
+    'Não repita o mesmo MODELO+COR:  se repetir, a linha fica VERMELHA e acende um aviso no topo — é só apagar a que sobrou.'
   ];
   INS.forEach(function(txt,i){
     var r=GB+1+i; merge(r,1,ULT); var c=ws.getCell(r,1); c.value=txt;
@@ -8208,20 +8201,39 @@ async function romGerarXlsx(){
   fo.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}};
   var ultLinha=foR;
 
-  /* ---- só a trava de quantidade nas numerações (modelo/cor já vêm prontos) ---- */
+  /* ---- seta ▼ de MODELO e COR + trava de quantidade ---- */
   for(var r=LIN0;r<=FIM;r++){
+    ws.getCell(r,1).dataValidation={type:'list',allowBlank:true,formulae:['=LISTAS!$A$2:$A$'+nMod],
+      showErrorMessage:true,errorTitle:'Modelo',error:'Clique na seta ▼ e escolha um modelo da lista.'};
+    // COR depende do MODELO: MATCH acha a posição do modelo, INDIRECT abre só as cores dele
+    ws.getCell(r,2).dataValidation={type:'list',allowBlank:true,
+      formulae:['=INDIRECT("MOD_"&MATCH(A'+r+',LISTAS!$A$2:$A$'+nMod+',0))'],
+      showErrorMessage:true,errorTitle:'Cor',
+      error:'Escolha primeiro o MODELO. Aí a seta mostra só as cores dele.'};
     for(var j=3;j<=10;j++){
       ws.getCell(r,j).dataValidation={type:'whole',operator:'between',allowBlank:true,formulae:[0,999],
         showErrorMessage:true,errorTitle:'Quantidade',error:'Digite apenas o número de pares (ex.: 5).'};
     }
   }
 
-  /* ---- trava tudo, solta SÓ as numerações (colunas 3..10) ----
-     Modelo e cor já vêm prontos e ficam travados: a fábrica não muda, não apaga
-     e não repete modelo/cor. Com selectLockedCells:false o Tab pula direto de
-     numeração em numeração e, no fim da linha, vai pra próxima. */
+  /* ---- avisa duplicado: MODELO+COR repetido deixa a linha VERMELHA na hora ---- */
+  try{
+    ws.addConditionalFormatting({
+      ref:'A'+LIN0+':M'+LINF,
+      rules:[{type:'expression',
+        formulae:['AND($A'+LIN0+'<>"",COUNTIFS($A$'+LIN0+':$A$'+LINF+',$A'+LIN0+',$B$'+LIN0+':$B$'+LINF+',$B'+LIN0+')>1)'],
+        style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFF4B7B7'}},font:{color:{argb:'FF8B1A1A'},bold:true}}}]
+    });
+  }catch(e){}
+  // aviso no topo (fica congelado): acende só quando existe alguma linha repetida
+  ws.mergeCells('L4:M4'); var wc=ws.getCell('L4');
+  wc.value={formula:'IF(SUMPRODUCT(($A$'+LIN0+':$A$'+LINF+'<>"")*(COUNTIFS($A$'+LIN0+':$A$'+LINF+',$A$'+LIN0+':$A$'+LINF+',$B$'+LIN0+':$B$'+LINF+',$B$'+LIN0+':$B$'+LINF+')>1))>0,"⚠ TEM LINHA REPETIDA","")'};
+  wc.font={name:'Arial',size:11,bold:true,color:{argb:'FFC0392B'}};
+  wc.alignment={horizontal:'center',vertical:'middle'};
+
+  /* ---- trava as partes cinzas / solta modelo, cor e numerações (colunas 1..10) ---- */
   for(var r=LIN0;r<=FIM;r++){
-    for(var j=3;j<=10;j++)ws.getCell(r,j).protection={locked:false};
+    for(var j=1;j<=10;j++)ws.getCell(r,j).protection={locked:false};
   }
   try{
     await ws.protect('',{selectLockedCells:false,selectUnlockedCells:true,
