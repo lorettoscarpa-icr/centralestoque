@@ -4052,7 +4052,9 @@ if($('ptN2'))$('ptN2').addEventListener('change',()=>$('ptN2Txt').classList.togg
 // (Antes o app inteiro ficava com visibility:hidden mas OCUPANDO altura, e o navegador
 //  paginava toda essa altura vazia -> dezenas de paginas em branco.)
 function _relPopup(corpo,pageRule){
-  const estilos=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n');
+  // tira qualquer @page das folhas de estilo do app (ex.: a regra da etiqueta,
+  // que usa margin:0) pra ela nao vazar pro relatorio e imprimir fora das bordas.
+  const estilos=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n').replace(/@page[^{]*\{[^}]*\}/g,'');
   const fontLinks=[...document.querySelectorAll('link[rel="stylesheet"],link[rel="preconnect"]')].map(l=>l.outerHTML).join('');
   const doc='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Relatório · Loretto Scarpa</title>'+fontLinks+
     '<style>'+estilos+'</style>'+
