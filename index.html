@@ -1178,7 +1178,7 @@
   .pe-pick-add{font-size:var(--fs-mini);color:var(--ouro);font-weight:600;white-space:nowrap}
   .pe-pick-disp{display:flex;flex-direction:column;gap:7px}
   .pe-pick-empty{font-size:var(--fs-base);color:rgba(251,249,238,.55);padding:8px 2px}
-  .pe-modal-foot{padding-top:14px;margin-top:4px;border-top:1px solid var(--linha);display:flex;justify-content:flex-end}
+  .pe-modal-foot{padding-top:14px;margin-top:4px;border-top:1px solid var(--linha);display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
   .btn.xs{padding:var(--btn-xs);font-size:var(--fs-mini);border-radius:var(--r-sm)}
   .pe-modacts{display:flex;gap:7px;align-items:flex-start}
   .pe-drag{display:inline-flex;align-items:center;justify-content:center;width:26px;height:28px;border:1px solid var(--linha);border-radius:var(--r-sm);background:rgba(220,189,96,.10);color:var(--ouro);cursor:grab;touch-action:none;font-size:var(--fs-md);line-height:1;letter-spacing:-3px;user-select:none;flex:0 0 auto}
@@ -2200,7 +2200,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     <div class="modal modal-lg">
       <button class="modal-x" type="button" onclick="peEnvioFechar()" aria-label="Fechar">&times;</button>
       <div id="peEnvioBox"></div>
-      <div class="pe-modal-foot"><button class="btn" onclick="peEnvioFechar()">Cancelar</button><button class="btn" id="peEnvioEtiqBtn" onclick="peImprimirEtiquetasDoModal()" style="display:none">&#127991; Etiquetas</button><button class="btn btn-ouro" id="peEnvioOk">Confirmar envio</button></div>
+      <div class="pe-modal-foot"><button class="btn btn-ghost" onclick="peEnvioFechar()">Cancelar</button><button class="btn" id="peEnvioEtiqBtn" onclick="peImprimirEtiquetasDoModal()" style="display:none">Etiquetas</button><button class="btn btn-ouro" id="peEnvioOk">Confirmar envio</button></div>
     </div>
   </div>
 
@@ -5503,7 +5503,7 @@ function _peCorrecoesHTML(o){
 }
 function peCorrigirEnvio(fid,oid){
   var cache=_peEstoqueCache[fid]||{};var o=(cache.ordens||[]).find(function(x){return x.id===oid;});if(!o){toast('Envio n\u00e3o encontrado');return;}
-  _peEnvio={fid:fid,oid:null,avulso:false};_peEditEnvio={fid:fid,oid:oid};
+  _peEnvio={fid:fid,oid:oid,avulso:false};_peEditEnvio={fid:fid,oid:oid};_peEnvioRomaneio=null;
   var g=o.enviado||{};var mods=peModelosDaFabrica(fid);
   var rows=mods.map(function(m){return m.cores.map(function(co){
     var _rf=(typeof repRefDe==='function')?repRefDe(m.id,co.nome):'';
@@ -5511,12 +5511,13 @@ function peCorrigirEnvio(fid,oid){
     var cells=co.tams.slice().sort(function(a,b){return parseFloat(a)-parseFloat(b);}).map(function(t){var sk=m.id+'|'+co.nome+'|'+t;var v=parseInt(g[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(t)+'</label><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value="'+(v||'')+'"></div>';}).join('');
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
   }).join('');}).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Corrigir envio</div><p class="pe-metahint">Ajuste o que foi realmente enviado. O estoque \u00e9 reajustado pela diferen\u00e7a e fica registrado quem corrigiu e o que mudou.</p>'+rows;
+  var _romNota=o.romaneio?('<p class="pe-metahint">Romaneio atual: <b>'+escapeHtml(o.romaneio.nome||'anexado')+'</b>. Anexe outro abaixo para substituir (opcional).</p>'):'';
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Corrigir envio</div><p class="pe-metahint">Ajuste o que foi realmente enviado. O estoque \u00e9 reajustado pela diferen\u00e7a e fica registrado quem corrigiu e o que mudou.</p>'+rows+_romNota+peRomaneioCampo();
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Salvar correção';ok.onclick=function(){peSalvarCorrecaoEnvio();};}
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
 function peSalvarCorrecaoEnvio(){
-  if(!_peEditEnvio)return;var fid=_peEditEnvio.fid,oid=_peEditEnvio.oid;
+  if(!_peEditEnvio)return;var fid=_peEditEnvio.fid,oid=_peEditEnvio.oid;var _rom=_peEnvioRomaneio;
   var nova={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)nova[i.getAttribute('data-k')]=q;});
   var quem=(typeof _FAB_PERFIL!=='undefined'&&_FAB_PERFIL)||(typeof userAtual!=='undefined'?userAtual:'')||'Fábrica';
   var did=peDocId(fid);
@@ -5527,8 +5528,10 @@ function peSalvarCorrecaoEnvio(){
     var old=o.enviado||{};var keys={};Object.keys(old).forEach(function(k){keys[k]=1;});Object.keys(nova).forEach(function(k){keys[k]=1;});
     var mudancas=[];
     Object.keys(keys).forEach(function(k){var de=parseInt(old[k])||0;var para=parseInt(nova[k])||0;if(para!==de){est[k]=Math.max(0,(parseInt(est[k])||0)+(de-para));if(!est[k])delete est[k];mudancas.push({k:k,label:_peLabelKey(fid,k),de:de,para:para});}});
-    if(!mudancas.length){toast('Nada mudou');return;}
-    o.enviado=nova;o.correcoes=(o.correcoes||[]).concat([{por:quem,em:Date.now(),mudancas:mudancas}]);o.corrigidoEm=Date.now();o.corrigidoPor=quem;
+    if(!mudancas.length&&!_rom){toast('Nada mudou');return;}
+    o.enviado=nova;
+    if(mudancas.length){o.correcoes=(o.correcoes||[]).concat([{por:quem,em:Date.now(),mudancas:mudancas}]);o.corrigidoEm=Date.now();o.corrigidoPor=quem;}
+    if(_rom){var _rid='rom_'+oid;o.romaneio={ref:_rid,tipo:_rom.tipo,nome:_rom.nome};if(_db){try{_db.collection('ls_pe_romaneios').doc(_rid).set({data:_rom.data,tipo:_rom.tipo,nome:_rom.nome,fid:fid,ordemId:oid,ts:Date.now()},{merge:true});}catch(e){}}}
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].ordens=ordens;}
     var payload={estoque:est,ordens:ordens,atualizadoEm:Date.now(),lorettoEm:Date.now()};
     if(!_db){renderModoFabrica(fid);toast('Correção salva');return;}
@@ -5551,7 +5554,29 @@ function peRomaneioCampo(){
   var has=_peEnvioRomaneio?('\u2713 '+escapeHtml(_peEnvioRomaneio.nome)):'';
   return '<div class="pe-romaneio"><label class="pe-romlbl">&#128206; Romaneio (PDF ou foto) &mdash; opcional</label><input type="file" id="peRomFile" accept="image/*,application/pdf" onchange="peRomSelect(this)"><div id="peRomMsg" class="pe-rommsg">'+has+'</div></div>';
 }
-window.peRomSelect=function(inp){var f=inp&&inp.files&&inp.files[0];var msg=document.getElementById('peRomMsg');if(!f){_peEnvioRomaneio=null;if(msg)msg.textContent='';return;}if(msg)msg.textContent='Carregando...';peLerArquivo(f,function(r){if(!r){if(msg)msg.textContent='N\u00e3o consegui ler o arquivo';return;}if(r.data.length>900000){_peEnvioRomaneio=null;if(msg)msg.textContent='Arquivo muito grande. Use foto menor ou PDF mais leve.';return;}_peEnvioRomaneio=r;if(msg)msg.textContent='\u2713 '+r.nome;});};
+window.peRomSelect=function(inp){var f=inp&&inp.files&&inp.files[0];var msg=document.getElementById('peRomMsg');if(!f){_peEnvioRomaneio=null;if(msg)msg.textContent='';return;}if(msg)msg.textContent='Carregando...';peLerArquivo(f,function(r){if(!r){if(msg)msg.textContent='N\u00e3o consegui ler o arquivo';return;}if(r.data.length>900000){_peEnvioRomaneio=null;if(msg)msg.textContent='Arquivo muito grande. Use foto menor ou PDF mais leve.';return;}_peEnvioRomaneio=r;if(msg)msg.textContent='\u2713 '+r.nome;
+  if(/\.pdf$/i.test(f.name||'')&&typeof finExtrairTexto==='function'&&typeof romaneioItensPDF==='function'){
+    if(msg)msg.textContent='\u2713 '+r.nome+' \u00b7 lendo romaneio\u2026';
+    finExtrairTexto(f).then(function(txt){if(msg)msg.textContent='\u2713 '+r.nome;peOferecerAutofill(romaneioItensPDF(txt));}).catch(function(){if(msg)msg.textContent='\u2713 '+r.nome;});
+  }
+});};
+function peOferecerAutofill(itens){
+  if(!itens||!itens.length){toast('N\u00e3o reconheci itens nesse romaneio');return;}
+  var fid=_peEnvio&&_peEnvio.fid;if(!fid)return;
+  function pn(s){return (s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+  var mods=(typeof peModelosDaFabrica==='function')?peModelosDaFabrica(fid):[];
+  var lk={};
+  mods.forEach(function(m){(m.cores||[]).forEach(function(c){var rf=(typeof repRefDe==='function')?repRefDe(m.id,c.nome):'';if(rf)lk[pn(rf)+'|'+pn(c.nome)]={modId:m.id,cor:c.nome};});});
+  var fill={},recon=0,totalRom=0;
+  itens.forEach(function(it){totalRom+=it.qtd;var hit=lk[pn(it.ref)+'|'+pn(it.cor)];if(!hit)return;var sk=hit.modId+'|'+hit.cor+'|'+it.tam;fill[sk]=(fill[sk]||0)+it.qtd;recon+=it.qtd;});
+  var inputs=document.querySelectorAll('#peEnvioModal input[data-k]');
+  var alvos=0;inputs.forEach(function(i){if(fill[i.getAttribute('data-k')]!=null)alvos++;});
+  if(!alvos){toast('Romaneio lido, mas nenhuma refer\u00eancia bateu com os modelos da pronta-entrega');return;}
+  var msg='Preencher a grade com base no romaneio?\n\n'+recon+' de '+totalRom+' pares do romaneio s\u00e3o de modelos da pronta-entrega ('+alvos+' numera\u00e7\u00e3o(\u00f5es)).\n\nIsso substitui os valores atuais da grade.';
+  if(!window.confirm(msg))return;
+  var n=0;inputs.forEach(function(i){var k=i.getAttribute('data-k');if(fill[k]!=null){i.value=fill[k];n++;}else{i.value=0;}});
+  toast(n+' numera\u00e7\u00e3o(\u00f5es) preenchida(s) pelo romaneio');
+}
 window.peVerRomaneio=function(ref){if(!_db){toast('Sem conex\u00e3o');return;}_db.collection('ls_pe_romaneios').doc(ref).get().then(function(s){if(!s.exists){toast('Romaneio n\u00e3o encontrado');return;}var d=s.data();var w=window.open('','_blank');if(!w){toast('Permita pop-up para ver o romaneio');return;}if(d.tipo==='img'){w.document.write('<title>'+(d.nome||'Romaneio')+'</title><img src="'+d.data+'" style="max-width:100%">');}else{w.document.write('<title>'+(d.nome||'Romaneio')+'</title><iframe src="'+d.data+'" style="border:0;width:100%;height:100vh"></iframe>');}w.document.close();}).catch(function(){toast('Erro ao abrir romaneio');});};
 function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';}var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='none';_peEnvio={fid:null,oid:null,avulso:false};_peEnvioRomaneio=null;_peEditEnvio=null;}
 function peEnvioSelecionar(fid){
@@ -8115,9 +8140,22 @@ function fecDPKey(cod,cor){return normKey(cod)+'|'+normKey(cor);}
    A referencia vem estruturada (500_37_MOURO = codigo_numeracao_cor), mas o pdf.js
    quebra o texto e entrega "500_37_ MOURO" — por isso o \s* antes da cor. */
 var FEC_RE_B2B=/^(\w+)_(\d{2})_\s*([A-ZÀ-Ú][\w À-Ú]*?)\s+(.+?)\s+(\d{5,})\s+(\S+)\s+(\d+)\s+([\d.,]+)\s+([\d.,]+)\s*$/;
+/* Extrai os itens de um romaneio B2B/idworks a partir do texto do PDF.
+   Robusto a produtos que quebram em varias linhas (o parser antigo, por linha,
+   perdia esses — dava a impressao de "so a primeira pagina"). */
+function romaneioItensPDF(txt){
+  var flat=(txt||'').replace(/\n/g,' ').replace(/\s+/g,' ');
+  var RE=/(\d{4,5})(?:[_\s][A-Za-zÀ-Ú0-9]*)*?\s+([A-ZÀ-Ú][A-ZÀ-Úa-z0-9 ]+?)\s*-\s*(\d{2})\s*-\s*([A-ZÀ-Úa-zÉé]{2,})\s+(\d{6,})\s+Saud[aá]vel\s+(\d+)\s+([\d.,]+)\s+([\d.,]+)/g;
+  var m,out=[];
+  while((m=RE.exec(flat))){
+    var nome=m[2].replace(/^.*?([A-ZÀ-Ú]{3,}(?: [A-ZÀ-Ú]{2,})*)$/,'$1').trim();
+    out.push({cod:m[1],ref:m[1],nome:nome,tam:m[3],cor:(m[4]||'').trim(),qtd:parseInt(m[6])||0,valorUn:fecNum(m[7])});
+  }
+  return out;
+}
 async function fecLerFabPdf(file){
   var txt=await finExtrairTexto(file);
-  var itens=[], conta='', pedido='', decl=null;
+  var conta='', pedido='', decl=null;
   var linhas=txt.split('\n');
   linhas.forEach(function(raw,idx){
     var l=raw.trim(); if(!l)return;
@@ -8126,13 +8164,8 @@ async function fecLerFabPdf(file){
     if(/^Conta\b/.test(l)&&linhas[idx+1])conta=(linhas[idx+1].split(' ')[0]||'').trim();
     // rodape: "90 10.800,00"
     if((m=l.match(/^(\d+)\s+([\d.]+,\d{2})$/)))decl={qtd:parseInt(m[1]),valor:fecNum(m[2])};
-    var it=l.match(FEC_RE_B2B);
-    if(it){
-      itens.push({cod:it[1],tam:it[2],cor:it[3].trim(),
-                  nome:String(it[4]).replace(/\s*-\s*\d+\s*-.*/,'').trim(),
-                  qtd:parseInt(it[7]),valorUn:fecNum(it[8])});
-    }
   });
+  var itens=romaneioItensPDF(txt);
   if(!itens.length)throw new Error('não reconheci esse PDF. Formatos aceitos hoje: a nossa planilha (.xlsx) ou o romaneio B2B/idworks (tipo o da TCHWM).');
   var soma=itens.reduce(function(s,i){return s+i.qtd;},0);
   return {nome:file.name, fab:conta||pedido||file.name, fabKey:normKey(conta||file.name),
