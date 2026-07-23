@@ -4785,7 +4785,7 @@ function peFabEntrar(fid){
   }catch(e){peFabLoginMsg('Erro ao entrar');}
 }
 var _fabSaveTimer=null;
-function peFabStatus(st,msg){var el=document.getElementById('fabStatus');if(!el)return;if(st==='saving'){el.textContent='Salvando\u2026';el.className='fab-status saving';}else if(st==='err'){el.textContent='N\u00c3O SALVOU'+(msg?(' ('+msg+')'):'');el.className='fab-status err';}else{var d=new Date();el.textContent='Tudo salvo \u00b7 '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);el.className='fab-status ok';}}
+function peFabStatus(st,msg){var el=document.getElementById('fabStatus');if(!el)return;if(st==='saving'){el.textContent='Salvando\u2026';el.className='fab-status saving';}else if(st==='err'){el.textContent='N\u00c3O SALVOU'+(msg?(' ('+msg+')'):'');el.className='fab-status err';}else{var d=new Date();el.textContent='\u00daltima atualiza\u00e7\u00e3o \u00b7 '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);el.className='fab-status ok';}}
 function peFabAuto(fid){peFabStatus('saving');if(_fabSaveTimer)clearTimeout(_fabSaveTimer);_fabSaveTimer=setTimeout(function(){peFabSalvar(fid,true);},1000);}
 function peFabFlush(fid){if(_fabSaveTimer){clearTimeout(_fabSaveTimer);_fabSaveTimer=null;peFabSalvar(fid,true);}}
 function peStep(btn,delta,fid){var wrap=btn.closest&&btn.closest('.pe-step');if(!wrap)return;var inp=wrap.querySelector('input[data-fk]');if(!inp)return;var v=(parseInt(inp.value)||0)+delta;if(v<0)v=0;inp.value=v?v:'';try{peFabAuto(fid);}catch(e){}}
@@ -4854,11 +4854,13 @@ function renderModoFabrica(fid){
   var envsShow=_peVerMaisHist?envs:envs.slice(0,3);
   var histHTML=envs.length?(envsShow.map(function(o){var g=o.enviado||{};var tot=0;Object.keys(g).forEach(function(k){tot+=parseInt(g[k])||0;});var val=envValor(g);return '<details class="fab-hist"><summary class="fab-histh"><span class="fab-histl"><b>'+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.avulso?' <span class="fab-avulso">avulso</span>':'')+((o.correcoes&&o.correcoes.length)?' <span class="fab-corrbadge">corrigido</span>':'')+'</span><span class="fab-histtot">'+tot+' pares'+(val?' · '+brMoney(val):'')+'</span></summary><div class="fab-histbody">'+_peEnvioDetalhe(fid,g,custoMap)+_peCorrecoesHTML(o)+'<div class="fab-acts">'+(o.romaneio?'<button class="fab-act ghost" onclick="event.stopPropagation();peVerRomaneio(\''+o.romaneio.ref+'\')">&#128206; ver romaneio'+(o.romaneio.nome?' ('+escapeHtml(o.romaneio.nome)+')':'')+'</button>':'')+'<button class="fab-act ghost" onclick="event.stopPropagation();peCorrigirEnvio(\''+fid+'\',\''+o.id+'\')">&#9998; corrigir envio</button></div></div></details>';}).join('')+(envs.length>3?'<button class="fab-vermais" onclick="peVerMais(\'hist\')">'+(_peVerMaisHist?'ver menos':'ver mais ('+(envs.length-3)+')')+'</button>':'')):'<div class="fab-vazio">Nada enviado ainda.</div>';
   var _etHTML=fabEtSecHTML();
+  var _uaTs=Math.max((cache.atualizadoEm||0),(cache.lorettoEm||0));
+  var _uaTxt=_uaTs?('Última atualização · '+fmtData(_uaTs)+' '+(function(){var _d=new Date(_uaTs);return ('0'+_d.getHours()).slice(-2)+':'+('0'+_d.getMinutes()).slice(-2);})()):'Sem alterações ainda';
   var _estoquePane=
     '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><span class="fab-sech-btns"><button class="btn fab-prod-top" onclick="peProduzirAbrir(\''+fid+'\')">Produzir</button><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></span></div>'+pedHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Em produção'+(atrasados?' <span class="fab-atraso-cnt">&#9888; '+atrasados+' em atraso</span>':'')+'</div>'+emProdHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
-    '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">Salva sozinho &middot; preencha que salva automaticamente</span></div>':'')+'</div>'+
+    '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">'+_uaTxt+'</span></div>':'')+'</div>'+
     totalGeral;
   var _tabnav=_etHTML?('<div class="fab-subnav"><button class="fab-tab'+(_fabTab==='estoque'?' on':'')+'" data-tab="estoque" onclick="fabSetTab(\'estoque\')">Pronta-entrega</button><button class="fab-tab'+(_fabTab==='etiquetas'?' on':'')+'" data-tab="etiquetas" onclick="fabSetTab(\'etiquetas\')">Etiquetas</button></div>'):'';
   var _estOn=(!_etHTML||_fabTab==='estoque');
@@ -5584,7 +5586,7 @@ function peOferecerAutofill(itens){
 window.peEnvCap=function(inp){
   var mx=parseInt(inp.getAttribute('data-max'));if(isNaN(mx))return;
   var v=parseInt(inp.value);if(isNaN(v))return;
-  if(v>mx){inp.value=mx<0?0:mx;var c=inp.closest?inp.closest('.pe-envcell'):null;if(c){c.classList.add('over');setTimeout(function(){if(c)c.classList.remove('over');},800);}toast('M\u00e1ximo em estoque: '+mx+' \u2014 se tem mais, suba o romaneio que ele destrava.');}
+  if(v>mx){inp.value=mx<0?0:mx;var c=inp.closest?inp.closest('.pe-envcell'):null;if(c){c.classList.add('over');setTimeout(function(){if(c)c.classList.remove('over');},800);}toast('M\u00e1ximo em estoque: '+mx+' pares');}
 };
 window.peVerRomaneio=function(ref){if(!_db){toast('Sem conex\u00e3o');return;}_db.collection('ls_pe_romaneios').doc(ref).get().then(function(s){if(!s.exists){toast('Romaneio n\u00e3o encontrado');return;}var d=s.data();var w=window.open('','_blank');if(!w){toast('Permita pop-up para ver o romaneio');return;}if(d.tipo==='img'){w.document.write('<title>'+(d.nome||'Romaneio')+'</title><img src="'+d.data+'" style="max-width:100%">');}else{w.document.write('<title>'+(d.nome||'Romaneio')+'</title><iframe src="'+d.data+'" style="border:0;width:100%;height:100vh"></iframe>');}w.document.close();}).catch(function(){toast('Erro ao abrir romaneio');});};
 function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';}var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='none';_peEnvio={fid:null,oid:null,avulso:false};_peEnvioRomaneio=null;_peEditEnvio=null;}
@@ -5607,7 +5609,7 @@ function peEnvioAbrir(fid,oid){
   var rows=Object.keys(groups).map(function(g){var p=g.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');
     var cells=groups[g].sort(function(a,b){return parseFloat(a.tam)-parseFloat(b.tam);}).map(function(c){var sk=p[0]+'|'+p[1]+'|'+c.tam;var emEst=parseInt(est[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(c.tam)+'</label><div class="pe-envped">pediu '+c.ped+'</div><input type="number" min="0" max="'+emEst+'" data-max="'+emEst+'" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value="'+Math.min(c.ped,emEst)+'" oninput="peEnvCap(this)"><div class="pe-envest">tem '+emEst+'</div></div>';}).join('');
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';}).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Não dá pra passar do que tem em estoque — se tiver mais, <b>suba o romaneio</b> que ele destrava e corrige o estoque. Ao confirmar, baixa do estoque e vai pro romaneio da conferencia.</p>'+rows+peRomaneioCampo();
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Ao confirmar, baixa do estoque e vai pro romaneio da conferencia.</p>'+rows+peRomaneioCampo();
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';ok.onclick=function(){peConfirmarEnvio();};}
   var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='';
   document.getElementById('peEnvioModal').classList.remove('hide');
@@ -5690,7 +5692,7 @@ function peEnvioAvulsoAbrir(fid){
       return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
     }).join('');
   }).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Enviar avulso (sem pedido)</div><p class="pe-metahint">Preencha quanto voc\u00ea est\u00e1 mandando de cada numera\u00e7\u00e3o. N\u00e3o d\u00e1 pra passar do estoque \u2014 se tiver mais, <b>suba o romaneio</b> que ele destrava. Baixa do seu estoque e vai pro recebimento da loja.</p>'+rows+peRomaneioCampo();
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Enviar avulso (sem pedido)</div><p class="pe-metahint">Preencha quanto voc\u00ea est\u00e1 mandando de cada numera\u00e7\u00e3o. Baixa do seu estoque e vai pro recebimento da loja.</p>'+rows+peRomaneioCampo();
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';ok.onclick=function(){peConfirmarEnvio();};}
   var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='';
   document.getElementById('peEnvioModal').classList.remove('hide');
