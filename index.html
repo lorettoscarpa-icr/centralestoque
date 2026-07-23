@@ -8022,6 +8022,11 @@ async function romGerarXlsx(){
   var ULT=13; // A..M
   var CAB=['MODELO','COR'].concat(ROM_TAMS.map(String)).concat(['TOTAL','VALOR DO PAR','VALOR TOTAL']);
   function merge(r,c1,c2){ws.mergeCells(r,c1,r,c2);}
+  // Topo enxuto (só isto fica congelado): título, fábrica, dica de 1 linha, TOTAL e cabeçalho.
+  // O passo a passo e o exemplo vão PARA BAIXO da tabela, pra não ocupar a tela em monitor pequeno.
+  // Como a planilha é protegida (células cinzas travadas), o Excel não estica a tabela sozinho —
+  // por isso já deixamos MUITAS linhas prontas (NLIN).
+  var TR=6, HDR=7, LIN0=8, NLIN=80, LINF=LIN0+NLIN-1, FIM=LINF;
 
   merge(1,1,ULT);
   var t=ws.getCell('A1'); t.value='ROMANEIO DE ENTREGA';
@@ -8058,66 +8063,24 @@ async function romGerarXlsx(){
   d2.dataValidation.formulae=[new Date(2020,0,1),new Date(2040,11,31)];
   ws.getRow(4).height=20;
 
-  merge(6,1,ULT);
-  var ih=ws.getCell('A6'); ih.value='COMO PREENCHER  (é rapidinho, só 3 passos)';
-  ih.font={name:'Arial',size:12,bold:true,color:{argb:CREME}}; ih.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF5A7A3A'}};
-  ih.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(6).height=22;
-  var INS=[
-    '1)  Nas colunas MODELO e COR:  clique na célula, aparece uma seta  ▼  do lado.  Clique nela e escolha da lista.',
-    '2)  Nas numerações (37 a 44):  digite quantos pares está mandando.  O que não tiver, deixe em branco.',
-    '3)  Pronto.  O VALOR DO PAR aparece sozinho e as contas são automáticas — não precisa somar nada.',
-    '     Se precisar de mais linhas:  digite na primeira linha vazia embaixo da tabela.  Ela entra sozinha, já pronta.'
-  ];
-  INS.forEach(function(txt,i){
-    var r=7+i; merge(r,1,ULT); var c=ws.getCell('A'+r); c.value=txt;
-    c.font={name:'Arial',size:11}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDFCF5'}};
-    c.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(r).height=19;
-  });
-  merge(11,1,ULT); var av=ws.getCell('A11');
-  av.value='Os campos em AMARELO são os que você preenche.';
-  av.font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
-  av.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDFCF5'}}; av.alignment={horizontal:'left',vertical:'middle'};
-  ws.getRow(11).height=19;
+  // dica curtinha numa linha só (o passo a passo e o exemplo ficam embaixo da tabela)
+  merge(5,1,ULT); var hint=ws.getCell('A5');
+  hint.value='Preencha só os campos AMARELOS.  MODELO e COR: clique na seta ▼ e escolha da lista.  Numerações (37 a 44): digite os pares.  As contas são automáticas.  (Passo a passo e exemplo embaixo da tabela.)';
+  hint.font={name:'Arial',size:10,bold:true,color:{argb:VERDE}}; hint.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDFCF5'}};
+  hint.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(5).height=18;
 
-  // exemplo fora da tabela (nada pra apagar depois)
-  merge(12,1,ULT); var ex=ws.getCell('A12');
-  ex.value='EXEMPLO de uma linha preenchida  (é só pra você ver como fica — não precisa mexer):';
-  ex.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}}; ex.alignment={horizontal:'left'};
-  CAB.forEach(function(h,j){
-    var c=ws.getCell(13,j+1); c.value=h;
-    c.font={name:'Arial',size:9,bold:true,color:{argb:CINZA}}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:CINZA_BG}};
-    c.alignment={horizontal:'center',vertical:'middle'};
-    c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
-  });
-  var m0=mods[0], c0=(m0.cores||[])[0], cu0=romPrecoFinal(m0)||135;
-  var EX=[m0.nome,(c0&&c0.nome)||'—',1,2,5,6,6,3,2,null,25,cu0,25*cu0];
-  EX.forEach(function(v,j){
-    var c=ws.getCell(14,j+1); if(v!==null)c.value=v;
-    c.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:CINZA_BG}};
-    c.alignment={horizontal:(j<2?'left':'center'),vertical:'middle'};
-    c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
-    if(j===11||j===12)c.numFmt='#,##0.00';
-  });
-  ws.getRow(14).height=18;
-
-  merge(15,1,ULT); var pa=ws.getCell('A15'); pa.value='PREENCHA AQUI  ▼   (precisa de mais linhas? é só digitar na primeira linha vazia logo abaixo da tabela — ela entra sozinha)';
-  pa.font={name:'Arial',size:11,bold:true,color:{argb:VERDE}}; pa.alignment={horizontal:'left',vertical:'middle'};
-  ws.getRow(15).height=22;
-
-  // TOTAL fica ACIMA do cabecalho de proposito: assim nada bloqueia a tabela de crescer
-  // pra baixo (o Excel so estende a tabela se a linha seguinte estiver vazia).
-  var TR=16, FIM=500;   // faixa generosa: cobre o crescimento da tabela
+  // TOTAL fica ACIMA do cabeçalho (linha 6), cabeçalho na 7
   ws.mergeCells(TR,1,TR,2); var tt=ws.getCell(TR,1); tt.value='TOTAL';
   tt.font={name:'Arial',size:12,bold:true,color:{argb:VERDE}}; tt.alignment={horizontal:'left',vertical:'middle'};
   for(var j=3;j<=10;j++){
     var col=String.fromCharCode(64+j);
-    var c=ws.getCell(TR,j); c.value={formula:'SUM('+col+'18:'+col+FIM+')'};
+    var c=ws.getCell(TR,j); c.value={formula:'SUM('+col+LIN0+':'+col+FIM+')'};
     c.font={name:'Arial',size:12,bold:true,color:{argb:VERDE}}; c.alignment={horizontal:'center',vertical:'middle'};
   }
-  var kc=ws.getCell(TR,11); kc.value={formula:'SUM(K18:K'+FIM+')'};
+  var kc=ws.getCell(TR,11); kc.value={formula:'SUM(K'+LIN0+':K'+FIM+')'};
   kc.font={name:'Arial',size:12,bold:true,color:{argb:'FFFFFFFF'}}; kc.fill={type:'pattern',pattern:'solid',fgColor:{argb:VERDE}};
   kc.alignment={horizontal:'center',vertical:'middle'};
-  var mc=ws.getCell(TR,13); mc.value={formula:'SUM(M18:M'+FIM+')'};
+  var mc=ws.getCell(TR,13); mc.value={formula:'SUM(M'+LIN0+':M'+FIM+')'};
   mc.font={name:'Arial',size:12,bold:true,color:{argb:'FFFFFFFF'}}; mc.fill={type:'pattern',pattern:'solid',fgColor:{argb:VERDE}};
   mc.numFmt='#,##0.00'; mc.alignment={horizontal:'center',vertical:'middle'};
   for(var j=1;j<=ULT;j++){
@@ -8125,11 +8088,8 @@ async function romGerarXlsx(){
     c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'medium',color:{argb:VERDE}},right:{style:'thin'}};
     if(j!==11&&j!==13)c.fill={type:'pattern',pattern:'solid',fgColor:{argb:OURO}};
   }
-  ws.getRow(TR).height=26;
+  ws.getRow(TR).height=24;
 
-  var HDR=17, LIN0=18, NLIN=40, LINF=LIN0+NLIN-1;
-  // TABELA do Excel: quando a fabrica digitar na linha logo abaixo, o Excel cria a linha
-  // sozinho ja com formula, lista e cor. Sem macro, sem botao, sem aviso de seguranca.
   ws.addTable({
     name:'ROMANEIO_'+String(fid).replace(/[^a-zA-Z0-9]/g,''),
     ref:'A'+HDR, headerRow:true, totalsRow:false,
@@ -8165,13 +8125,49 @@ async function romGerarXlsx(){
     ws.getCell(r,13).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
   }
 
-  ws.mergeCells(LINF+2,1,LINF+2,ULT);
-  var fo=ws.getCell(LINF+2,1); fo.value='Qualquer dúvida é só chamar a Loretto Scarpa. Obrigado!';
+  // ---- passo a passo + exemplo: EMBAIXO da tabela (fora da área congelada) ----
+  var GB=LINF+3;
+  merge(GB,1,ULT);
+  var ih=ws.getCell(GB,1); ih.value='COMO PREENCHER  (é rapidinho, só 3 passos)';
+  ih.font={name:'Arial',size:12,bold:true,color:{argb:CREME}}; ih.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF5A7A3A'}};
+  ih.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(GB).height=22;
+  var INS=[
+    '1)  Nas colunas MODELO e COR:  clique na célula, aparece uma seta  ▼  do lado.  Clique nela e escolha da lista.',
+    '2)  Nas numerações (37 a 44):  digite quantos pares está mandando.  O que não tiver, deixe em branco.',
+    '3)  Pronto.  O VALOR DO PAR aparece sozinho e as contas são automáticas — não precisa somar nada.',
+    'Já deixamos '+NLIN+' linhas prontas na tabela — é só ir preenchendo de cima pra baixo, tem espaço de sobra.'
+  ];
+  INS.forEach(function(txt,i){
+    var r=GB+1+i; merge(r,1,ULT); var c=ws.getCell(r,1); c.value=txt;
+    c.font={name:'Arial',size:11}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDFCF5'}};
+    c.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(r).height=19;
+  });
+  var exN=GB+1+INS.length+1;
+  merge(exN,1,ULT); var ex=ws.getCell(exN,1);
+  ex.value='EXEMPLO de uma linha preenchida  (é só pra ver como fica — não precisa mexer):';
+  ex.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}}; ex.alignment={horizontal:'left'};
+  CAB.forEach(function(h,j){
+    var c=ws.getCell(exN+1,j+1); c.value=h;
+    c.font={name:'Arial',size:9,bold:true,color:{argb:CINZA}}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:CINZA_BG}};
+    c.alignment={horizontal:'center',vertical:'middle'};
+    c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
+  });
+  var m0=mods[0], c0=(m0.cores||[])[0], cu0=romPrecoFinal(m0)||135;
+  var EX=[m0.nome,(c0&&c0.nome)||'—',1,2,5,6,6,3,2,null,25,cu0,25*cu0];
+  EX.forEach(function(v,j){
+    var c=ws.getCell(exN+2,j+1); if(v!==null)c.value=v;
+    c.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:CINZA_BG}};
+    c.alignment={horizontal:(j<2?'left':'center'),vertical:'middle'};
+    c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
+    if(j===11||j===12)c.numFmt='#,##0.00';
+  });
+  ws.getRow(exN+2).height=18;
+  var foR=exN+4; merge(foR,1,ULT); var fo=ws.getCell(foR,1);
+  fo.value='Qualquer dúvida é só chamar a Loretto Scarpa. Obrigado!';
   fo.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}};
+  var ultLinha=foR;
 
-  /* ---- listas suspensas + trava de quantidade ----
-     Aplicadas ate a linha FIM (bem alem das 15 visiveis): assim, quando a fabrica digitar
-     na linha de baixo e o Excel esticar a tabela, a linha nova ja nasce com lista e trava. */
+  /* ---- listas suspensas + trava de quantidade em todas as linhas prontas ---- */
   for(var r=LIN0;r<=FIM;r++){
     ws.getCell(r,1).dataValidation={type:'list',allowBlank:true,formulae:['=LISTAS!$A$2:$A$'+nMod],
       showErrorMessage:true,errorTitle:'Modelo',error:'Clique na seta e escolha um modelo da lista.'};
@@ -8208,7 +8204,7 @@ async function romGerarXlsx(){
   ws.views=[{state:'frozen',ySplit:HDR}];
   ws.pageSetup={orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,paperSize:9,
                 margins:{left:0.3,right:0.3,top:0.4,bottom:0.4,header:0,footer:0}};
-  ws.printArea='A1:M'+(LINF+2);
+  ws.printArea='A1:M'+ultLinha;
 
   var buf=await wb.xlsx.writeBuffer();
   var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
