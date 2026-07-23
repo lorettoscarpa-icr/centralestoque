@@ -1189,7 +1189,11 @@
   .pe-envrow:first-child{border-top:none}
   .pe-envmc{font-weight:600;color:var(--areia);margin-bottom:8px}
   .pe-envgrid{display:flex;gap:8px;flex-wrap:wrap}
-  .pe-envcell{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:var(--r-sm);padding:6px 7px}
+  .pe-envcell{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:var(--r-sm);padding:6px 7px;transition:border-color .15s,background .15s}
+  .pe-envcell.over{border-color:var(--perigo);background:rgba(229,115,115,.14);animation:peShake .25s}
+  @keyframes peShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+  .pe-envcell.rom-over{border-color:var(--alerta);background:rgba(240,180,41,.12)}
+  .pe-envcell.rom-over .pe-envest{color:var(--alerta)}
   .pe-envcell label{font-size:var(--fs-sm);color:var(--ouro);font-family:'DM Mono',monospace;font-weight:600}
   .pe-envped{font-size:var(--fs-micro);color:rgba(251,249,238,.5)}
   .pe-envest{font-size:var(--fs-micro);color:rgba(251,249,238,.5)}
@@ -5574,9 +5578,14 @@ function peOferecerAutofill(itens){
   if(!alvos){toast('Romaneio lido, mas nenhuma refer\u00eancia bateu com os modelos da pronta-entrega');return;}
   var msg='Preencher a grade com base no romaneio?\n\n'+recon+' de '+totalRom+' pares do romaneio s\u00e3o de modelos da pronta-entrega ('+alvos+' numera\u00e7\u00e3o(\u00f5es)).\n\nIsso substitui os valores atuais da grade.';
   if(!window.confirm(msg))return;
-  var n=0;inputs.forEach(function(i){var k=i.getAttribute('data-k');if(fill[k]!=null){i.value=fill[k];n++;}else{i.value=0;}});
-  toast(n+' numera\u00e7\u00e3o(\u00f5es) preenchida(s) pelo romaneio');
+  var n=0,over=0;inputs.forEach(function(i){var k=i.getAttribute('data-k');var c=i.closest?i.closest('.pe-envcell'):null;if(c)c.classList.remove('rom-over');if(fill[k]!=null){i.value=fill[k];n++;var mx=parseInt(i.getAttribute('data-max'));if(!isNaN(mx)&&fill[k]>mx){over++;if(c)c.classList.add('rom-over');}}else{i.value=0;}});
+  toast(n+' numera\u00e7\u00e3o(\u00f5es) preenchida(s)'+(over?' \u00b7 '+over+' acima do estoque (estava desatualizado)':''));
 }
+window.peEnvCap=function(inp){
+  var mx=parseInt(inp.getAttribute('data-max'));if(isNaN(mx))return;
+  var v=parseInt(inp.value);if(isNaN(v))return;
+  if(v>mx){inp.value=mx<0?0:mx;var c=inp.closest?inp.closest('.pe-envcell'):null;if(c){c.classList.add('over');setTimeout(function(){if(c)c.classList.remove('over');},800);}toast('M\u00e1ximo em estoque: '+mx+' \u2014 se tem mais, suba o romaneio que ele destrava.');}
+};
 window.peVerRomaneio=function(ref){if(!_db){toast('Sem conex\u00e3o');return;}_db.collection('ls_pe_romaneios').doc(ref).get().then(function(s){if(!s.exists){toast('Romaneio n\u00e3o encontrado');return;}var d=s.data();var w=window.open('','_blank');if(!w){toast('Permita pop-up para ver o romaneio');return;}if(d.tipo==='img'){w.document.write('<title>'+(d.nome||'Romaneio')+'</title><img src="'+d.data+'" style="max-width:100%">');}else{w.document.write('<title>'+(d.nome||'Romaneio')+'</title><iframe src="'+d.data+'" style="border:0;width:100%;height:100vh"></iframe>');}w.document.close();}).catch(function(){toast('Erro ao abrir romaneio');});};
 function peEnvioFechar(){var m=document.getElementById('peEnvioModal');if(m)m.classList.add('hide');var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';}var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='none';_peEnvio={fid:null,oid:null,avulso:false};_peEnvioRomaneio=null;_peEditEnvio=null;}
 function peEnvioSelecionar(fid){
@@ -5596,9 +5605,9 @@ function peEnvioAbrir(fid,oid){
   var est=cache.estoque||{};
   var groups={};Object.keys(o.grade||{}).forEach(function(k){var p=k.split('|');var g=p[0]+'|'+p[1];(groups[g]=groups[g]||[]).push({tam:p[2],ped:o.grade[k]});});
   var rows=Object.keys(groups).map(function(g){var p=g.split('|');var _rf=(typeof repRefDe==='function')?repRefDe(p[0],p[1]):'';var mc=(nome[p[0]]||p[0])+(p[1]?' '+p[1]:'')+(_rf?' \u00b7 ref '+_rf:'');
-    var cells=groups[g].sort(function(a,b){return parseFloat(a.tam)-parseFloat(b.tam);}).map(function(c){var sk=p[0]+'|'+p[1]+'|'+c.tam;var emEst=parseInt(est[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(c.tam)+'</label><div class="pe-envped">pediu '+c.ped+'</div><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value="'+c.ped+'"><div class="pe-envest">tem '+emEst+'</div></div>';}).join('');
+    var cells=groups[g].sort(function(a,b){return parseFloat(a.tam)-parseFloat(b.tam);}).map(function(c){var sk=p[0]+'|'+p[1]+'|'+c.tam;var emEst=parseInt(est[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(c.tam)+'</label><div class="pe-envped">pediu '+c.ped+'</div><input type="number" min="0" max="'+emEst+'" data-max="'+emEst+'" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value="'+Math.min(c.ped,emEst)+'" oninput="peEnvCap(this)"><div class="pe-envest">tem '+emEst+'</div></div>';}).join('');
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';}).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Ao confirmar, baixa do estoque da pronta-entrega e vai pro romaneio da conferencia.</p>'+rows+peRomaneioCampo();
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Confirmar envio &mdash; o que a fabrica mandou</div><p class="pe-metahint">Edite cada numeracao para o que <b>realmente foi enviado</b>. Não dá pra passar do que tem em estoque — se tiver mais, <b>suba o romaneio</b> que ele destrava e corrige o estoque. Ao confirmar, baixa do estoque e vai pro romaneio da conferencia.</p>'+rows+peRomaneioCampo();
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';ok.onclick=function(){peConfirmarEnvio();};}
   var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='';
   document.getElementById('peEnvioModal').classList.remove('hide');
@@ -5677,11 +5686,11 @@ function peEnvioAvulsoAbrir(fid){
     return m.cores.map(function(co){
       var _rf=(typeof repRefDe==='function')?repRefDe(m.id,co.nome):'';
       var mc=m.nome+(co.nome?' '+co.nome:'')+(_rf?' \u00b7 ref '+_rf:'');
-      var cells=co.tams.slice().sort(function(a,b){return parseFloat(a)-parseFloat(b);}).map(function(t){var sk=m.id+'|'+co.nome+'|'+t;var emEst=parseInt(est[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(t)+'</label><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value=""><div class="pe-envest">tem '+emEst+'</div></div>';}).join('');
+      var cells=co.tams.slice().sort(function(a,b){return parseFloat(a)-parseFloat(b);}).map(function(t){var sk=m.id+'|'+co.nome+'|'+t;var emEst=parseInt(est[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(t)+'</label><input type="number" min="0" max="'+emEst+'" data-max="'+emEst+'" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value="" oninput="peEnvCap(this)"><div class="pe-envest">tem '+emEst+'</div></div>';}).join('');
       return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
     }).join('');
   }).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Enviar avulso (sem pedido)</div><p class="pe-metahint">Preencha quanto voc\u00ea est\u00e1 mandando de cada numera\u00e7\u00e3o. Baixa do seu estoque e vai pro recebimento da loja.</p>'+rows+peRomaneioCampo();
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Enviar avulso (sem pedido)</div><p class="pe-metahint">Preencha quanto voc\u00ea est\u00e1 mandando de cada numera\u00e7\u00e3o. N\u00e3o d\u00e1 pra passar do estoque \u2014 se tiver mais, <b>suba o romaneio</b> que ele destrava. Baixa do seu estoque e vai pro recebimento da loja.</p>'+rows+peRomaneioCampo();
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar envio';ok.onclick=function(){peConfirmarEnvio();};}
   var _eb=document.getElementById('peEnvioEtiqBtn');if(_eb)_eb.style.display='';
   document.getElementById('peEnvioModal').classList.remove('hide');
