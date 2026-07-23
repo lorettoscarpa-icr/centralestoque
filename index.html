@@ -959,8 +959,8 @@
   .fab-hist>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;margin:0}
   .fab-hist>summary::-webkit-details-marker{display:none}
   .fab-histl{display:flex;align-items:center;gap:6px;font-size:var(--fs-base)}
-  .fab-histl::before{content:'\25B8';color:var(--ouro);display:inline-block;transition:transform .15s;font-size:var(--fs-mini)}
-  .fab-hist[open]>summary .fab-histl::before{transform:rotate(90deg)}
+  .fab-histl::before{content:'';display:inline-block;width:.5em;height:.5em;border:solid var(--ouro);border-width:0 .12em .12em 0;transform:rotate(-45deg);transition:transform .15s;box-sizing:border-box;flex-shrink:0}
+  .fab-hist[open]>summary .fab-histl::before{transform:rotate(45deg)}
   .fab-histtot{color:var(--ouro);font-family:'DM Mono',monospace;font-size:var(--fs-sm);white-space:nowrap}
   .fab-histby{font-size:var(--fs-sm);color:var(--ouro-claro);opacity:.8;font-weight:400}
   .fab-hist-ped{border-left-color:var(--ouro)}
@@ -1203,8 +1203,8 @@
   .pe-envdet>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;list-style:none;cursor:pointer;padding:11px 12px}
   .pe-envdet>summary::-webkit-details-marker{display:none}
   .pe-envsum-l{display:flex;align-items:center;gap:8px;min-width:0}
-  .pe-envsum-l::before{content:'\25B8';color:var(--ouro);font-size:var(--fs-mini);transition:transform .15s;flex-shrink:0}
-  .pe-envdet[open]>summary .pe-envsum-l::before{transform:rotate(90deg)}
+  .pe-envsum-l::before{content:'';display:inline-block;width:.5em;height:.5em;border:solid var(--ouro);border-width:0 .12em .12em 0;transform:rotate(-45deg);transition:transform .15s;box-sizing:border-box;flex-shrink:0}
+  .pe-envdet[open]>summary .pe-envsum-l::before{transform:rotate(45deg)}
   .pe-envsum-l b{font-family:'Barlow',sans-serif;font-size:var(--fs-base);color:var(--areia);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pe-envsum-by{font-size:var(--fs-sm);color:var(--ouro-claro);opacity:.8;white-space:nowrap}
   .pe-envsum-r{font-family:'DM Mono',monospace;font-size:var(--fs-sm);color:var(--ouro);white-space:nowrap;flex-shrink:0}
