@@ -8202,13 +8202,44 @@ var FEC_RE_B2B=/^(\w+)_(\d{2})_\s*([A-ZÀ-Ú][\w À-Ú]*?)\s+(.+?)\s+(\d{5,})\s+
    Robusto a produtos que quebram em varias linhas (o parser antigo, por linha,
    perdia esses — dava a impressao de "so a primeira pagina"). */
 function romaneioItensPDF(txt){
+  var a=romaneioIdworks(txt);
+  if(a.length)return a;
+  return romaneioBling(txt);          // Bling "Pedido de Venda" (grade "qtd - tam")
+}
+// idworks/B2B "Saudável": uma linha por par. Ref pode ter 3 a 6 dígitos; a cor às vezes
+// vem cortada em 1 letra quando o PDF quebra a linha (ex.: "- 37 - C" = Castor) — por isso o +.
+function romaneioIdworks(txt){
   var flat=(txt||'').replace(/\n/g,' ').replace(/\s+/g,' ');
-  var RE=/(\d{4,5})(?:[_\s][A-Za-zÀ-Ú0-9]*)*?\s+([A-ZÀ-Ú][A-ZÀ-Úa-z0-9 ]+?)\s*-\s*(\d{2})\s*-\s*([A-ZÀ-Úa-zÉé]{2,})\s+(\d{6,})\s+Saud[aá]vel\s+(\d+)\s+([\d.,]+)\s+([\d.,]+)/g;
+  var RE=/(\d{3,6})(?:[_\s][A-Za-zÀ-Ú0-9]*)*?\s+([A-ZÀ-Ú][A-ZÀ-Úa-z0-9 ]+?)\s*-\s*(\d{2})\s*-\s*([A-ZÀ-Úa-zÉé]+)\s+(\d{6,})\s+Saud[aá]vel\s+(\d+)\s+([\d.,]+)\s+([\d.,]+)/g;
   var m,out=[];
   while((m=RE.exec(flat))){
     var nome=m[2].replace(/^.*?([A-ZÀ-Ú]{3,}(?: [A-ZÀ-Ú]{2,})*)$/,'$1').trim();
-    out.push({cod:m[1],ref:m[1],nome:nome,tam:m[3],cor:(m[4]||'').trim(),qtd:parseInt(m[6])||0,valorUn:fecNum(m[7])});
+    out.push({cod:m[1],ref:m[1],nome:nome||m[2].trim(),tam:m[3],cor:(m[4]||'').trim(),qtd:parseInt(m[6])||0,valorUn:fecNum(m[7])});
   }
+  return out;
+}
+// Bling "Pedido de Venda": bloco "PL <ref> <modelo> [cor]" + grade "qtd - tam" + linha "PAR ..." + a cor sozinha embaixo.
+function _blingLimpaNome(rest,cor){var toks=String(rest).trim().split(/\s+/),c=(cor||'').toUpperCase();while(toks.length>1){var last=toks[toks.length-1].toUpperCase();if(last.length>=2&&c.indexOf(last)===0)toks.pop();else break;}return toks.join(' ');}
+function romaneioBling(txt){
+  var lines=(txt||'').split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  var out=[],cur=null,st='';
+  function flush(){
+    if(cur&&cur.cor){(cur.gbuf.match(/(\d+)\s*-\s*(3[0-9]|4[0-9])/g)||[]).forEach(function(p){
+      var mm=p.match(/(\d+)\s*-\s*(\d{2})/);
+      out.push({cod:cur.ref,ref:cur.ref,nome:_blingLimpaNome(cur.rest,cur.cor),tam:mm[2],cor:cur.cor,qtd:parseInt(mm[1])||0,valorUn:cur.unit});
+    });}
+    cur=null;st='';
+  }
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i], mPL=l.match(/^PL\s+(\d+)\s+(.+)$/);
+    if(mPL){flush();cur={ref:mPL[1],rest:mPL[2],gbuf:'',unit:0,cor:''};st='grade';continue;}
+    if(!cur)continue;
+    var mPAR=l.match(/^PAR\b.*?([\d.]+,\d{2})\s+([\d.]+,\d{2})\s*$/);
+    if(mPAR){cur.unit=fecNum(mPAR[1]);st='cor';continue;}
+    if(st==='grade'){cur.gbuf+=' '+l;continue;}
+    if(st==='cor'){if(/^[A-ZÀ-ÚÉÊÁÂÃÔÕÇ]{2,}$/.test(l)){cur.cor=l;flush();}continue;}
+  }
+  flush();
   return out;
 }
 async function fecLerFabPdf(file){
@@ -8220,11 +8251,13 @@ async function fecLerFabPdf(file){
     var m;
     if((m=l.match(/Pedido\s*:\s*([\w\s]+?)\s*$/)))pedido=m[1].replace(/\s+/g,'');
     if(/^Conta\b/.test(l)&&linhas[idx+1])conta=(linhas[idx+1].split(' ')[0]||'').trim();
-    // rodape: "90 10.800,00"
+    // rodape idworks: "90 10.800,00"
     if((m=l.match(/^(\d+)\s+([\d.]+,\d{2})$/)))decl={qtd:parseInt(m[1]),valor:fecNum(m[2])};
+    // rodape Bling: "Soma das Qtdes 93,00"
+    if((m=l.match(/Soma das Qtdes\s+([\d.]+)/)))decl={qtd:parseInt(m[1].replace(/\./g,'')),valor:(decl&&decl.valor)||0};
   });
   var itens=romaneioItensPDF(txt);
-  if(!itens.length)throw new Error('não reconheci esse PDF. Formatos aceitos hoje: a nossa planilha (.xlsx) ou o romaneio B2B/idworks (tipo o da TCHWM).');
+  if(!itens.length)throw new Error('não reconheci esse PDF. Formatos aceitos hoje: a nossa planilha (.xlsx), o romaneio B2B/idworks (tipo o da TCHWM) ou o Pedido de Venda do Bling.');
   var soma=itens.reduce(function(s,i){return s+i.qtd;},0);
   return {nome:file.name, fab:conta||pedido||file.name, fabKey:normKey(conta||file.name),
           pedido:pedido, itens:itens, decl:decl, precisaDP:true,
