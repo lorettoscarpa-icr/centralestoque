@@ -7822,10 +7822,15 @@ var ROM_TAMS=[37,38,39,40,41,42,43,44];
 function romColLetra(n){var s='';while(n>0){var m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=(n-m-1)/26;}return s;}
 
 function romCat(){
-  var out=[],seen={};
-  function add(arr){(arr||[]).forEach(function(m){if(m&&m.id&&!seen[m.id]){seen[m.id]=1;out.push(m);}});}
-  try{ add(window.LS_catalogo?window.LS_catalogo():[]); }catch(e){}
-  try{ if(typeof repCatalogo!=='undefined'&&repCatalogo)add(repCatalogo); }catch(e){}
+  var out=[],byName={};
+  function add(arr){(arr||[]).forEach(function(m){
+    if(!m||!m.id)return;
+    var key=(m.nome||'').trim().toLowerCase();
+    if(key&&byName[key]!=null){ out[byName[key]]=m; return; }   // mesmo nome: a fonte que vem depois vence (reposicao)
+    byName[key]=out.length; out.push(m);
+  });}
+  try{ add(window.LS_catalogo?window.LS_catalogo():[]); }catch(e){}                       // loja primeiro
+  try{ if(typeof repCatalogo!=='undefined'&&repCatalogo)add(repCatalogo); }catch(e){}      // reposicao sobrescreve (id que a marcacao usa)
   return out;
 }
 function romFabs(){try{return (window.LS_fornecedores?window.LS_fornecedores():[])||[];}catch(e){return [];}}
@@ -7945,6 +7950,9 @@ async function romGerarXlsx(){
   lz.getCell('B'+(mods.length+3)).value='Loretto: esta aba alimenta as listas. A fábrica não precisa mexer aqui.';
   lz.getCell('B'+(mods.length+3)).font={name:'Arial',size:9,italic:true,color:{argb:CINZA}};
   lz.getColumn(1).width=30; lz.getColumn(2).width=14;
+  // aba de apoio: fica escondida e travada, pra fabrica nao mexer sem querer
+  try{ await lz.protect('',{selectLockedCells:true,selectUnlockedCells:false}); }catch(e){ try{lz.protect();}catch(_e){} }
+  lz.state='hidden';
 
   /* ---- ROMANEIO ---- */
   var ULT=13; // A..M
@@ -8055,7 +8063,7 @@ async function romGerarXlsx(){
   }
   ws.getRow(TR).height=26;
 
-  var HDR=17, LIN0=18, NLIN=15, LINF=LIN0+NLIN-1;
+  var HDR=17, LIN0=18, NLIN=40, LINF=LIN0+NLIN-1;
   // TABELA do Excel: quando a fabrica digitar na linha logo abaixo, o Excel cria a linha
   // sozinho ja com formula, lista e cor. Sem macro, sem botao, sem aviso de seguranca.
   ws.addTable({
@@ -8113,6 +8121,22 @@ async function romGerarXlsx(){
         showErrorMessage:true,errorTitle:'Quantidade',error:'Digite apenas o número de pares (ex.: 5).'};
     }
   }
+
+  /* ---- travar as partes cinzas / soltar só o que a fábrica preenche ----
+     Só as colunas 1..10 (modelo, cor e numerações) ficam liberadas nas linhas
+     da tabela. Todo o resto (títulos, exemplo, VALOR DO PAR, totais, contas)
+     fica travado — não dá pra apagar sem querer. Com selectLockedCells:false,
+     o Tab pula sozinho de célula em célula e, no fim da linha, vai pra próxima
+     linha vazia: "continua automaticamente" sem precisar clicar. */
+  for(var r=LIN0;r<=FIM;r++){
+    for(var j=1;j<=10;j++)ws.getCell(r,j).protection={locked:false};
+  }
+  try{
+    await ws.protect('',{selectLockedCells:false,selectUnlockedCells:true,
+      formatCells:false,formatColumns:false,formatRows:false,
+      insertRows:true,insertColumns:false,deleteRows:false,deleteColumns:false,
+      sort:true,autoFilter:false,pivotTables:false});
+  }catch(e){ try{ws.protect();}catch(_e){} }
 
   ws.getColumn(1).width=24; ws.getColumn(2).width=22;
   for(var j=3;j<=10;j++)ws.getColumn(j).width=6.5;
