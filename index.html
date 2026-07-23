@@ -1142,6 +1142,21 @@
   .pe-histbox{margin:10px 0;font-size:var(--fs-sm);color:var(--areia);opacity:.85}
   .pe-histbox b{color:var(--ouro-claro);font-size:var(--fs-sm);display:block;margin-bottom:3px}
   .pe-hist{font-family:'DM Mono',monospace;font-size:var(--fs-mini);padding:1px 0;opacity:.85}
+  /* histórico global de alterações (lista de fábricas) */
+  .pe-histglob{margin-top:18px;border:1px solid var(--linha);border-radius:var(--r-md);background:rgba(0,0,0,.16);overflow:hidden}
+  .pe-histglob>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:12px 15px;font-weight:600;color:var(--ouro-claro);user-select:none}
+  .pe-histglob>summary::-webkit-details-marker{display:none}
+  .pe-histglob>summary:hover{background:rgba(220,189,96,.06)}
+  .pe-hcount{font-family:'DM Mono',monospace;font-size:var(--fs-mini);background:rgba(220,189,96,.16);color:var(--ouro-claro);border-radius:999px;padding:2px 9px}
+  .pe-htbl{max-height:340px;overflow:auto;border-top:1px solid var(--linha)}
+  .pe-hrow{display:grid;grid-template-columns:82px 110px 1fr 2.2fr;gap:10px;align-items:baseline;padding:7px 15px;border-bottom:1px solid rgba(255,255,255,.05);font-size:var(--fs-mini)}
+  .pe-hrow.pe-hhead{position:sticky;top:0;background:#243318;color:var(--ouro);text-transform:uppercase;letter-spacing:.05em;font-family:'DM Mono',monospace;z-index:1}
+  .pe-hwhen{font-family:'DM Mono',monospace;color:rgba(251,249,238,.6);white-space:nowrap}
+  .pe-hfab{font-weight:600;color:var(--areia)}
+  .pe-hwho{color:var(--ouro-claro)}
+  .pe-hwhat{color:rgba(251,249,238,.82)}
+  .pe-hwhat b{font-family:'DM Mono',monospace;color:var(--areia)}
+  @media(max-width:620px){.pe-hrow{grid-template-columns:70px 1fr;gap:3px 8px}.pe-hrow .pe-hwho,.pe-hrow .pe-hwhat{grid-column:2}.pe-hhead .pe-hfab,.pe-hhead .pe-hwho,.pe-hhead .pe-hwhat{display:none}}
   .pe-mod-crit{border-color:rgba(224,90,60,.55)!important}
   .pe-critaviso{background:rgba(192,73,43,.2);border:1px solid rgba(224,90,60,.55);color:#ffb59c;border-radius:var(--r-sm);padding:7px 10px;font-size:var(--fs-sm);font-weight:700;margin:8px 0}
   .pe-cfg{display:flex;align-items:center;flex-wrap:wrap;gap:7px;background:rgba(0,0,0,.16);border:1px solid var(--linha);border-radius:var(--r-md);padding:11px 14px;margin-bottom:14px;font-size:var(--fs-base);color:var(--areia)}
@@ -4805,13 +4820,24 @@ function peFabAuto(fid){peFabStatus('saving');if(_fabSaveTimer)clearTimeout(_fab
 function peFabFlush(fid){if(_fabSaveTimer){clearTimeout(_fabSaveTimer);_fabSaveTimer=null;peFabSalvar(fid,true);}}
 function peStep(btn,delta,fid){var wrap=btn.closest&&btn.closest('.pe-step');if(!wrap)return;var inp=wrap.querySelector('input[data-fk]');if(!inp)return;var v=(parseInt(inp.value)||0)+delta;if(v<0)v=0;inp.value=v?v:'';try{peFabAuto(fid);}catch(e){}}
 window.peStep=peStep;
+/* ===== hist\u00f3rico de altera\u00e7\u00f5es: quem mexeu no qu\u00ea (loja e f\u00e1brica) ===== */
+function peFmtDataHora(ts){var d=new Date(ts||Date.now());var p=function(n){return ('0'+n).slice(-2);};return p(d.getDate())+'/'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes());}
+function peLabelKeyCurto(k){var p=String(k).split('|');var nome=p[0];try{var m=((typeof repCatalogo!=='undefined'&&repCatalogo)||[]).find(function(x){return x.id===p[0];});if(m)nome=m.nome;}catch(e){}return nome+(p[1]?' '+p[1]:'')+(p[2]?' '+p[2]:'');}
+function peDiffMapas(ant,nov){var out=[],ks={};Object.keys(ant||{}).forEach(function(k){ks[k]=1;});Object.keys(nov||{}).forEach(function(k){ks[k]=1;});Object.keys(ks).forEach(function(k){var a=parseInt((ant||{})[k])||0,b=parseInt((nov||{})[k])||0;if(a!==b)out.push({label:peLabelKeyCurto(k),de:a,para:b});});return out;}
+function peHistEntry(por,tipo,mudancas){return {ts:Date.now(),por:String(por||'?'),tipo:String(tipo||''),mudancas:(mudancas||[]).slice(0,15)};}
+function peHistLocal(fid,e){var c=_peEstoqueCache[fid];if(c)c.historico=((c.historico)||[]).concat([e]).slice(-150);}
+function peHistUnion(e){try{return firebase.firestore.FieldValue.arrayUnion(e);}catch(_e){return undefined;}}
 function peFabSalvar(fid,silent){
   if(_fabSaveTimer){clearTimeout(_fabSaveTimer);_fabSaveTimer=null;}
-  var _c=_peEstoqueCache[fid]||{};var est=Object.assign({},_c.estoque||{}),prod=Object.assign({},_c.produzindo||{});
+  var _c=_peEstoqueCache[fid]||{};
+  var estAnt=Object.assign({},_c.estoque||{}),prodAnt=Object.assign({},_c.produzindo||{});
+  var est=Object.assign({},_c.estoque||{}),prod=Object.assign({},_c.produzindo||{});
   document.querySelectorAll('#fabricaMode input[data-fk]').forEach(function(i){var k=i.getAttribute('data-fk');var q=parseInt(i.value)||0;var tgt=(i.getAttribute('data-tp')==='e')?est:prod;if(q>0)tgt[k]=q;else delete tgt[k];});
   var did=peDocId(fid);var quem=_FAB_PERFIL||_FAB_EMAIL||(peAcessoDe(fid).usuario)||'F\u00e1brica';
   if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].atualizadoEm=Date.now();}
   var payload={estoque:est,produzindo:prod,atualizadoEm:Date.now(),lorettoEm:Date.now(),lorettoPor:quem};
+  var _mud=peDiffMapas(estAnt,est).concat(peDiffMapas(prodAnt,prod));
+  if(_mud.length){var _e=peHistEntry(quem,'estoque/produ\u00e7\u00e3o',_mud);peHistLocal(fid,_e);var _u=peHistUnion(_e);if(_u)payload.historico=_u;}
   if(!_db){if(silent)peFabStatus('ok');else toast('Atualizado');return;}
   var ref=_db.collection('ls_pe').doc(did);
   ref.get().then(function(s){return s.exists?ref.update(payload):ref.set(payload,{merge:true});}).then(function(){if(silent)peFabStatus('ok');else{toast('Atualizado \u2014 a Loretto j\u00e1 v\u00ea');if(typeof peRender==='function')peRender();}}).catch(function(e){peFabStatus('err',(e&&e.code)||(e&&e.message)||'');if(!silent)toast('Erro ao salvar');});
@@ -5202,7 +5228,20 @@ function peRenderLista(c){
       '<div class="pe-fst">'+escapeHtml(st)+'</div>'+
       '<div class="pe-fstats"><div class="pe-fstat"><b>'+f.qtdModelos+'</b><span>modelos</span></div><div class="pe-fstat"><b>'+totEst+'</b><span>em estoque</span></div></div>'+
       '</button><div class="pe-fcardfoot"><button class="pe-fcardkey" onclick="peAcessoModalAbrir(\''+f.fid+'\')" title="Acesso da fabrica">&#128273; Acesso</button><button class="pe-fcardkey" onclick="peConfigModalAbrir(\''+f.fid+'\')" title="Configuracoes da fabrica">&#9881; Configurações</button></div></div>';
-  }).join('')+'</div>';
+  }).join('')+'</div>'+peHistGlobalHTML();
+}
+function peHistGlobalHTML(){
+  var fabs=peFabricas(),all=[];
+  fabs.forEach(function(f){var c=_peEstoqueCache[f.fid]||{};(c.historico||[]).forEach(function(h){if(h&&h.ts)all.push({fab:f.nome,h:h});});});
+  if(!all.length)return '';
+  all.sort(function(a,b){return (b.h.ts||0)-(a.h.ts||0);});
+  var linhas=all.slice(0,60).map(function(o){var h=o.h;
+    var ms=(h.mudancas||[]).slice(0,8).map(function(x){return escapeHtml(x.label)+' <b>'+x.de+'&#8594;'+x.para+'</b>';}).join(', ');
+    var det=h.tipo?escapeHtml(h.tipo):''; if(ms)det=det?(det+': '+ms):ms; if(!det)det='salvou';
+    return '<div class="pe-hrow"><span class="pe-hwhen">'+peFmtDataHora(h.ts)+'</span><span class="pe-hfab">'+escapeHtml(o.fab)+'</span><span class="pe-hwho">'+escapeHtml(h.por||'?')+'</span><span class="pe-hwhat">'+det+'</span></div>';
+  }).join('');
+  return '<details class="pe-histglob"><summary><span class="pe-hgt">&#128203; Histórico de alterações</span><span class="pe-hcount">'+all.length+'</span></summary>'+
+    '<div class="pe-htbl"><div class="pe-hrow pe-hhead"><span class="pe-hwhen">Quando</span><span class="pe-hfab">Fábrica</span><span class="pe-hwho">Quem</span><span class="pe-hwhat">O que mudou</span></div>'+linhas+'</div></details>';
 }
 function peRenderFabrica(c,fid){
   const fabs=peFabricas();const f=fabs.find(x=>x.fid===fid)||{fid:fid,nome:fid,qtdModelos:peModelosDaFabrica(fid).length};
@@ -5250,7 +5289,7 @@ function peRenderFabrica(c,fid){
     return '<div class="pe-mod'+(critico?' pe-mod-crit':'')+'" data-fid="'+escapeHtml(f.fid)+'" data-mid="'+escapeHtml(m.id)+'"><div class="pe-modtop"><span class="pe-drag" title="Arraste para reordenar">&#8942;&#8942;</span><div class="pe-modi"><div class="pe-modh">'+escapeHtml(m.nome)+'</div><div class="pe-custo">Compra: R$ <input class="pe-custoi" type="number" min="0" step="0.01" inputmode="decimal" value="'+(m.custo||0)+'" onchange="peSetCusto(\''+m.id+'\',this.value)"></div></div><div class="pe-modacts"><button class="btn sm pe-stop" title="Zera as metas: a fábrica deixa de receber pedido de reposição deste modelo" onclick="peZerarMetas(\''+f.fid+'\',\''+m.id+'\')">Parar produção</button><button class="btn sm pe-modrem" title="Tirar modelo desta fábrica" onclick="if(confirm(\'Tirar este modelo desta fábrica?\'))peRemModelo(\''+f.fid+'\',\''+m.id+'\')">&#10005;</button></div></div>'+critAviso+cores+hidHTML+'</div>';
   }).join('')
   :'<div class="empty">Esta fábrica ainda não tem modelos. Clique em <b>+ Cadastrar modelo</b> acima para escolher, do catálogo do Kigi, quais modelos ela produz.</div>';
-  const hist=(cache.historico||[]).slice(-3).reverse().map(h=>{const ms=(h.mudancas||[]).slice(0,7).map(x=>escapeHtml(x.label)+' '+x.de+'\u2192'+x.para).join(', ');return '<div class="pe-hist">'+fmtData(h.ts)+' \u2014 '+(ms||'salvou')+'</div>';}).join('');
+  const hist=(cache.historico||[]).slice(-8).reverse().map(h=>{const ms=(h.mudancas||[]).slice(0,7).map(x=>escapeHtml(x.label)+' '+x.de+'\u2192'+x.para).join(', ');let d=h.tipo?escapeHtml(h.tipo):'';if(ms)d=d?(d+': '+ms):ms;if(!d)d='salvou';return '<div class="pe-hist">'+peFmtDataHora(h.ts)+' \u00b7 <b>'+escapeHtml(h.por||'?')+'</b> \u2014 '+d+'</div>';}).join('');
   const ped=_pePedidoCache[f.fid];
   const pedidoBox=ped?('<div class="pe-pedbox"><div class="pe-pedh"><b>Pedido de produção</b> &middot; '+ped.totPares+' pares &middot; '+brl(ped.totCusto)+' <span class="pe-pedx" onclick="pePedidoFechar(\''+f.fid+'\')">&#10005;</span></div>'+(ped.itens.length?(ped.itens.map(function(it){return '<div class="pe-pedit"><div class="pe-pedm">'+escapeHtml(it.modelo)+' '+escapeHtml(it.cor)+(it.cod?' &middot; '+escapeHtml(it.cod):'')+'</div><div class="pe-pednums">'+it.nums.map(function(n){return '<span>'+n.tam+':<b>'+n.qtd+'</b></span>';}).join('')+'<span class="pe-pedpar">'+it.pares+' pares</span></div></div>';}).join('')+'<div class="pe-pedacts"><button class="btn btn-ouro sm" onclick="pePedidoLancar(\''+f.fid+'\')">Lançar como pedido</button><button class="btn btn-ouro sm" onclick="pePedidoWhats(\''+f.fid+'\')">Enviar no WhatsApp</button><button class="btn sm" onclick="pePedidoCopiar(\''+f.fid+'\')">Copiar pedido</button></div>'):'<div class="pe-pedempty">Nenhuma numeração em falta — a grade já está completa.</div>')+'</div>'):'';
   c.innerHTML='<button class="pe-voltar" onclick="peVoltar()">&#8249; Todas as fábricas</button>'+
@@ -5264,7 +5303,7 @@ function peRenderFabrica(c,fid){
     pedidoBox+
     peOrdensPainel(f.fid)+
     '<div class="pe-actions" style="margin-top:6px"><button class="btn sm" onclick="peConfigModalAbrir(\''+f.fid+'\')">&#9881; Configurações e etiquetas</button></div>'+
-    (hist?'<div class="pe-histbox"><b>Últimas alterações da fábrica:</b>'+hist+'</div>':'')+
+    (hist?'<div class="pe-histbox"><b>Últimas alterações:</b>'+hist+'</div>':'')+
     (modelos.length?'<details class="pe-det" open><summary>Grade e metas por numeração</summary><div class="pe-metahint">Defina a meta de cada numeração na linha <b>Meta</b> e toque em <b>Salvar metas</b>. A fábrica vê só quanto repor — nunca a meta.</div>'+grade+'</details>':grade)+'</div>';
 }
 function peSalvarCritPct(){
@@ -5281,6 +5320,8 @@ function peSalvarMetas(fid){
   document.querySelectorAll('#peFabricas input[data-meta][data-fid="'+fid+'"]').forEach(function(inp){const q=parseInt(inp.value)||0;if(q>0)meta[inp.dataset.meta]=q;else delete meta[inp.dataset.meta];});
   const ref=_db.collection('ls_pe').doc(peDocId(fid));
   const payload={meta:meta,lorettoEm:Date.now(),lorettoPor:userAtual||'Loretto'};
+  const _mud=peDiffMapas((_peEstoqueCache[fid]&&_peEstoqueCache[fid].meta)||{},meta);
+  if(_mud.length){const _e=peHistEntry(userAtual||'Loretto','metas',_mud);peHistLocal(fid,_e);const _u=peHistUnion(_e);if(_u)payload.historico=_u;}
   ref.update(payload).catch(function(){return ref.set(payload,{merge:true});}).then(function(){if(_peEstoqueCache[fid]){_peEstoqueCache[fid].meta=meta;_peEstoqueCache[fid].lorettoEm=Date.now();_peEstoqueCache[fid].lorettoPor=userAtual||'Loretto';}toast('Metas salvas — a fábrica já vê o que precisa repor');peRender();}).catch(function(e){toast('Erro ao salvar metas: '+((e&&e.message)||''));});
 }
 function peTrocarFoto(fid,modId,cor){
@@ -5331,8 +5372,9 @@ function _peMigraOrdens(d){var ordens=[],ped=(d&&d.pedido)||{},prod=(d&&d.produz
 // grava ordens (fonte da verdade) + pedido/produzindo derivados. Usa update quando o doc existe
 // para SUBSTITUIR os mapas por inteiro (set+merge faria merge profundo e deixaria chaves obsoletas,
 // fazendo pedido e producao se misturarem - exatamente o que queremos evitar).
-function _pePersistir(did,fid,payload,exists,okMsg){
+function _pePersistir(did,fid,payload,exists,okMsg,tipo){
   if(!_db){peRender();if(okMsg)toast(okMsg);return;}
+  if(tipo){var _e=peHistEntry(payload.lorettoPor||'Loretto',tipo,[]);peHistLocal(fid,_e);var _u=peHistUnion(_e);if(_u)payload.historico=_u;}
   var ref=_db.collection('ls_pe').doc(did);
   var p=exists?ref.update(payload):ref.set(payload,{merge:true});
   p.then(function(){if(_peEstoqueCache[fid])_peEstoqueCache[fid].lorettoEm=payload.lorettoEm;peRender();if(okMsg)toast(okMsg);}).catch(function(e){toast('Erro ao salvar: '+((e&&e.message)||''));});
@@ -5343,7 +5385,7 @@ function peMutarOrdens(fid,mut,okMsg){
     var novo=mut((ordens||[]).map(function(o){return Object.assign({},o);}))||ordens||[];
     var t=peTotaisOrdens(novo);
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=novo;_peEstoqueCache[fid].pedido=t.pedido;}
-    _pePersistir(did,fid,{ordens:novo,pedido:t.pedido,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,okMsg);
+    _pePersistir(did,fid,{ordens:novo,pedido:t.pedido,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,okMsg,String(okMsg||'').replace(/<[^>]*>/g,''));
   }
   if(!_db){aplica((_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){var d=s.exists?s.data():{};var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);aplica(ordens,s.exists);}).catch(function(){aplica((_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],false);});
@@ -5360,7 +5402,7 @@ function peOrdemPronta(fid,oid){
     if(alvo&&alvo.grade){Object.keys(alvo.grade).forEach(function(k){var q=parseInt(alvo.grade[k])||0;if(q>0)est[k]=(parseInt(est[k])||0)+q;});}
     var t=peTotaisOrdens(ordens);
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].pedido=t.pedido;_peEstoqueCache[fid].estoque=est;}
-    _pePersistir(did,fid,{ordens:ordens,pedido:t.pedido,estoque:est,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Produção concluída — somada ao estoque');
+    _pePersistir(did,fid,{ordens:ordens,pedido:t.pedido,estoque:est,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Produção concluída — somada ao estoque','Produção concluída');
   }
   if(!_db){aplica({ordens:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],estoque:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}},false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({ordens:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],estoque:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}},false);});
@@ -5736,7 +5778,10 @@ function peConfirmarEnvio(){
     var t=peTotaisOrdens(ordens);
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].pedido=t.pedido;}
     if(repoId)peEscreveRomaneio(repoId,sent);
-    _pePersistir(did,fid,{ordens:ordens,estoque:est,pedido:t.pedido,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Envio confirmado &mdash; baixado do estoque');
+    var _sentTot=Object.keys(sent).reduce(function(s,k){return s+(parseInt(sent[k])||0);},0);
+    var _epl={ordens:ordens,estoque:est,pedido:t.pedido,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'};
+    var _ee=peHistEntry(_quem,'Envio ao cliente ('+_sentTot+' pares)',[]);peHistLocal(fid,_ee);var _eu=peHistUnion(_ee);if(_eu)_epl.historico=_eu;
+    _pePersistir(did,fid,_epl,exists,'Envio confirmado &mdash; baixado do estoque');
   }
   var _sentEtiq=sent;
   function _ofereceEtiq(){setTimeout(function(){if(confirm('Envio confirmado!\n\nImprimir as etiquetas Loretto para colar nas caixas?'))peImprimirEtiquetas(_sentEtiq);},150);}
