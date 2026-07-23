@@ -4714,7 +4714,6 @@ window.peCopiarAcesso=peCopiarAcesso;window.peWhatsAcesso=peWhatsAcesso;window.p
 
 /* ===================== MODO FÁBRICA (painel reduzido via link) ===================== */
 var MODO_FABRICA=null,_MODO_FAB_CHAVE='',_MODO_FAB_OK=false;
-var PE_FAB_VER='v21 · excluir lote';
 function loadFirebaseFab(cb){
   loadFirebase(function(){
     if(window.firebase&&window.firebase.auth){cb();return;}
@@ -4860,7 +4859,7 @@ function renderModoFabrica(fid){
     '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><span class="fab-sech-btns"><button class="btn fab-prod-top" onclick="peProduzirAbrir(\''+fid+'\')">Produzir</button><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></span></div>'+pedHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Em produção'+(atrasados?' <span class="fab-atraso-cnt">&#9888; '+atrasados+' em atraso</span>':'')+'</div>'+emProdHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
-    '<div class="fab-sec"><div class="fab-sech">Meus modelos — atualize o que tenho e o que estou fazendo</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">'+_uaTxt+'</span></div>':'')+'</div>'+
+    '<div class="fab-sec"><div class="fab-sech">Meus modelos</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">'+_uaTxt+'</span></div>':'')+'</div>'+
     totalGeral;
   var _tabnav=_etHTML?('<div class="fab-subnav"><button class="fab-tab'+(_fabTab==='estoque'?' on':'')+'" data-tab="estoque" onclick="fabSetTab(\'estoque\')">Pronta-entrega</button><button class="fab-tab'+(_fabTab==='etiquetas'?' on':'')+'" data-tab="etiquetas" onclick="fabSetTab(\'etiquetas\')">Etiquetas</button></div>'):'';
   var _estOn=(!_etHTML||_fabTab==='estoque');
@@ -4876,7 +4875,7 @@ function renderModoFabrica(fid){
     _tabnav+
     '<div class="fab-pane'+(_estOn?' on':'')+'" id="fabPaneEstoque">'+_estoquePane+'</div>'+
     (_etHTML?('<div class="fab-pane'+(_fabTab==='etiquetas'?' on':'')+'" id="fabPaneEtiquetas">'+_etHTML+'</div>'):'')+
-    '<div class="fab-rodape">Loretto Scarpa · '+PE_FAB_VER+'</div></div>';
+    '<div class="fab-rodape">Loretto Scarpa</div></div>';
   fabEtPreview();
 }
 function peFabSair(){try{firebase.auth().signOut();}catch(e){}try{location.reload();}catch(e){}}
@@ -5624,7 +5623,7 @@ function peProduzirAbrir(fid){
     var cells=co.tams.slice().sort(function(a,b){return parseFloat(a)-parseFloat(b);}).map(function(t){var sk=m.id+'|'+co.nome+'|'+t;var jp=parseInt(prod[sk])||0;return '<div class="pe-envcell"><label>'+escapeHtml(t)+'</label><input type="number" min="0" inputmode="numeric" data-k="'+escapeHtml(sk)+'" value=""><div class="pe-envest">produz '+jp+'</div></div>';}).join('');
     return '<div class="pe-envrow"><div class="pe-envmc">'+escapeHtml(mc)+'</div><div class="pe-envgrid">'+cells+'</div></div>';
   }).join('');}).join('');
-  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Colocar em produ\u00e7\u00e3o</div><p class="pe-metahint">Cada vez \u00e9 um lote. Preencha a grade e as <b>duas datas</b> (obrigat\u00f3rias). N\u00e3o entra no estoque sozinho: voc\u00ea confirma quando ficar pronto.</p><div class="pe-prazo"><div class="pe-prazo-row"><label>Colocado em produ\u00e7\u00e3o</label><input type="date" id="peProdInicio" max="'+peYMD(Date.now())+'" value="'+peYMD(Date.now())+'"></div><div class="pe-prazo-row"><label>Previs\u00e3o de entrega</label><input type="date" id="peProdData" min="'+peYMD(Date.now())+'" value="'+peYMD(Date.now()+7*86400000)+'"></div></div>'+rows;
+  document.getElementById('peEnvioBox').innerHTML='<div class="pe-modal-h">Colocar em produ\u00e7\u00e3o</div><div class="pe-prazo"><div class="pe-prazo-row"><label>Colocado em produ\u00e7\u00e3o</label><input type="date" id="peProdInicio" max="'+peYMD(Date.now())+'" value="'+peYMD(Date.now())+'"></div><div class="pe-prazo-row"><label>Previs\u00e3o de entrega</label><input type="date" id="peProdData" min="'+peYMD(Date.now())+'" value="'+peYMD(Date.now()+7*86400000)+'"></div></div>'+rows;
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Confirmar produção';ok.onclick=function(){peConfirmarProduzir(fid);};}
   document.getElementById('peEnvioModal').classList.remove('hide');
 }
@@ -5803,7 +5802,6 @@ function fabEtSecHTML(){
         '<div class="fabet-adjbtns"><button class="btn" onclick="fabEtLayout()">&#9881; Ajustar layout</button><button class="btn btn-ghost" onclick="fabEtReset()">Voltar ao padrao</button></div>'+
       '</div>'+
     '</div>'+
-    '<div class="fabet-help">Toque na numeracao que quer imprimir &mdash; ela entra na fila. Confira a previa e clique em Imprimir.</div>'+
     '<div id="fabEtMods">'+fabEtModsHTML()+'</div>'+
     '<div class="fabet-printbar">'+
       '<div class="fabet-prev"><div class="etiqueta" id="fabEtPrev"></div></div>'+
@@ -5813,7 +5811,6 @@ function fabEtSecHTML(){
         '<div class="fabet-row" style="align-items:center;gap:10px;margin-top:12px"><button class="btn btn-ouro" onclick="fabEtImprimir()">Imprimir etiquetas</button><button class="btn" onclick="fabEtLimpar()">Limpar fila</button></div>'+
       '</div>'+
     '</div>'+
-    '<div class="fabet-nota">O tamanho e o layout ficam salvos neste aparelho. O simbolo do leao vem do painel da Loretto. Imprima em 100% (tamanho real) e margens: nenhuma.</div>'+
   '</div>';
 }
 function fabEtRefreshList(){
