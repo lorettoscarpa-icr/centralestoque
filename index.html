@@ -555,6 +555,10 @@
   .rep-ped-cor{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
   .rep-ped-ref{font-family:'DM Mono',monospace;font-size:var(--fs-mini);background:rgba(220,189,96,.14);color:var(--ouro-claro);padding:1px 7px;border-radius:var(--r-xs);margin-left:4px}
   .rep-ped-mod .rep-ped-it{padding-left:53px}
+  .rep-ped-x{flex:0 0 auto;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--linha);border-radius:var(--r-sm);background:transparent;color:var(--ouro-claro);font-size:16px;line-height:1;cursor:pointer;opacity:.65;transition:.15s;padding:0}
+  .rep-ped-x:hover{opacity:1;border-color:var(--perigo);color:var(--perigo);background:rgba(201,85,61,.12)}
+  .rep-ped-modh .rep-ped-x{margin-left:auto}
+  .rep-ped-x.cor{width:24px;height:24px;font-size:15px;align-self:center}
   .rep-ped-acts{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.06)}
   /* impressão do pedido */
   #repo-print{display:none}
@@ -6554,6 +6558,9 @@ function repBindDrag(){
 function repTamanhosDe(mid,cor){const m=(repCatalogo||[]).find(x=>x.id===mid);if(!m)return [];const c=(m.cores||[]).find(c=>c.nome===cor);return c&&c.skus?Object.keys(c.skus):[];}
 function repRecalcForn(fid){const F=repPedidoCache&&repPedidoCache[fid];if(!F)return;let pares=0,valor=0;Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];const cu=M.custo||0;Object.keys(M.cores).forEach(cor=>{const tams=M.cores[cor];Object.keys(tams).forEach(t=>{const q=parseInt(tams[t])||0;pares+=q;valor+=q*cu;});});});F.pares=pares;F.valor=valor;}
 window.repSetPedidoQtd=function(fid,mid,cor,tam,val){const F=repPedidoCache&&repPedidoCache[fid];if(!F||!F.mods[mid])return;const c=F.mods[mid].cores;if(!c[cor])c[cor]={};const q=parseInt(val)||0;if(q>0)c[cor][tam]=q;else delete c[cor][tam];repRecalcForn(fid);repRenderPedido();};
+// tirar do pedido ATUAL so (nao mexe no fixo: ao gerar de novo, volta)
+window.repRemoverCor=function(fid,mid,cor){const F=repPedidoCache&&repPedidoCache[fid];if(!F||!F.mods[mid])return;delete F.mods[mid].cores[cor];if(!Object.keys(F.mods[mid].cores).length)delete F.mods[mid];repRecalcForn(fid);if(!Object.keys(F.mods).length)delete repPedidoCache[fid];repRenderPedido();toast(cor+' saiu deste pedido');};
+window.repRemoverMod=function(fid,mid){const F=repPedidoCache&&repPedidoCache[fid];if(!F||!F.mods[mid])return;const nome=F.mods[mid].nome||'Modelo';delete F.mods[mid];repRecalcForn(fid);if(!Object.keys(F.mods).length)delete repPedidoCache[fid];repRenderPedido();toast(nome+' saiu deste pedido');};
 function repRenderPedido(){
   const box=$('repPedido'); if(!box)return;
   const porForn=repPedidoCache||{};
@@ -6567,14 +6574,14 @@ function repRenderPedido(){
       <div class="rep-ped-h"><h4>${escapeHtml(fnome)}</h4><div class="rep-ped-tot">${F.pares} un &middot; ${repBRL(F.valor)}</div></div>
       <div class="rep-ped-itens">`;
     repOrdenarMids(fid,Object.keys(F.mods)).forEach(mid=>{const M=F.mods[mid];
-      html+=`<div class="rep-ped-mod" data-fid="${escapeHtml(fid)}" data-mid="${escapeHtml(mid)}"><div class="rep-ped-modh"><span class="rep-ped-drag" title="Arraste para reordenar">&#8942;&#8942;</span><span class="rep-ped-modn">${escapeHtml(M.nome)}</span></div>`;
+      html+=`<div class="rep-ped-mod" data-fid="${escapeHtml(fid)}" data-mid="${escapeHtml(mid)}"><div class="rep-ped-modh"><span class="rep-ped-drag" title="Arraste para reordenar">&#8942;&#8942;</span><span class="rep-ped-modn">${escapeHtml(M.nome)}</span><button class="rep-ped-x" title="Tirar este modelo deste pedido (continua fixo)" onclick="repRemoverMod('${fid}','${mid}')">&times;</button></div>`;
       Object.keys(M.cores).forEach(cor=>{
         const tams=M.cores[cor];
         const ft=repFotoDe(mid,cor);const ref=repRefDe(mid,cor);const corJs=String(cor).replace(/'/g,"\\'");
         const sizes=Array.from(new Set(repTamanhosDe(mid,cor).concat(Object.keys(tams)))).sort((a,b)=>parseFloat(a)-parseFloat(b));
         const subp=Object.keys(tams).reduce((s,t)=>s+(parseInt(tams[t])||0),0);
         const gradeEd=sizes.map(t=>`<span class="rep-ped-cell"><label>${escapeHtml(t)}</label><input type="number" min="0" inputmode="numeric" value="${tams[t]||''}" onchange="repSetPedidoQtd('${fid}','${mid}','${corJs}','${escapeHtml(t)}',this.value)"></span>`).join('');
-        html+=`<div class="rep-ped-it"><div class="rep-ped-cor">${ft?`<img class="rep-ped-foto" src="${ft}" alt="">`:`<label class="rep-ped-foto ph">+ foto<input type="file" accept="image/*" onchange="repSetFoto('${mid}','${corJs}',this)" hidden></label>`}<span class="rep-ped-mc">${escapeHtml(cor)}${ref?` <span class="rep-ped-ref">ref ${escapeHtml(ref)}</span>`:''}<span class="rep-ped-sub">${subp} par${subp===1?'':'es'}</span></span></div><div class="rep-ped-grade-ed">${gradeEd}</div></div>`;
+        html+=`<div class="rep-ped-it"><div class="rep-ped-cor">${ft?`<img class="rep-ped-foto" src="${ft}" alt="">`:`<label class="rep-ped-foto ph">+ foto<input type="file" accept="image/*" onchange="repSetFoto('${mid}','${corJs}',this)" hidden></label>`}<span class="rep-ped-mc">${escapeHtml(cor)}${ref?` <span class="rep-ped-ref">ref ${escapeHtml(ref)}</span>`:''}<span class="rep-ped-sub">${subp} par${subp===1?'':'es'}</span></span></div><div class="rep-ped-grade-ed">${gradeEd}</div><button class="rep-ped-x cor" title="Tirar esta cor deste pedido (continua fixa)" onclick="repRemoverCor('${fid}','${mid}','${corJs}')">&times;</button></div>`;
       });
       html+=`</div>`;
     });
