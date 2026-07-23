@@ -1491,6 +1491,16 @@
   .fec-tab td.dif.zero{color:rgba(251,249,238,.3)}
   .fec-tab tr.mais{background:rgba(240,180,41,.06)}
   .fec-tab tr.menos{background:rgba(229,115,115,.07)}
+  /* grade (igual entrada de estoque): uma linha por modelo+cor, colunas por numero */
+  .fec-grade td,.fec-grade th{padding:6px 6px}
+  .fec-grade td.n{min-width:36px}
+  .fec-grade td.div{background:rgba(229,115,115,.14)}
+  .fec-grade .cf-nos{display:block;font-weight:700;color:var(--areia)}
+  .fec-grade .cf-fab{display:block;font-size:var(--fs-micro);color:var(--perigo);font-family:'DM Mono',monospace;line-height:1.2}
+  .fec-grade .fec-ok{color:var(--ok);font-weight:700}
+  .fec-grade .fec-x{color:var(--perigo);font-weight:700;font-family:'DM Mono',monospace}
+  .fec-grade tfoot .fec-foot td{border-top:2px solid rgba(220,189,96,.4);font-weight:700;color:var(--ouro-claro);background:rgba(0,0,0,.2);font-family:'DM Mono',monospace}
+  .fec-grade tfoot .fec-foot td.div{background:rgba(229,115,115,.16)}
   .fec-acts{margin-top:12px}
   .fec-barra{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;
     font-size:var(--fs-sm);color:rgba(251,249,238,.55)}
@@ -8442,19 +8452,51 @@ function fecRender(){
      (divs.length? ('&#9888; '+divs.length+' divergência(s) — confira antes de pagar. Pague pelo que <b>chegou</b>, não pelo que o romaneio diz.')
                  : '&#10003; Bateu tudo. O que a fábrica mandou é exatamente o que entrou no sistema.')+'</div>';
   if(incompleto)h+='<div class="fec-selo err">&#9888; Um dos nossos romaneios não foi lido por inteiro. Corrija antes de confiar neste resultado.</div>';
-  var okN=L.length-divs.length;
-  if(divs.length&&okN)h+='<div class="fec-barra"><span>Mostrando as '+divs.length+' divergência(s). Outras <b>'+okN+'</b> linha(s) bateram certinho.</span>'+
+  // ===== agrupa por modelo+cor pra montar a grade (igual a entrada de estoque) =====
+  var tamsSet={}; ROM_TAMS.forEach(function(t){tamsSet[t]=1;}); L.forEach(function(x){tamsSet[x.tam]=1;});
+  var TAMS=Object.keys(tamsSet).map(Number).sort(function(a,b){return a-b;});
+  var grupos={};
+  L.forEach(function(x){
+    var gk=normKey(x.modelo)+'|'+normKey(x.cor);
+    if(!grupos[gk])grupos[gk]={modelo:x.modelo,cor:x.cor,valor:x.valor||0,cel:{},fab:0,nos:0};
+    var g=grupos[gk];
+    g.cel[x.tam]={fab:x.fab,nos:x.nos};
+    g.fab+=x.fab; g.nos+=x.nos;
+    if(x.valor)g.valor=x.valor;
+  });
+  var gArr=Object.keys(grupos).map(function(k){return grupos[k];})
+    .sort(function(a,b){return a.modelo.localeCompare(b.modelo)||String(a.cor).localeCompare(String(b.cor));});
+  function gBate(g){return g.fab===g.nos && !TAMS.some(function(t){var c=g.cel[t];return c&&c.fab!==c.nos;});}
+  var gDiv=gArr.filter(function(g){return !gBate(g);});
+  var okN=gArr.length-gDiv.length;
+  if(gDiv.length&&okN)h+='<div class="fec-barra"><span>Mostrando os '+gDiv.length+' modelo(s)/cor com divergência. Outros <b>'+okN+'</b> bateram certinho.</span>'+
     '<button class="rom-mini" onclick="_fecTudo=!_fecTudo;fecRender()">'+(_fecTudo?'Ver só as divergências':'Ver tudo')+'</button></div>';
-  h+='<div class="fec-tw"><table class="fec-tab"><thead><tr><th style="text-align:left">Modelo</th><th style="text-align:left">Cor</th><th>Nº</th>'+
-     '<th>Fábrica diz</th><th>A gente lançou</th><th>Diferença</th></tr></thead><tbody>';
-  var mostrar = (divs.length&&!_fecTudo)? divs : L;
-  h+=mostrar.map(function(x){
-    var cls=x.dif===0?'zero':(x.dif>0?'mais':'menos');
-    var txt=x.dif===0?'bateu':(x.dif>0?('+'+x.dif+' a mais'):(Math.abs(x.dif)+' a menos'));
-    return '<tr class="'+cls+'"><td style="text-align:left">'+escapeHtml(x.modelo)+'</td><td style="text-align:left">'+escapeHtml(x.cor||'-')+'</td>'+
-      '<td class="n">'+x.tam+'</td><td class="n">'+x.fab+'</td><td class="n">'+x.nos+'</td><td class="n dif '+cls+'">'+txt+'</td></tr>';
+  var gMostrar=(gDiv.length&&!_fecTudo)?gDiv:gArr;
+  // celula: numero grande = o que a gente lançou (o que chegou); embaixo, em vermelho, o que o romaneio diz
+  function celHTML(fab,nos){
+    if(!fab&&!nos)return '<td class="n"></td>';
+    if(fab===nos)return '<td class="n">'+nos+'</td>';
+    return '<td class="n div"><span class="cf-nos">'+nos+'</span><span class="cf-fab">fáb '+fab+'</span></td>';
+  }
+  h+='<div class="fec-tw"><table class="fec-tab fec-grade"><thead><tr><th style="text-align:left">Modelo</th><th style="text-align:left">Cor</th>'+
+     TAMS.map(function(t){return '<th>'+t+'</th>';}).join('')+
+     '<th>Total</th><th>Valor</th><th>Bateu?</th></tr></thead><tbody>';
+  h+=gMostrar.map(function(g){
+    var bate=gBate(g), dg=g.nos-g.fab;
+    var cels=TAMS.map(function(t){var c=g.cel[t]||{fab:0,nos:0};return celHTML(c.fab,c.nos);}).join('');
+    var totCel=(g.fab===g.nos)?('<td class="n">'+g.nos+'</td>'):('<td class="n div"><span class="cf-nos">'+g.nos+'</span><span class="cf-fab">fáb '+g.fab+'</span></td>');
+    var badge=bate?'<span class="fec-ok">&#10003;</span>':'<span class="fec-x">'+(dg>0?'+':'')+dg+'</span>';
+    return '<tr class="'+(bate?'zero':'menos')+'"><td style="text-align:left">'+escapeHtml(g.modelo)+'</td><td style="text-align:left">'+escapeHtml(g.cor||'-')+'</td>'+
+      cels+totCel+'<td class="n">'+brMoney(g.nos*g.valor)+'</td><td class="n">'+badge+'</td></tr>';
   }).join('');
-  h+='</tbody></table></div>';
+  var footTams=TAMS.map(function(t){
+    var sf=0,sn=0; gArr.forEach(function(g){var c=g.cel[t];if(c){sf+=c.fab;sn+=c.nos;}});
+    return (sf===sn)?('<td class="n">'+(sn||'')+'</td>'):('<td class="n div"><span class="cf-nos">'+sn+'</span><span class="cf-fab">fáb '+sf+'</span></td>');
+  }).join('');
+  var geralBate=(tf===tn);
+  h+='</tbody><tfoot><tr class="fec-foot"><td style="text-align:left" colspan="2">TOTAL</td>'+footTams+
+     (geralBate?('<td class="n">'+tn+'</td>'):('<td class="n div"><span class="cf-nos">'+tn+'</span><span class="cf-fab">fáb '+tf+'</span></td>'))+
+     '<td class="n">'+brMoney(vn)+'</td><td class="n">'+(geralBate?'<span class="fec-ok">&#10003;</span>':'<span class="fec-x">'+(tn-tf>0?'+':'')+(tn-tf)+'</span>')+'</td></tr></tfoot></table></div>';
   if(divs.length)h+='<div class="fec-acts"><button class="btn btn-ghost" onclick="fecCopiarDiverg()">Copiar divergências p/ mandar pra fábrica</button></div>';
   box.innerHTML=h;
 }
