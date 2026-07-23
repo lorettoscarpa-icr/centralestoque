@@ -8061,6 +8061,9 @@ async function romGerarXlsx(){
     showInputMessage:true,promptTitle:'Data',prompt:'Digite assim: 13/07/2026'};
   d1.dataValidation=DVDATA; d2.dataValidation=JSON.parse(JSON.stringify(DVDATA));
   d2.dataValidation.formulae=[new Date(2020,0,1),new Date(2040,11,31)];
+  // as duas datas ficam no topo (fora da tabela): precisam ser destravadas na mão,
+  // senão a proteção da planilha não deixa nem clicar pra digitar.
+  d1.protection={locked:false}; d2.protection={locked:false};
   ws.getRow(4).height=20;
 
   // dica curtinha numa linha só (o passo a passo e o exemplo ficam embaixo da tabela)
