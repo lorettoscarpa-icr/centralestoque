@@ -7945,7 +7945,7 @@ function romRender(){
   if(!lista.length){box.innerHTML='<div class="rom-vazio">Nenhum modelo com esse nome.</div>';return;}
   box.innerHTML=lista.map(function(m){
     var sis=romCusto(m), val=romPrecoFinal(m), ncor=(m.cores||[]).filter(function(x){return !x.off;}).length;
-    var mid=JSON.stringify(m.id);
+    var mid="'"+jsq(m.id)+"'";   // id entre aspas simples: não quebra o onclick (que usa aspas duplas)
     var origem = (_romPreco[m.id]!=null&&_romPreco[m.id]!=='') ? '<span class="rom-org edit">definido por você</span>'
                : (sis>0 ? '<span class="rom-org">do sistema</span>' : '<span class="rom-org zero">sem custo — preencha</span>');
     var coresSel=romCoresSel(m).length, coresHTML='';
@@ -7953,7 +7953,7 @@ function romRender(){
       var cs=romCoresDe(m);
       coresHTML='<div class="rom-cores"><span class="rom-cores-l">Cores na planilha ('+coresSel+' de '+cs.length+'):</span>'+
         cs.map(function(c){var on=romCorOn(m,c.nome);
-          return '<button type="button" class="rom-cchip'+(on?' on':'')+'" onclick="romToggleCor('+mid+','+JSON.stringify(c.nome)+')">'+(on?'&#10003; ':'')+escapeHtml(c.nome)+'</button>';
+          return '<button type="button" class="rom-cchip'+(on?' on':'')+'" onclick="romToggleCor('+mid+',\''+jsq(c.nome)+'\')">'+(on?'&#10003; ':'')+escapeHtml(c.nome)+'</button>';
         }).join('')+'</div>';
     }
     return '<div class="rom-block'+(_romSel[m.id]?' exp':'')+'">'+
@@ -7972,7 +7972,7 @@ function romRender(){
 }
 window.romToggle=function(id){ if(_romSel[id])delete _romSel[id]; else _romSel[id]=true; romRender(); };
 window.romToggleCor=function(id,cor){
-  var cat=romCat(), m=cat.find(function(x){return x.id===id;}); if(!m)return;
+  var cat=romCat(), m=cat.find(function(x){return String(x.id)===String(id);}); if(!m)return;
   if(!_romCores[id]){_romCores[id]={};romCoresDe(m).forEach(function(c){_romCores[id][c.nome]=true;});}
   _romCores[id][cor]=(_romCores[id][cor]===false);   // desligada->liga, ligada->desliga
   romRender();
