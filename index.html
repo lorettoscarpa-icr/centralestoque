@@ -744,6 +744,10 @@
   #romGerar .rom-cchip{font-size:var(--fs-mini);padding:4px 9px;border-radius:999px;border:1px solid var(--linha);background:rgba(0,0,0,.25);color:rgba(251,249,238,.5);cursor:pointer;transition:.12s}
   #romGerar .rom-cchip:hover{border-color:var(--ouro-claro)}
   #romGerar .rom-cchip.on{background:rgba(220,189,96,.16);border-color:var(--ouro);color:var(--ouro-claro);font-weight:600}
+  #romGerar .rom-tipo{display:inline-flex;border:1px solid var(--linha);border-radius:var(--r-sm);overflow:hidden}
+  #romGerar .rom-tipo-b{background:transparent;border:0;color:rgba(251,249,238,.6);font-family:'Barlow',sans-serif;font-size:var(--fs-md);padding:9px 14px;cursor:pointer;white-space:nowrap}
+  #romGerar .rom-tipo-b+.rom-tipo-b{border-left:1px solid var(--linha)}
+  #romGerar .rom-tipo-b.active{background:var(--ouro);color:var(--verde-escuro);font-weight:700}
   #romGerar .rom-hint{font-size:var(--fs-sm);color:rgba(251,249,238,.5);line-height:1.6;margin-top:12px}
   #romGerar .rom-hint b{color:var(--ouro-claro)}
   #romGerar .rom-vazio{color:rgba(251,249,238,.4);font-size:var(--fs-base);padding:16px;grid-column:1/-1}
@@ -2348,6 +2352,12 @@ textarea.cons-field{min-height:80px;resize:vertical}
         <div class="rom-brand"><h1>Planilha de romaneio pra fábrica</h1><p>Gera a planilha com os NOSSOS nomes &middot; a fábrica preenche e devolve</p></div>
         <div class="rom-acts">
           <div class="cf-field"><label for="romFab">Fábrica</label><select id="romFab"></select></div>
+          <div class="cf-field"><label>Tipo de planilha</label>
+            <div class="rom-tipo">
+              <button type="button" class="rom-tipo-b active" data-tipo="modelo" onclick="romSetTipo('modelo')" title="A fábrica escolhe pelo MODELO. Sem coluna de referência. (ex.: Urbana Men)">Por modelo</button>
+              <button type="button" class="rom-tipo-b" data-tipo="ref" onclick="romSetTipo('ref')" title="A fábrica escolhe pela REFERÊNCIA e o modelo aparece sozinho. (ex.: Tarragona)">Por referência</button>
+            </div>
+          </div>
           <button class="btn btn-ouro" id="romBtn" type="button">&#128229; Gerar planilha</button>
         </div>
       </div>
@@ -2360,7 +2370,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
           <button class="rom-mini" id="romNenhum" type="button">Limpar</button>
         </div>
         <div class="rom-lista" id="romLista"></div>
-        <p class="rom-hint">Marque os modelos e, em cada um, <b>escolha as cores</b> que a fábrica vai poder lançar. A planilha sai com a <b>seta ▼</b> pra escolher modelo e cor (só os que você marcou), <b>valor do par puxado do sistema</b> e contas automáticas. Se a fábrica repetir o mesmo <b>modelo+cor</b>, a linha fica <b>vermelha na hora</b> e acende um aviso no topo — não passa duplicado sem perceber. Como volta com os nossos nomes, o batimento no acerto é direto.</p>
+        <p class="rom-hint">Escolha o <b>tipo de planilha</b> ali em cima: <b>Por modelo</b> (a fábrica escolhe pelo modelo, sem referência — ex.: Urbana) ou <b>Por referência</b> (a fábrica escolhe pela referência e o modelo/cor aparecem sozinhos — ex.: Tarragona). Depois marque os modelos e, em cada um, <b>escolha as cores</b> que a fábrica vai poder lançar. Sai com a <b>seta ▼</b>, <b>valor do par puxado do sistema</b> e contas automáticas. Se repetir a mesma linha, ela fica <b>vermelha na hora</b> com aviso no topo. Como volta com os nossos nomes, o batimento no acerto é direto.</p>
       </div>
       </div>
         </div>
@@ -7890,6 +7900,7 @@ window.abrirModal=abrirModal;window.aoSelecionarItem=aoSelecionarItem;window.atu
    e digita a quantidade. Quando ela devolve, nao existe "conciliar nome" — ja bate direto.
    Usa ExcelJS (o SheetJS que a Central ja tem NAO grava lista suspensa nem cor). */
 var _romSel={};   // {modId:true}
+var _romTipo='modelo';  // 'modelo' (escolhe pelo modelo, sem ref) | 'ref' (escolhe pela referência, modelo aparece)
 var _romCores={}; // {modId:{corNome:true/false}} — quais cores VÃO na planilha (padrão: todas)
 var _romPreco={}; // {modId:valor}  preco que VOCE define aqui, antes de gerar (vence o do sistema)
 var ROM_TAMS=[37,38,39,40,41,42,43,44];
@@ -7971,6 +7982,9 @@ function romRender(){
   if($('romConta'))$('romConta').innerHTML = fid ? (n+' modelo(s) marcado(s)'+(semP?(' · <span style="color:var(--alerta)">'+semP+' sem valor</span>'):'')) : 'Escolha a fábrica';
 }
 window.romToggle=function(id){ if(_romSel[id])delete _romSel[id]; else _romSel[id]=true; romRender(); };
+window.romSetTipo=function(t){ _romTipo=(t==='ref')?'ref':'modelo';
+  document.querySelectorAll('#romGerar .rom-tipo-b').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tipo')===_romTipo);});
+};
 window.romToggleCor=function(id,cor){
   var cat=romCat(), m=cat.find(function(x){return String(x.id)===String(id);}); if(!m)return;
   if(!_romCores[id]){_romCores[id]={};romCoresDe(m).forEach(function(c){_romCores[id][c.nome]=true;});}
@@ -8043,18 +8057,19 @@ async function romGerarXlsx(){
     lz.getColumn(4+i).width=20;
   });
   // combos MODELO|COR -> REFERÊNCIA: alimenta a coluna de referência (puxa sozinha do nosso cadastro)
-  var colKeyN=4+mods.length, colRefN=colKeyN+1;
-  var colKey=romColLetra(colKeyN), colRef=romColLetra(colRefN);
-  lz.getCell(colKey+'1').value='chave'; lz.getCell(colRef+'1').value='ref';
-  [colKey+'1',colRef+'1'].forEach(function(c){lz.getCell(c).font={name:'Arial',size:9,bold:true,color:{argb:CINZA}};});
-  var combos=[];
+  // combos pro modo "por referência": REF -> MODELO, COR (e a lista de refs pra seta). Dedup por ref.
+  var colRefN=4+mods.length, colModN=colRefN+1, colCorN=colModN+1;
+  var colRefL=romColLetra(colRefN), colModL=romColLetra(colModN), colCorL=romColLetra(colCorN);
+  lz.getCell(colRefL+'1').value='ref'; lz.getCell(colModL+'1').value='modelo'; lz.getCell(colCorL+'1').value='cor';
+  [colRefL+'1',colModL+'1',colCorL+'1'].forEach(function(c){lz.getCell(c).font={name:'Arial',size:9,bold:true,color:{argb:CINZA}};});
+  var combos=[], _seenRef={};
   mods.forEach(function(m){romCoresSel(m).forEach(function(cor){
-    var rf=(typeof repRefDe==='function')?(repRefDe(m.id,cor)||''):'';
-    if(rf)combos.push({key:m.nome+'|'+cor, ref:rf});
+    var rf=(typeof repRefDe==='function')?String(repRefDe(m.id,cor)||''):'';
+    if(rf&&!_seenRef[rf]){_seenRef[rf]=1; combos.push({ref:rf, modelo:m.nome, cor:cor});}
   });});
-  combos.forEach(function(cb,i){ lz.getCell(colKey+(i+2)).value=cb.key; lz.getCell(colRef+(i+2)).value=String(cb.ref); });
+  combos.forEach(function(cb,i){ lz.getCell(colRefL+(i+2)).value=cb.ref; lz.getCell(colModL+(i+2)).value=cb.modelo; lz.getCell(colCorL+(i+2)).value=cb.cor; });
   var nRef=Math.max(combos.length,1)+1;
-  lz.getColumn(colKeyN).width=24; lz.getColumn(colRefN).width=14;
+  lz.getColumn(colRefN).width=16; lz.getColumn(colModN).width=24; lz.getColumn(colCorN).width=20;
   lz.getCell('B'+(mods.length+3)).value='Loretto: esta aba alimenta as listas. A fábrica não precisa mexer aqui.';
   lz.getCell('B'+(mods.length+3)).font={name:'Arial',size:9,italic:true,color:{argb:CINZA}};
   lz.getColumn(1).width=30; lz.getColumn(2).width=14;
@@ -8063,8 +8078,19 @@ async function romGerarXlsx(){
   lz.state='hidden';
 
   /* ---- ROMANEIO ---- */
-  var ULT=14; // A..N  (N = REFERÊNCIA, no fim, puxada sozinha do modelo+cor)
-  var CAB=['MODELO','COR'].concat(ROM_TAMS.map(String)).concat(['TOTAL','VALOR DO PAR','VALOR TOTAL','REFERÊNCIA']);
+  // DOIS modos de planilha:
+  //  'modelo' (ex.: Urbana): escolhe pelo MODELO na seta, sem coluna de referência.
+  //  'ref'    (ex.: Tarragona): escolhe pela REFERÊNCIA na seta e MODELO+COR aparecem sozinhos.
+  var comRef=(_romTipo==='ref');
+  if(comRef&&!combos.length){toast('Modo "por referência", mas nenhum modelo/cor marcado tem referência cadastrada. Cadastre as refs (Reposição) ou use "por modelo".');return;}
+  var cRef=comRef?1:0, cMod=comRef?2:1, cCor=comRef?3:2, cS0=comRef?4:3;
+  var nT=ROM_TAMS.length, cTot=cS0+nT, cVpar=cTot+1, cVtot=cVpar+1, ULT=cVtot;
+  function L(n){return romColLetra(n);}
+  var LMod=L(cMod), LCor=L(cCor), LTot=L(cTot), LVpar=L(cVpar), LVtot=L(cVtot);
+  var LS0=L(cS0), LS7=L(cS0+nT-1), LRef=comRef?L(cRef):'';
+  function romIsInput(j){ return (comRef?(j===cRef):(j===cMod||j===cCor)) || (j>=cS0&&j<cS0+nT); }
+  var CAB=[]; if(comRef)CAB.push('REFERÊNCIA'); CAB.push('MODELO','COR');
+  ROM_TAMS.forEach(function(t){CAB.push(String(t));}); CAB.push('TOTAL','VALOR DO PAR','VALOR TOTAL');
   function merge(r,c1,c2){ws.mergeCells(r,c1,r,c2);}
   // Topo enxuto (só isto fica congelado): título, fábrica, dica de 1 linha, TOTAL e cabeçalho.
   // O passo a passo e o exemplo vão PARA BAIXO da tabela, pra não ocupar a tela em monitor pequeno.
@@ -8112,28 +8138,30 @@ async function romGerarXlsx(){
 
   // dica curtinha numa linha só (o passo a passo e o exemplo ficam embaixo da tabela)
   merge(5,1,ULT); var hint=ws.getCell('A5');
-  hint.value='MODELO e COR: clique na célula e escolha na seta ▼.  Numerações (37 a 44): digite os pares.  As contas são automáticas.  Se repetir o mesmo MODELO+COR, a linha fica VERMELHA — apague a repetida.';
+  hint.value=comRef
+    ? 'REFERÊNCIA: escolha na seta ▼ — o MODELO e a COR aparecem sozinhos.  Numerações (37 a 44): digite os pares.  As contas são automáticas.  Se repetir, a linha fica VERMELHA — apague a repetida.'
+    : 'MODELO e COR: clique na célula e escolha na seta ▼.  Numerações (37 a 44): digite os pares.  As contas são automáticas.  Se repetir o mesmo MODELO+COR, a linha fica VERMELHA — apague a repetida.';
   hint.font={name:'Arial',size:10,bold:true,color:{argb:VERDE}}; hint.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDFCF5'}};
   hint.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(5).height=18;
 
   // TOTAL fica ACIMA do cabeçalho (linha 6), cabeçalho na 7
-  ws.mergeCells(TR,1,TR,2); var tt=ws.getCell(TR,1); tt.value='TOTAL';
+  ws.mergeCells(TR,1,TR,cCor); var tt=ws.getCell(TR,1); tt.value='TOTAL';
   tt.font={name:'Arial',size:12,bold:true,color:{argb:VERDE}}; tt.alignment={horizontal:'left',vertical:'middle'};
-  for(var j=3;j<=10;j++){
-    var col=String.fromCharCode(64+j);
+  for(var j=cS0;j<cS0+nT;j++){
+    var col=L(j);
     var c=ws.getCell(TR,j); c.value={formula:'SUM('+col+LIN0+':'+col+FIM+')'};
     c.font={name:'Arial',size:12,bold:true,color:{argb:VERDE}}; c.alignment={horizontal:'center',vertical:'middle'};
   }
-  var kc=ws.getCell(TR,11); kc.value={formula:'SUM(K'+LIN0+':K'+FIM+')'};
+  var kc=ws.getCell(TR,cTot); kc.value={formula:'SUM('+LTot+LIN0+':'+LTot+FIM+')'};
   kc.font={name:'Arial',size:12,bold:true,color:{argb:'FFFFFFFF'}}; kc.fill={type:'pattern',pattern:'solid',fgColor:{argb:VERDE}};
   kc.alignment={horizontal:'center',vertical:'middle'};
-  var mc=ws.getCell(TR,13); mc.value={formula:'SUM(M'+LIN0+':M'+FIM+')'};
+  var mc=ws.getCell(TR,cVtot); mc.value={formula:'SUM('+LVtot+LIN0+':'+LVtot+FIM+')'};
   mc.font={name:'Arial',size:12,bold:true,color:{argb:'FFFFFFFF'}}; mc.fill={type:'pattern',pattern:'solid',fgColor:{argb:VERDE}};
   mc.numFmt='#,##0.00'; mc.alignment={horizontal:'center',vertical:'middle'};
   for(var j=1;j<=ULT;j++){
     var c=ws.getCell(TR,j);
     c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'medium',color:{argb:VERDE}},right:{style:'thin'}};
-    if(j!==11&&j!==13)c.fill={type:'pattern',pattern:'solid',fgColor:{argb:OURO}};
+    if(j!==cTot&&j!==cVtot)c.fill={type:'pattern',pattern:'solid',fgColor:{argb:OURO}};
   }
   ws.getRow(TR).height=24;
 
@@ -8152,28 +8180,31 @@ async function romGerarXlsx(){
   });
   ws.getRow(HDR).height=26;
 
-  var nMod=Math.max(mods.length,1)+1, nCor=Math.max(cores.length,1)+1;
+  var nMod=Math.max(mods.length,1)+1;
   for(var r=LIN0;r<=LINF;r++){
     ws.getRow(r).height=20;
     for(var j=1;j<=ULT;j++){
       var c=ws.getCell(r,j);
       c.font={name:'Arial',size:11};
-      c.alignment={horizontal:(j<=2?'left':'center'),vertical:'middle'};
+      c.alignment={horizontal:(j<=cCor?'left':'center'),vertical:'middle'};
       c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
-      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:(j<=10?AMARELO:CALC)}};
+      c.fill={type:'pattern',pattern:'solid',fgColor:{argb:(romIsInput(j)?AMARELO:CALC)}};
     }
-    ws.getCell(r,11).value={formula:'IF(SUM(C'+r+':J'+r+')=0,"",SUM(C'+r+':J'+r+'))'};
-    ws.getCell(r,11).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
-    // valor do par: puxa do nosso sistema pelo modelo escolhido
-    ws.getCell(r,12).value={formula:'IF(A'+r+'="","",IFERROR(INDEX(LISTAS!$B$2:$B$'+nMod+',MATCH(A'+r+',LISTAS!$A$2:$A$'+nMod+',0)),""))'};
-    ws.getCell(r,12).numFmt='#,##0.00';
-    ws.getCell(r,13).value={formula:'IF(OR(K'+r+'="",L'+r+'=""),"",K'+r+'*L'+r+')'};
-    ws.getCell(r,13).numFmt='#,##0.00';
-    ws.getCell(r,13).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
-    // REFERÊNCIA: puxa sozinha do nosso cadastro pelo MODELO+COR escolhidos (fica em branco se não tiver)
-    ws.getCell(r,14).value={formula:'IF(OR(A'+r+'="",B'+r+'=""),"",IFERROR(INDEX(LISTAS!$'+colRef+'$2:$'+colRef+'$'+nRef+',MATCH(A'+r+'&"|"&B'+r+',LISTAS!$'+colKey+'$2:$'+colKey+'$'+nRef+',0)),""))'};
-    ws.getCell(r,14).font={name:'Arial',size:11,color:{argb:CINZA}};
-    ws.getCell(r,14).alignment={horizontal:'center',vertical:'middle'};
+    ws.getCell(r,cTot).value={formula:'IF(SUM('+LS0+r+':'+LS7+r+')=0,"",SUM('+LS0+r+':'+LS7+r+'))'};
+    ws.getCell(r,cTot).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
+    // valor do par: puxa do nosso sistema pelo modelo (no modo ref o modelo é fórmula, mas o valor resolvido serve pro MATCH)
+    ws.getCell(r,cVpar).value={formula:'IF('+LMod+r+'="","",IFERROR(INDEX(LISTAS!$B$2:$B$'+nMod+',MATCH('+LMod+r+',LISTAS!$A$2:$A$'+nMod+',0)),""))'};
+    ws.getCell(r,cVpar).numFmt='#,##0.00';
+    ws.getCell(r,cVtot).value={formula:'IF(OR('+LTot+r+'="",'+LVpar+r+'=""),"",'+LTot+r+'*'+LVpar+r+')'};
+    ws.getCell(r,cVtot).numFmt='#,##0.00';
+    ws.getCell(r,cVtot).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
+    if(comRef){
+      // MODELO e COR aparecem sozinhos a partir da REFERÊNCIA escolhida
+      ws.getCell(r,cMod).value={formula:'IF('+LRef+r+'="","",IFERROR(INDEX(LISTAS!$'+colModL+'$2:$'+colModL+'$'+nRef+',MATCH('+LRef+r+',LISTAS!$'+colRefL+'$2:$'+colRefL+'$'+nRef+',0)),""))'};
+      ws.getCell(r,cCor).value={formula:'IF('+LRef+r+'="","",IFERROR(INDEX(LISTAS!$'+colCorL+'$2:$'+colCorL+'$'+nRef+',MATCH('+LRef+r+',LISTAS!$'+colRefL+'$2:$'+colRefL+'$'+nRef+',0)),""))'};
+      ws.getCell(r,cMod).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
+      ws.getCell(r,cCor).font={name:'Arial',size:11,color:{argb:VERDE}};
+    }
   }
 
   // ---- passo a passo + exemplo: EMBAIXO da tabela (fora da área congelada) ----
@@ -8182,10 +8213,15 @@ async function romGerarXlsx(){
   var ih=ws.getCell(GB,1); ih.value='COMO PREENCHER  (é rapidinho, só 3 passos)';
   ih.font={name:'Arial',size:12,bold:true,color:{argb:CREME}}; ih.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF5A7A3A'}};
   ih.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(GB).height=22;
-  var INS=[
+  var INS=comRef?[
+    '1)  REFERÊNCIA:  clique na célula, aparece a seta ▼.  Escolha a referência — o MODELO e a COR aparecem sozinhos.',
+    '2)  Numerações (37 a 44):  digite quantos pares está mandando.  O que não tiver, deixe em branco.',
+    '3)  O VALOR DO PAR e as contas aparecem sozinhos — não precisa somar nada.',
+    'Não repita a mesma REFERÊNCIA:  se repetir, a linha fica VERMELHA e acende um aviso no topo — é só apagar a que sobrou.'
+  ]:[
     '1)  MODELO e COR:  clique na célula, aparece a seta ▼ do lado.  Clique nela e escolha da lista.',
     '2)  Numerações (37 a 44):  digite quantos pares está mandando.  O que não tiver, deixe em branco.',
-    '3)  O VALOR DO PAR, a REFERÊNCIA e as contas aparecem sozinhos — não precisa digitar nem somar nada.',
+    '3)  O VALOR DO PAR e as contas aparecem sozinhos — não precisa somar nada.',
     'Não repita o mesmo MODELO+COR:  se repetir, a linha fica VERMELHA e acende um aviso no topo — é só apagar a que sobrou.'
   ];
   INS.forEach(function(txt,i){
@@ -8204,13 +8240,15 @@ async function romGerarXlsx(){
     c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
   });
   var m0=mods[0], c0=(m0.cores||[])[0], cu0=romPrecoFinal(m0)||135;
-  var EX=[m0.nome,(c0&&c0.nome)||'—',1,2,5,6,6,3,2,null,25,cu0,25*cu0,(typeof repRefDe==='function'?(repRefDe(m0.id,(c0&&c0.nome))||'—'):'—')];
+  var exRef=(typeof repRefDe==='function'?String(repRefDe(m0.id,(c0&&c0.nome))||'—'):'—');
+  var EX=[]; if(comRef)EX.push(exRef); EX.push(m0.nome,(c0&&c0.nome)||'—');
+  EX=EX.concat([1,2,5,6,6,3,2,null]); EX.push(25,cu0,25*cu0);
   EX.forEach(function(v,j){
     var c=ws.getCell(exN+2,j+1); if(v!==null)c.value=v;
     c.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:CINZA_BG}};
-    c.alignment={horizontal:(j<2?'left':'center'),vertical:'middle'};
+    c.alignment={horizontal:((j+1)<=cCor?'left':'center'),vertical:'middle'};
     c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
-    if(j===11||j===12)c.numFmt='#,##0.00';
+    if((j+1)===cVpar||(j+1)===cVtot)c.numFmt='#,##0.00';
   });
   ws.getRow(exN+2).height=18;
   var foR=exN+4; merge(foR,1,ULT); var fo=ws.getCell(foR,1);
@@ -8218,39 +8256,47 @@ async function romGerarXlsx(){
   fo.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}};
   var ultLinha=foR;
 
-  /* ---- seta ▼ de MODELO e COR + trava de quantidade ---- */
+  /* ---- setas ▼ (conforme o modo) + trava de quantidade ---- */
   for(var r=LIN0;r<=FIM;r++){
-    ws.getCell(r,1).dataValidation={type:'list',allowBlank:true,formulae:['=LISTAS!$A$2:$A$'+nMod],
-      showErrorMessage:true,errorTitle:'Modelo',error:'Clique na seta ▼ e escolha um modelo da lista.'};
-    // COR depende do MODELO: MATCH acha a posição do modelo, INDIRECT abre só as cores dele
-    ws.getCell(r,2).dataValidation={type:'list',allowBlank:true,
-      formulae:['=INDIRECT("MOD_"&MATCH(A'+r+',LISTAS!$A$2:$A$'+nMod+',0))'],
-      showErrorMessage:true,errorTitle:'Cor',
-      error:'Escolha primeiro o MODELO. Aí a seta mostra só as cores dele.'};
-    for(var j=3;j<=10;j++){
+    if(comRef){
+      // modo por referência: só a REF tem seta; modelo e cor são fórmula
+      ws.getCell(r,cRef).dataValidation={type:'list',allowBlank:true,formulae:['=LISTAS!$'+colRefL+'$2:$'+colRefL+'$'+nRef],
+        showErrorMessage:true,errorTitle:'Referência',error:'Clique na seta ▼ e escolha uma referência da lista.'};
+    }else{
+      ws.getCell(r,cMod).dataValidation={type:'list',allowBlank:true,formulae:['=LISTAS!$A$2:$A$'+nMod],
+        showErrorMessage:true,errorTitle:'Modelo',error:'Clique na seta ▼ e escolha um modelo da lista.'};
+      // COR depende do MODELO: MATCH acha a posição do modelo, INDIRECT abre só as cores dele
+      ws.getCell(r,cCor).dataValidation={type:'list',allowBlank:true,
+        formulae:['=INDIRECT("MOD_"&MATCH('+LMod+r+',LISTAS!$A$2:$A$'+nMod+',0))'],
+        showErrorMessage:true,errorTitle:'Cor',
+        error:'Escolha primeiro o MODELO. Aí a seta mostra só as cores dele.'};
+    }
+    for(var j=cS0;j<cS0+nT;j++){
       ws.getCell(r,j).dataValidation={type:'whole',operator:'between',allowBlank:true,formulae:[0,999],
         showErrorMessage:true,errorTitle:'Quantidade',error:'Digite apenas o número de pares (ex.: 5).'};
     }
   }
 
-  /* ---- avisa duplicado: MODELO+COR repetido deixa a linha VERMELHA na hora ---- */
+  /* ---- avisa duplicado: mesma identidade repetida deixa a linha VERMELHA ----
+     modo modelo: chave = MODELO+COR.  modo ref: chave = REFERÊNCIA. */
+  var dupA=comRef?LRef:LMod, dupB=comRef?LRef:LCor;
   try{
     ws.addConditionalFormatting({
-      ref:'A'+LIN0+':N'+LINF,
+      ref:'A'+LIN0+':'+L(ULT)+LINF,
       rules:[{type:'expression',
-        formulae:['AND($A'+LIN0+'<>"",COUNTIFS($A$'+LIN0+':$A$'+LINF+',$A'+LIN0+',$B$'+LIN0+':$B$'+LINF+',$B'+LIN0+')>1)'],
+        formulae:['AND($'+dupA+LIN0+'<>"",COUNTIFS($'+dupA+'$'+LIN0+':$'+dupA+'$'+LINF+',$'+dupA+LIN0+',$'+dupB+'$'+LIN0+':$'+dupB+'$'+LINF+',$'+dupB+LIN0+')>1)'],
         style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFF4B7B7'}},font:{color:{argb:'FF8B1A1A'},bold:true}}}]
     });
   }catch(e){}
   // aviso no topo (fica congelado): acende só quando existe alguma linha repetida
   ws.mergeCells('L4:M4'); var wc=ws.getCell('L4');
-  wc.value={formula:'IF(SUMPRODUCT(($A$'+LIN0+':$A$'+LINF+'<>"")*(COUNTIFS($A$'+LIN0+':$A$'+LINF+',$A$'+LIN0+':$A$'+LINF+',$B$'+LIN0+':$B$'+LINF+',$B$'+LIN0+':$B$'+LINF+')>1))>0,"⚠ TEM LINHA REPETIDA","")'};
+  wc.value={formula:'IF(SUMPRODUCT(($'+dupA+'$'+LIN0+':$'+dupA+'$'+LINF+'<>"")*(COUNTIFS($'+dupA+'$'+LIN0+':$'+dupA+'$'+LINF+',$'+dupA+'$'+LIN0+':$'+dupA+'$'+LINF+',$'+dupB+'$'+LIN0+':$'+dupB+'$'+LINF+',$'+dupB+'$'+LIN0+':$'+dupB+'$'+LINF+')>1))>0,"⚠ TEM LINHA REPETIDA","")'};
   wc.font={name:'Arial',size:11,bold:true,color:{argb:'FFC0392B'}};
   wc.alignment={horizontal:'center',vertical:'middle'};
 
-  /* ---- trava as partes cinzas / solta modelo, cor e numerações (colunas 1..10) ---- */
+  /* ---- trava tudo, solta só o que a fábrica preenche (conforme o modo) ---- */
   for(var r=LIN0;r<=FIM;r++){
-    for(var j=1;j<=10;j++)ws.getCell(r,j).protection={locked:false};
+    for(var j=1;j<=ULT;j++)if(romIsInput(j))ws.getCell(r,j).protection={locked:false};
   }
   try{
     await ws.protect('',{selectLockedCells:false,selectUnlockedCells:true,
@@ -8259,13 +8305,14 @@ async function romGerarXlsx(){
       sort:true,autoFilter:false,pivotTables:false});
   }catch(e){ try{ws.protect();}catch(_e){} }
 
-  ws.getColumn(1).width=24; ws.getColumn(2).width=22;
-  for(var j=3;j<=10;j++)ws.getColumn(j).width=6.5;
-  ws.getColumn(11).width=9; ws.getColumn(12).width=14; ws.getColumn(13).width=14; ws.getColumn(14).width=16;
+  if(comRef)ws.getColumn(cRef).width=16;
+  ws.getColumn(cMod).width=24; ws.getColumn(cCor).width=22;
+  for(var j=cS0;j<cS0+nT;j++)ws.getColumn(j).width=6.5;
+  ws.getColumn(cTot).width=9; ws.getColumn(cVpar).width=14; ws.getColumn(cVtot).width=14;
   ws.views=[{state:'frozen',ySplit:HDR}];
   ws.pageSetup={orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,paperSize:9,
                 margins:{left:0.3,right:0.3,top:0.4,bottom:0.4,header:0,footer:0}};
-  ws.printArea='A1:N'+ultLinha;
+  ws.printArea='A1:'+L(ULT)+ultLinha;
 
   var buf=await wb.xlsx.writeBuffer();
   var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
