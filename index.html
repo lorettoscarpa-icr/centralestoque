@@ -8042,6 +8042,19 @@ async function romGerarXlsx(){
     if(cs.length)wb.definedNames.add('LISTAS!$'+col+'$2:$'+col+'$'+(cs.length+1),'MOD_'+(i+1));
     lz.getColumn(4+i).width=20;
   });
+  // combos MODELO|COR -> REFERÊNCIA: alimenta a coluna de referência (puxa sozinha do nosso cadastro)
+  var colKeyN=4+mods.length, colRefN=colKeyN+1;
+  var colKey=romColLetra(colKeyN), colRef=romColLetra(colRefN);
+  lz.getCell(colKey+'1').value='chave'; lz.getCell(colRef+'1').value='ref';
+  [colKey+'1',colRef+'1'].forEach(function(c){lz.getCell(c).font={name:'Arial',size:9,bold:true,color:{argb:CINZA}};});
+  var combos=[];
+  mods.forEach(function(m){romCoresSel(m).forEach(function(cor){
+    var rf=(typeof repRefDe==='function')?(repRefDe(m.id,cor)||''):'';
+    if(rf)combos.push({key:m.nome+'|'+cor, ref:rf});
+  });});
+  combos.forEach(function(cb,i){ lz.getCell(colKey+(i+2)).value=cb.key; lz.getCell(colRef+(i+2)).value=String(cb.ref); });
+  var nRef=Math.max(combos.length,1)+1;
+  lz.getColumn(colKeyN).width=24; lz.getColumn(colRefN).width=14;
   lz.getCell('B'+(mods.length+3)).value='Loretto: esta aba alimenta as listas. A fábrica não precisa mexer aqui.';
   lz.getCell('B'+(mods.length+3)).font={name:'Arial',size:9,italic:true,color:{argb:CINZA}};
   lz.getColumn(1).width=30; lz.getColumn(2).width=14;
@@ -8050,8 +8063,8 @@ async function romGerarXlsx(){
   lz.state='hidden';
 
   /* ---- ROMANEIO ---- */
-  var ULT=13; // A..M
-  var CAB=['MODELO','COR'].concat(ROM_TAMS.map(String)).concat(['TOTAL','VALOR DO PAR','VALOR TOTAL']);
+  var ULT=14; // A..N  (N = REFERÊNCIA, no fim, puxada sozinha do modelo+cor)
+  var CAB=['MODELO','COR'].concat(ROM_TAMS.map(String)).concat(['TOTAL','VALOR DO PAR','VALOR TOTAL','REFERÊNCIA']);
   function merge(r,c1,c2){ws.mergeCells(r,c1,r,c2);}
   // Topo enxuto (só isto fica congelado): título, fábrica, dica de 1 linha, TOTAL e cabeçalho.
   // O passo a passo e o exemplo vão PARA BAIXO da tabela, pra não ocupar a tela em monitor pequeno.
@@ -8157,6 +8170,10 @@ async function romGerarXlsx(){
     ws.getCell(r,13).value={formula:'IF(OR(K'+r+'="",L'+r+'=""),"",K'+r+'*L'+r+')'};
     ws.getCell(r,13).numFmt='#,##0.00';
     ws.getCell(r,13).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
+    // REFERÊNCIA: puxa sozinha do nosso cadastro pelo MODELO+COR escolhidos (fica em branco se não tiver)
+    ws.getCell(r,14).value={formula:'IF(OR(A'+r+'="",B'+r+'=""),"",IFERROR(INDEX(LISTAS!$'+colRef+'$2:$'+colRef+'$'+nRef+',MATCH(A'+r+'&"|"&B'+r+',LISTAS!$'+colKey+'$2:$'+colKey+'$'+nRef+',0)),""))'};
+    ws.getCell(r,14).font={name:'Arial',size:11,color:{argb:CINZA}};
+    ws.getCell(r,14).alignment={horizontal:'center',vertical:'middle'};
   }
 
   // ---- passo a passo + exemplo: EMBAIXO da tabela (fora da área congelada) ----
@@ -8168,7 +8185,7 @@ async function romGerarXlsx(){
   var INS=[
     '1)  MODELO e COR:  clique na célula, aparece a seta ▼ do lado.  Clique nela e escolha da lista.',
     '2)  Numerações (37 a 44):  digite quantos pares está mandando.  O que não tiver, deixe em branco.',
-    '3)  O VALOR DO PAR e as contas aparecem sozinhos — não precisa somar nada.',
+    '3)  O VALOR DO PAR, a REFERÊNCIA e as contas aparecem sozinhos — não precisa digitar nem somar nada.',
     'Não repita o mesmo MODELO+COR:  se repetir, a linha fica VERMELHA e acende um aviso no topo — é só apagar a que sobrou.'
   ];
   INS.forEach(function(txt,i){
@@ -8187,7 +8204,7 @@ async function romGerarXlsx(){
     c.border={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
   });
   var m0=mods[0], c0=(m0.cores||[])[0], cu0=romPrecoFinal(m0)||135;
-  var EX=[m0.nome,(c0&&c0.nome)||'—',1,2,5,6,6,3,2,null,25,cu0,25*cu0];
+  var EX=[m0.nome,(c0&&c0.nome)||'—',1,2,5,6,6,3,2,null,25,cu0,25*cu0,(typeof repRefDe==='function'?(repRefDe(m0.id,(c0&&c0.nome))||'—'):'—')];
   EX.forEach(function(v,j){
     var c=ws.getCell(exN+2,j+1); if(v!==null)c.value=v;
     c.font={name:'Arial',size:10,italic:true,color:{argb:CINZA}}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:CINZA_BG}};
@@ -8219,7 +8236,7 @@ async function romGerarXlsx(){
   /* ---- avisa duplicado: MODELO+COR repetido deixa a linha VERMELHA na hora ---- */
   try{
     ws.addConditionalFormatting({
-      ref:'A'+LIN0+':M'+LINF,
+      ref:'A'+LIN0+':N'+LINF,
       rules:[{type:'expression',
         formulae:['AND($A'+LIN0+'<>"",COUNTIFS($A$'+LIN0+':$A$'+LINF+',$A'+LIN0+',$B$'+LIN0+':$B$'+LINF+',$B'+LIN0+')>1)'],
         style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFF4B7B7'}},font:{color:{argb:'FF8B1A1A'},bold:true}}}]
@@ -8244,11 +8261,11 @@ async function romGerarXlsx(){
 
   ws.getColumn(1).width=24; ws.getColumn(2).width=22;
   for(var j=3;j<=10;j++)ws.getColumn(j).width=6.5;
-  ws.getColumn(11).width=9; ws.getColumn(12).width=14; ws.getColumn(13).width=14;
+  ws.getColumn(11).width=9; ws.getColumn(12).width=14; ws.getColumn(13).width=14; ws.getColumn(14).width=16;
   ws.views=[{state:'frozen',ySplit:HDR}];
   ws.pageSetup={orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,paperSize:9,
                 margins:{left:0.3,right:0.3,top:0.4,bottom:0.4,header:0,footer:0}};
-  ws.printArea='A1:M'+ultLinha;
+  ws.printArea='A1:N'+ultLinha;
 
   var buf=await wb.xlsx.writeBuffer();
   var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
