@@ -7907,6 +7907,15 @@ var ROM_TAMS=[37,38,39,40,41,42,43,44];
 function romCoresDe(m){return (m.cores||[]).filter(function(c){return !c.off;});}
 function romCorOn(m,cor){var s=_romCores[m.id];return !s||s[cor]!==false;}     // sem config = ligada
 function romCoresSel(m){return romCoresDe(m).filter(function(c){return romCorOn(m,c.nome);}).map(function(c){return c.nome;});}
+// referência DO MODELO (não é por cor): prefere a ref de modelo cadastrada; se não, a 1ª que achar
+function romRefModelo(m){
+  try{ var cf=(typeof repCfg!=='undefined'&&repCfg[m.id])||null;
+    if(cf){ if(cf.referencia)return String(cf.referencia);
+      if(cf.refs){ for(var k in cf.refs){ if(cf.refs[k])return String(cf.refs[k]); } } }
+  }catch(e){}
+  try{ if(typeof repRefDe==='function'){ var cs=romCoresSel(m); for(var i=0;i<cs.length;i++){ var r=repRefDe(m.id,cs[i]); if(r)return String(r); } } }catch(e){}
+  return '';
+}
 function romColLetra(n){var s='';while(n>0){var m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=(n-m-1)/26;}return s;}
 
 function romCat(){
@@ -8057,19 +8066,19 @@ async function romGerarXlsx(){
     lz.getColumn(4+i).width=20;
   });
   // combos MODELO|COR -> REFERÊNCIA: alimenta a coluna de referência (puxa sozinha do nosso cadastro)
-  // combos pro modo "por referência": REF -> MODELO, COR (e a lista de refs pra seta). Dedup por ref.
-  var colRefN=4+mods.length, colModN=colRefN+1, colCorN=colModN+1;
-  var colRefL=romColLetra(colRefN), colModL=romColLetra(colModN), colCorL=romColLetra(colCorN);
-  lz.getCell(colRefL+'1').value='ref'; lz.getCell(colModL+'1').value='modelo'; lz.getCell(colCorL+'1').value='cor';
-  [colRefL+'1',colModL+'1',colCorL+'1'].forEach(function(c){lz.getCell(c).font={name:'Arial',size:9,bold:true,color:{argb:CINZA}};});
+  // combos pro modo "por referência": REF -> MODELO (a ref é do MODELO; a cor a fábrica escolhe). 1 por modelo.
+  var colRefN=4+mods.length, colModN=colRefN+1;
+  var colRefL=romColLetra(colRefN), colModL=romColLetra(colModN);
+  lz.getCell(colRefL+'1').value='ref'; lz.getCell(colModL+'1').value='modelo';
+  [colRefL+'1',colModL+'1'].forEach(function(c){lz.getCell(c).font={name:'Arial',size:9,bold:true,color:{argb:CINZA}};});
   var combos=[], _seenRef={};
-  mods.forEach(function(m){romCoresSel(m).forEach(function(cor){
-    var rf=(typeof repRefDe==='function')?String(repRefDe(m.id,cor)||''):'';
-    if(rf&&!_seenRef[rf]){_seenRef[rf]=1; combos.push({ref:rf, modelo:m.nome, cor:cor});}
-  });});
-  combos.forEach(function(cb,i){ lz.getCell(colRefL+(i+2)).value=cb.ref; lz.getCell(colModL+(i+2)).value=cb.modelo; lz.getCell(colCorL+(i+2)).value=cb.cor; });
+  mods.forEach(function(m){
+    var rf=romRefModelo(m);
+    if(rf&&!_seenRef[rf]){_seenRef[rf]=1; combos.push({ref:rf, modelo:m.nome});}
+  });
+  combos.forEach(function(cb,i){ lz.getCell(colRefL+(i+2)).value=cb.ref; lz.getCell(colModL+(i+2)).value=cb.modelo; });
   var nRef=Math.max(combos.length,1)+1;
-  lz.getColumn(colRefN).width=16; lz.getColumn(colModN).width=24; lz.getColumn(colCorN).width=20;
+  lz.getColumn(colRefN).width=16; lz.getColumn(colModN).width=24;
   lz.getCell('B'+(mods.length+3)).value='Loretto: esta aba alimenta as listas. A fábrica não precisa mexer aqui.';
   lz.getCell('B'+(mods.length+3)).font={name:'Arial',size:9,italic:true,color:{argb:CINZA}};
   lz.getColumn(1).width=30; lz.getColumn(2).width=14;
@@ -8088,7 +8097,8 @@ async function romGerarXlsx(){
   function L(n){return romColLetra(n);}
   var LMod=L(cMod), LCor=L(cCor), LTot=L(cTot), LVpar=L(cVpar), LVtot=L(cVtot);
   var LS0=L(cS0), LS7=L(cS0+nT-1), LRef=comRef?L(cRef):'';
-  function romIsInput(j){ return (comRef?(j===cRef):(j===cMod||j===cCor)) || (j>=cS0&&j<cS0+nT); }
+  // no modo ref, MODELO é fórmula (vem da ref) mas a COR a fábrica escolhe → cor também é input
+  function romIsInput(j){ return (comRef?(j===cRef||j===cCor):(j===cMod||j===cCor)) || (j>=cS0&&j<cS0+nT); }
   var CAB=[]; if(comRef)CAB.push('REFERÊNCIA'); CAB.push('MODELO','COR');
   ROM_TAMS.forEach(function(t){CAB.push(String(t));}); CAB.push('TOTAL','VALOR DO PAR','VALOR TOTAL');
   function merge(r,c1,c2){ws.mergeCells(r,c1,r,c2);}
@@ -8139,7 +8149,7 @@ async function romGerarXlsx(){
   // dica curtinha numa linha só (o passo a passo e o exemplo ficam embaixo da tabela)
   merge(5,1,ULT); var hint=ws.getCell('A5');
   hint.value=comRef
-    ? 'REFERÊNCIA: escolha na seta ▼ — o MODELO e a COR aparecem sozinhos.  Numerações (37 a 44): digite os pares.  As contas são automáticas.  Se repetir, a linha fica VERMELHA — apague a repetida.'
+    ? 'REFERÊNCIA: escolha na seta ▼ — o MODELO aparece sozinho.  Depois escolha a COR na seta ▼.  Numerações (37 a 44): digite os pares.  Se repetir modelo+cor, a linha fica VERMELHA — apague a repetida.'
     : 'MODELO e COR: clique na célula e escolha na seta ▼.  Numerações (37 a 44): digite os pares.  As contas são automáticas.  Se repetir o mesmo MODELO+COR, a linha fica VERMELHA — apague a repetida.';
   hint.font={name:'Arial',size:10,bold:true,color:{argb:VERDE}}; hint.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDFCF5'}};
   hint.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(5).height=18;
@@ -8199,11 +8209,9 @@ async function romGerarXlsx(){
     ws.getCell(r,cVtot).numFmt='#,##0.00';
     ws.getCell(r,cVtot).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
     if(comRef){
-      // MODELO e COR aparecem sozinhos a partir da REFERÊNCIA escolhida
+      // só o MODELO aparece sozinho a partir da REFERÊNCIA (a ref é do modelo); a COR a fábrica escolhe na seta
       ws.getCell(r,cMod).value={formula:'IF('+LRef+r+'="","",IFERROR(INDEX(LISTAS!$'+colModL+'$2:$'+colModL+'$'+nRef+',MATCH('+LRef+r+',LISTAS!$'+colRefL+'$2:$'+colRefL+'$'+nRef+',0)),""))'};
-      ws.getCell(r,cCor).value={formula:'IF('+LRef+r+'="","",IFERROR(INDEX(LISTAS!$'+colCorL+'$2:$'+colCorL+'$'+nRef+',MATCH('+LRef+r+',LISTAS!$'+colRefL+'$2:$'+colRefL+'$'+nRef+',0)),""))'};
       ws.getCell(r,cMod).font={name:'Arial',size:11,bold:true,color:{argb:VERDE}};
-      ws.getCell(r,cCor).font={name:'Arial',size:11,color:{argb:VERDE}};
     }
   }
 
@@ -8214,10 +8222,10 @@ async function romGerarXlsx(){
   ih.font={name:'Arial',size:12,bold:true,color:{argb:CREME}}; ih.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF5A7A3A'}};
   ih.alignment={horizontal:'left',vertical:'middle'}; ws.getRow(GB).height=22;
   var INS=comRef?[
-    '1)  REFERÊNCIA:  clique na célula, aparece a seta ▼.  Escolha a referência — o MODELO e a COR aparecem sozinhos.',
-    '2)  Numerações (37 a 44):  digite quantos pares está mandando.  O que não tiver, deixe em branco.',
-    '3)  O VALOR DO PAR e as contas aparecem sozinhos — não precisa somar nada.',
-    'Não repita a mesma REFERÊNCIA:  se repetir, a linha fica VERMELHA e acende um aviso no topo — é só apagar a que sobrou.'
+    '1)  REFERÊNCIA:  clique na célula e escolha na seta ▼.  O MODELO aparece sozinho.',
+    '2)  COR:  clique na seta ▼ e escolha a cor (mostra só as cores daquele modelo).',
+    '3)  Numerações (37 a 44):  digite os pares.  O VALOR e as contas aparecem sozinhos.',
+    'Não repita o mesmo MODELO+COR:  se repetir, a linha fica VERMELHA e acende um aviso no topo — é só apagar a que sobrou.'
   ]:[
     '1)  MODELO e COR:  clique na célula, aparece a seta ▼ do lado.  Clique nela e escolha da lista.',
     '2)  Numerações (37 a 44):  digite quantos pares está mandando.  O que não tiver, deixe em branco.',
@@ -8259,9 +8267,12 @@ async function romGerarXlsx(){
   /* ---- setas ▼ (conforme o modo) + trava de quantidade ---- */
   for(var r=LIN0;r<=FIM;r++){
     if(comRef){
-      // modo por referência: só a REF tem seta; modelo e cor são fórmula
+      // modo por referência: a REF tem seta (define o modelo); a COR tem seta (dependente do modelo que a ref trouxe)
       ws.getCell(r,cRef).dataValidation={type:'list',allowBlank:true,formulae:['=LISTAS!$'+colRefL+'$2:$'+colRefL+'$'+nRef],
         showErrorMessage:true,errorTitle:'Referência',error:'Clique na seta ▼ e escolha uma referência da lista.'};
+      ws.getCell(r,cCor).dataValidation={type:'list',allowBlank:true,
+        formulae:['=INDIRECT("MOD_"&MATCH('+LMod+r+',LISTAS!$A$2:$A$'+nMod+',0))'],
+        showErrorMessage:true,errorTitle:'Cor',error:'Escolha primeiro a REFERÊNCIA. Aí a seta mostra só as cores daquele modelo.'};
     }else{
       ws.getCell(r,cMod).dataValidation={type:'list',allowBlank:true,formulae:['=LISTAS!$A$2:$A$'+nMod],
         showErrorMessage:true,errorTitle:'Modelo',error:'Clique na seta ▼ e escolha um modelo da lista.'};
@@ -8279,7 +8290,7 @@ async function romGerarXlsx(){
 
   /* ---- avisa duplicado: mesma identidade repetida deixa a linha VERMELHA ----
      modo modelo: chave = MODELO+COR.  modo ref: chave = REFERÊNCIA. */
-  var dupA=comRef?LRef:LMod, dupB=comRef?LRef:LCor;
+  var dupA=LMod, dupB=LCor;   // identidade real da linha = MODELO+COR (no modo ref, modelo vem da ref e a cor é escolhida)
   try{
     ws.addConditionalFormatting({
       ref:'A'+LIN0+':'+L(ULT)+LINF,
