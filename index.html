@@ -1893,19 +1893,17 @@
   .tpl14 .right .mi{font-size:2.2em;letter-spacing:.5px;text-transform:uppercase;text-align:right}
   .tpl14 .right .bc{margin-top:auto}
   /* Modelo 15 — Topper (Manutt): linha + ref grande + modelo/cor + código; nº em caixa grande à direita, com o leão da Loretto */
-  .tpl15{display:flex;flex-direction:row;align-items:stretch;padding:1.1em 1.4em;gap:1.3em}
-  .tpl15 .l{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.22em;overflow:hidden}
-  .tpl15 .lin{font-size:4.2em;font-weight:var(--etNomeW,600);letter-spacing:.5px;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tpl15 .ref{font-size:6.8em;font-weight:800;line-height:1;letter-spacing:1px}
-  .tpl15 .mc{font-size:4.2em;font-weight:var(--etCorW,600);text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tpl15 .bcw{margin-top:.45em;width:100%}
-  .tpl15 .tbc{justify-content:flex-start;width:var(--etBcW,100%)}
-  .tpl15 .tbc svg{height:8.5em!important;width:100%!important;max-width:100%}
-  .tpl15 .r{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45em}
-  .tpl15 .r .lg{width:calc(var(--lh)*var(--etLeao,.19));height:calc(var(--lh)*var(--etLeao,.19));display:flex;align-items:center;justify-content:center}
-  .tpl15 .r .lg img,.tpl15 .r .lg svg{max-width:100%;max-height:100%;object-fit:contain}
-  .tpl15 .sz{border:.45em solid #000;border-radius:.3em;display:flex;align-items:center;justify-content:center;padding:.05em .5em;min-width:8.5em;min-height:7.5em}
-  .tpl15 .sz b{font-size:calc(var(--lh)*var(--etNum,.30));font-weight:var(--etNumW,800);line-height:1}
+  .tpl15{display:flex;flex-direction:row;align-items:stretch;padding:1em 1.2em;gap:1.1em;font-family:var(--etFont,'Barlow',sans-serif)}
+  .tpl15 .l{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+  .tpl15 .txt{display:flex;flex-direction:column;gap:.18em}
+  .tpl15 .lin{font-size:4.4em;font-weight:var(--etNomeW,500);letter-spacing:.3px;text-transform:uppercase;line-height:1.02;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tpl15 .ref{font-size:6.8em;font-weight:800;line-height:1;letter-spacing:.3px}
+  .tpl15 .mc{font-size:4.4em;font-weight:var(--etCorW,500);text-transform:uppercase;line-height:1.02;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tpl15 .bcw{width:100%}
+  .tpl15 .tbc{justify-content:var(--etBcAlign,left);width:var(--etBcW,100%)}
+  .tpl15 .tbc svg{height:9.5em!important;width:100%!important;max-width:100%}
+  .tpl15 .sz{flex:0 0 auto;align-self:stretch;border:.4em solid #000;border-radius:.25em;display:flex;align-items:center;justify-content:center;padding:.05em .45em;min-width:9em}
+  .tpl15 .sz b{font-size:calc(var(--lh)*var(--etNum,.34));font-weight:var(--etNumW,800);line-height:1}
 </style>
 <style id="pageRule"></style>
 <style id="consertos-css">
@@ -2798,7 +2796,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     <h3>Layout da etiqueta</h3>
     <div class="lay-prev"><div class="etiqueta" id="layoutPrev"></div></div>
     <div class="lay-grid">
-      <div class="full">
+      <div class="full" data-feat="font">
         <label style="margin-top:0">Fonte</label>
         <select id="lFont">
           <option value="'Barlow', sans-serif">Barlow (padrão)</option>
@@ -2808,7 +2806,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
           <option value="Georgia, serif">Georgia</option>
         </select>
       </div>
-      <div class="full">
+      <div class="full" data-feat="neg">
         <label style="margin-top:0">Negrito</label>
         <div class="lay-checks">
           <label class="ck"><input type="checkbox" id="lNomeB"> Nome do modelo</label>
@@ -2816,11 +2814,11 @@ textarea.cons-field{min-height:80px;resize:vertical}
           <label class="ck"><input type="checkbox" id="lNumB"> Numeração</label>
         </div>
       </div>
-      <div><label style="margin-top:0">Tamanho da numeração <span class="lay-val" id="vNum"></span></label><input type="range" id="lNum" min="0.16" max="0.45" step="0.01"></div>
-      <div><label style="margin-top:0">Tamanho do leao <span class="lay-val" id="vLeao"></span></label><input type="range" id="lLeao" min="0.08" max="0.34" step="0.01"></div>
-      <div><label style="margin-top:0">Altura do codigo <span class="lay-val" id="vBcH"></span></label><input type="range" id="lBcH" min="20" max="60" step="1"></div>
-      <div><label style="margin-top:0">Largura do codigo <span class="lay-val" id="vBcW"></span></label><input type="range" id="lBcW" min="40" max="100" step="1"></div>
-      <div class="full">
+      <div data-feat="num"><label style="margin-top:0">Tamanho da numeração <span class="lay-val" id="vNum"></span></label><input type="range" id="lNum" min="0.16" max="0.45" step="0.01"></div>
+      <div data-feat="leao"><label style="margin-top:0">Tamanho do leao <span class="lay-val" id="vLeao"></span></label><input type="range" id="lLeao" min="0.08" max="0.34" step="0.01"></div>
+      <div data-feat="bcH"><label style="margin-top:0">Altura do codigo <span class="lay-val" id="vBcH"></span></label><input type="range" id="lBcH" min="20" max="60" step="1"></div>
+      <div data-feat="bcW"><label style="margin-top:0">Largura do codigo <span class="lay-val" id="vBcW"></span></label><input type="range" id="lBcW" min="40" max="100" step="1"></div>
+      <div class="full" data-feat="bcAlign">
         <label style="margin-top:0">Posicao do código de barras</label>
         <select id="lBcAlign">
           <option value="left">Esquerda</option>
@@ -2829,6 +2827,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
         </select>
       </div>
     </div>
+    <div id="layFixoNota" class="modal-nota hide" style="text-align:center">Este modelo tem <b>layout fixo</b> — o desenho já vem pronto e não tem ajustes.</div>
     <div class="modal-acts" style="margin-top:20px">
       <button class="btn btn-ghost" id="layoutReset">Restaurar padrão</button>
       <button class="btn btn-ouro" id="layoutClose">Concluir</button>
@@ -3022,8 +3021,8 @@ function tplEtiqueta(modelo,d,barId){
     case 't14': return '<div class="left"><div class="v">'+br+'</div><div class="sz mono">-- US<br>'+br+' BR<br>-- cm</div></div>'+
       '<div class="mid"><div class="cod mono">'+cod+'</div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>'+
       '<div class="right"><div class="mi"><span class="tph">origem a preencher</span></div><div class="bc">'+BC+'</div></div>';
-    case 't15': return '<div class="l"><div class="lin">'+(nome||'&nbsp;')+'</div><div class="ref mono">'+(ref||cod||'')+'</div><div class="mc">'+(cor||'')+'</div><div class="bcw">'+BC+'</div></div>'+
-      '<div class="r"><div class="lg">'+leao+'</div><div class="sz"><b>'+br+'</b></div></div>';
+    case 't15': return '<div class="l"><div class="txt"><div class="lin">'+(nome||'&nbsp;')+'</div><div class="ref mono">'+(ref||cod||'')+'</div><div class="mc">'+(cor||'')+'</div></div><div class="bcw">'+BC+'</div></div>'+
+      '<div class="sz"><b>'+br+'</b></div>';
     default: return '';
   }
 }
@@ -3128,7 +3127,22 @@ function previewLayout(){
 }
 function layoutSpans(){if($('vNum')){$('vNum').textContent=Math.round(layout.num*100)+'%';$('vLeao').textContent=Math.round(layout.leao*100)+'%';$('vBcH').textContent=layout.bcHeight+'px';$('vBcW').textContent=layout.bcW+'%';}}
 function preencheLayout(){$('lFont').value=layout.font;$('lNum').value=layout.num;$('lLeao').value=layout.leao;$('lBcH').value=layout.bcHeight;$('lBcW').value=layout.bcW;$('lBcAlign').value=layout.bcAlign;$('lNomeB').checked=layout.nomeB;$('lCorB').checked=layout.corB;$('lNumB').checked=layout.numB;layoutSpans();}
-function abrirLayout(){preencheLayout();aplicaLayout();previewLayout();$('layoutModal').classList.remove('hide');}
+// quais controles cada modelo de etiqueta realmente usa (o que o modelo não tem, some do editor)
+var TPL_FEAT={
+  padrao:{font:1,neg:1,num:1,leao:1,bcH:1,bcW:1,bcAlign:1},
+  t15:{font:1,neg:1,num:1,bcW:1,bcAlign:1}   // Topper/Manutt: sem leão e sem altura do código
+};
+function tplFeatAtual(){var m=(typeof etqModelo!=='undefined'&&etqModelo)||'padrao';return TPL_FEAT[m]||{};/* t1..t14 = layout fixo */}
+function updateLayoutControls(){
+  var f=tplFeatAtual(),any=false;
+  ['font','neg','num','leao','bcH','bcW','bcAlign'].forEach(function(k){
+    var el=document.querySelector('[data-feat="'+k+'"]');if(!el)return;
+    var on=!!f[k];el.classList.toggle('hide',!on);if(on)any=true;
+  });
+  var grid=document.querySelector('#layoutModal .lay-grid');if(grid)grid.classList.toggle('hide',!any);
+  var nota=document.getElementById('layFixoNota');if(nota)nota.classList.toggle('hide',any);
+}
+function abrirLayout(){preencheLayout();aplicaLayout();previewLayout();updateLayoutControls();$('layoutModal').classList.remove('hide');}
 function lerLayout(){layout.font=$('lFont').value;layout.num=parseFloat($('lNum').value);layout.leao=parseFloat($('lLeao').value);layout.bcHeight=parseInt($('lBcH').value,10);layout.bcW=parseInt($('lBcW').value,10);layout.bcAlign=$('lBcAlign').value;layout.nomeB=$('lNomeB').checked;layout.corB=$('lCorB').checked;layout.numB=$('lNumB').checked;layoutSpans();aplicaLayout();salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
 function resetLayout(){layout=Object.assign({},LAYOUT_PADRAO);preencheLayout();aplicaLayout();salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
 if($('layoutOpen'))$('layoutOpen').addEventListener('click',abrirLayout);
@@ -4577,7 +4591,7 @@ function toggleCustom(){$('customWrap').classList.toggle('hide',$('tamanho').val
 $('tamanho').addEventListener('change',()=>{toggleCustom();aplicaTamanho();salvaTamanho();if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');});
 ['customW','customH'].forEach(id=>$(id).addEventListener('input',()=>{aplicaTamanho();salvaTamanho();if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}));
 const tSalvo=localStorage.getItem('loretto_tamanho');if(tSalvo)$('tamanho').value=tSalvo;
-if($('etqModelo')){$('etqModelo').value=etqModelo;$('etqModelo').addEventListener('change',function(){etqModelo=$('etqModelo').value;try{localStorage.setItem('loretto_modelo_etq',etqModelo);}catch(e){}if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');renderFila&&renderFila();});}
+if($('etqModelo')){$('etqModelo').value=etqModelo;$('etqModelo').addEventListener('change',function(){etqModelo=$('etqModelo').value;try{localStorage.setItem('loretto_modelo_etq',etqModelo);}catch(e){}if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');renderFila&&renderFila();if(typeof updateLayoutControls==='function')updateLayoutControls();});}
 const cSalvo=(localStorage.getItem('loretto_custom')||'').split(',');if(cSalvo[0])$('customW').value=cSalvo[0];if(cSalvo[1])$('customH').value=cSalvo[1];
 toggleCustom();
 ['mNumIni','mNumFim'].forEach(id=>$(id).addEventListener('input',()=>{if(editandoId){coresTmp=lerCoresEditor();renderCoresEditor(coresTmp);}}));
@@ -5946,7 +5960,7 @@ window.fabEtTamCh=function(){
   aplicaTamanho();
   fabEtPreview();
 };
-window.fabEtLayout=function(){abrirLayout();};
+window.fabEtLayout=function(){if(typeof fabAplicarEtqConfig==='function')fabAplicarEtqConfig();abrirLayout();};
 window.fabEtReset=function(){
   try{localStorage.removeItem('loretto_fab_et_tam');localStorage.removeItem('loretto_fab_et_custom');}catch(e){}
   if(typeof layout!=='undefined'){layout=Object.assign({},LAYOUT_PADRAO);try{salvaLayout();}catch(e){}if(typeof aplicaLayout==='function')aplicaLayout();}
