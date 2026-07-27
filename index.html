@@ -3117,7 +3117,15 @@ window.LS_fornecedores=function(){try{return Object.keys(repForn||{}).filter(fun
 window.LS_pedidosDaFabrica=function(fid){try{return (repoHist||[]).filter(function(p){return p&&p.fk===fid;}).sort(function(a,b){return (b.data||0)-(a.data||0);}).map(function(p){return {id:p.id,rot:new Date(p.data).toLocaleDateString('pt-BR')+' \u00b7 '+(p.status==='pendente'?'a caminho':'recebido')};});}catch(e){return [];}};
 function detectaFormato(cod){if(/^\d{13}$/.test(cod))return'EAN13';if(/^\d{12}$/.test(cod))return'UPC';return'CODE128';}
 const LAYOUT_PADRAO={font:"'Barlow', sans-serif",num:.30,leao:.19,bcW:100,bcAlign:'left',bcHeight:36,nomeB:true,corB:false,numB:true,ref:.136,nomeSz:.088,bcHt:.30,szBox:.9,szAlign:'center'};
-let layout=Object.assign({},LAYOUT_PADRAO,carregar('loretto_layout',{}));
+// cada modelo de etiqueta tem seu proprio padrao (so as diferencas em relacao ao base)
+const LAYOUT_PRESET={padrao:{},t15:{num:.34}};
+function layoutPadraoDe(m){return Object.assign({},LAYOUT_PADRAO,LAYOUT_PRESET[m]||{});}
+function modeloEtqAtual(){return (typeof etqModelo!=='undefined'&&etqModelo)||'padrao';}
+// mapa de layouts salvos, um por modelo: { padrao:{...}, t15:{...} }
+let LAYOUTS=carregar('loretto_layouts',null);
+if(!LAYOUTS||typeof LAYOUTS!=='object'){LAYOUTS={};var _lyOld=carregar('loretto_layout',null);if(_lyOld&&typeof _lyOld==='object')LAYOUTS.padrao=Object.assign({},_lyOld);}
+function layoutDe(m){return Object.assign(layoutPadraoDe(m),LAYOUTS[m]||{});}
+let layout=layoutDe(modeloEtqAtual());
 const LAYOUT_SAMPLE={nome:'Birken Bahamas',cor:'Marfim',numero:'40',codigo:'BRKBAHMAR40'};
 function aplicaLayout(){const r=document.documentElement.style;
   r.setProperty('--etFont',layout.font);
@@ -3134,7 +3142,7 @@ function aplicaLayout(){const r=document.documentElement.style;
   r.setProperty('--etSzBox',layout.szBox);
   r.setProperty('--etSzAlign',layout.szAlign);
 }
-function salvaLayout(){try{localStorage.setItem('loretto_layout',JSON.stringify(layout));}catch(e){}}
+function salvaLayout(){LAYOUTS[modeloEtqAtual()]=Object.assign({},layout);try{localStorage.setItem('loretto_layouts',JSON.stringify(LAYOUTS));}catch(e){}}
 function previewLayout(){
   if(!$('layoutPrev'))return;
   var d=LAYOUT_SAMPLE;
@@ -3162,9 +3170,9 @@ function updateLayoutControls(){
   var grid=document.querySelector('#layoutModal .lay-grid');if(grid)grid.classList.toggle('hide',!any);
   var nota=document.getElementById('layFixoNota');if(nota)nota.classList.toggle('hide',any);
 }
-function abrirLayout(){preencheLayout();aplicaLayout();previewLayout();updateLayoutControls();$('layoutModal').classList.remove('hide');}
+function abrirLayout(){layout=layoutDe(modeloEtqAtual());preencheLayout();aplicaLayout();previewLayout();updateLayoutControls();$('layoutModal').classList.remove('hide');}
 function lerLayout(){layout.font=$('lFont').value;layout.num=parseFloat($('lNum').value);layout.leao=parseFloat($('lLeao').value);layout.bcHeight=parseInt($('lBcH').value,10);layout.bcW=parseInt($('lBcW').value,10);layout.bcAlign=$('lBcAlign').value;layout.nomeB=$('lNomeB').checked;layout.corB=$('lCorB').checked;layout.numB=$('lNumB').checked;if($('lRef'))layout.ref=parseFloat($('lRef').value);if($('lNomeSz'))layout.nomeSz=parseFloat($('lNomeSz').value);if($('lBcHt'))layout.bcHt=parseFloat($('lBcHt').value);if($('lSzBox'))layout.szBox=parseFloat($('lSzBox').value);if($('lSzAlign'))layout.szAlign=$('lSzAlign').value;layoutSpans();aplicaLayout();salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
-function resetLayout(){layout=Object.assign({},LAYOUT_PADRAO);preencheLayout();aplicaLayout();salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
+function resetLayout(){layout=layoutPadraoDe(modeloEtqAtual());preencheLayout();aplicaLayout();salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
 if($('layoutOpen'))$('layoutOpen').addEventListener('click',abrirLayout);
 if($('layoutClose'))$('layoutClose').addEventListener('click',()=>{$('layoutModal').classList.add('hide');if(typeof MODO_FABRICA!=='undefined'&&MODO_FABRICA&&typeof fabEtPreview==='function')fabEtPreview();});
 if($('layoutReset'))$('layoutReset').addEventListener('click',resetLayout);
@@ -4612,7 +4620,7 @@ function toggleCustom(){$('customWrap').classList.toggle('hide',$('tamanho').val
 $('tamanho').addEventListener('change',()=>{toggleCustom();aplicaTamanho();salvaTamanho();if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');});
 ['customW','customH'].forEach(id=>$(id).addEventListener('input',()=>{aplicaTamanho();salvaTamanho();if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}));
 const tSalvo=localStorage.getItem('loretto_tamanho');if(tSalvo)$('tamanho').value=tSalvo;
-if($('etqModelo')){$('etqModelo').value=etqModelo;$('etqModelo').addEventListener('change',function(){etqModelo=$('etqModelo').value;try{localStorage.setItem('loretto_modelo_etq',etqModelo);}catch(e){}if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');renderFila&&renderFila();if(typeof updateLayoutControls==='function')updateLayoutControls();});}
+if($('etqModelo')){$('etqModelo').value=etqModelo;$('etqModelo').addEventListener('change',function(){etqModelo=$('etqModelo').value;try{localStorage.setItem('loretto_modelo_etq',etqModelo);}catch(e){}if(typeof layoutDe==='function'){layout=layoutDe(etqModelo);if(typeof aplicaLayout==='function')aplicaLayout();if(typeof preencheLayout==='function'&&$('layoutModal')&&!$('layoutModal').classList.contains('hide'))preencheLayout();}if(fila.length)montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');renderFila&&renderFila();if(typeof updateLayoutControls==='function')updateLayoutControls();});}
 const cSalvo=(localStorage.getItem('loretto_custom')||'').split(',');if(cSalvo[0])$('customW').value=cSalvo[0];if(cSalvo[1])$('customH').value=cSalvo[1];
 toggleCustom();
 ['mNumIni','mNumFim'].forEach(id=>$(id).addEventListener('input',()=>{if(editandoId){coresTmp=lerCoresEditor();renderCoresEditor(coresTmp);}}));
@@ -5984,7 +5992,7 @@ window.fabEtTamCh=function(){
 window.fabEtLayout=function(){if(typeof fabAplicarEtqConfig==='function')fabAplicarEtqConfig();abrirLayout();};
 window.fabEtReset=function(){
   try{localStorage.removeItem('loretto_fab_et_tam');localStorage.removeItem('loretto_fab_et_custom');}catch(e){}
-  if(typeof layout!=='undefined'){layout=Object.assign({},LAYOUT_PADRAO);try{salvaLayout();}catch(e){}if(typeof aplicaLayout==='function')aplicaLayout();}
+  if(typeof layout!=='undefined'){layout=layoutPadraoDe(modeloEtqAtual());try{salvaLayout();}catch(e){}if(typeof aplicaLayout==='function')aplicaLayout();}
   if(typeof toast==='function')toast('Etiqueta voltou ao padrão da Loretto');
   renderModoFabrica(MODO_FABRICA);
 };
