@@ -1892,6 +1892,18 @@
   .tpl14 .right{width:28em;flex-shrink:0;display:flex;flex-direction:column;padding:2.6em}
   .tpl14 .right .mi{font-size:2.2em;letter-spacing:.5px;text-transform:uppercase;text-align:right}
   .tpl14 .right .bc{margin-top:auto}
+  /* Modelo 15 — Topper (Manute): linha + ref grande + modelo/cor, número em caixa e código de barras embaixo */
+  .tpl15{display:flex;flex-direction:column;padding:1.4em 1.9em;justify-content:center;gap:.7em}
+  .tpl15 .top{display:flex;align-items:center;gap:1.6em}
+  .tpl15 .info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.25em;overflow:hidden}
+  .tpl15 .lin{font-size:4.4em;font-weight:600;letter-spacing:.5px;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tpl15 .ref{font-size:7.2em;font-weight:800;line-height:1;letter-spacing:1px}
+  .tpl15 .mc{font-size:4.4em;font-weight:600;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tpl15 .sz{flex-shrink:0;border:.5em solid #000;border-radius:.35em;display:flex;align-items:center;justify-content:center;padding:.05em .35em;min-width:6.2em;min-height:6.2em}
+  .tpl15 .sz b{font-size:9.5em;font-weight:800;line-height:1}
+  .tpl15 .bcw{width:100%}
+  .tpl15 .tbc{justify-content:flex-start}
+  .tpl15 .tbc svg{height:6.2em!important}
 </style>
 <style id="pageRule"></style>
 <style id="consertos-css">
@@ -2065,6 +2077,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
                 <option value="80,50" selected>80 x 50 mm (padrão loja)</option>
                 <option value="85,30">85 x 30 mm (Tarragona)</option>
                 <option value="80,40">80 x 40 mm térmica (Tchwm)</option>
+                <option value="75,25">75 x 25 mm (Manute)</option>
                 <option value="70,40">70 x 40 mm</option>
                 <option value="60,40">60 x 40 mm</option>
                 <option value="50,30">50 x 30 mm</option>
@@ -2089,6 +2102,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
                 <option value="t12">Modelo 12 — Ilustração central (sem barras)</option>
                 <option value="t13">Modelo 13 — Número + linhas</option>
                 <option value="t14">Modelo 14 — 3 colunas</option>
+                <option value="t15">Modelo 15 — Topper (Manute)</option>
               </select>
               <div id="customWrap" class="hide" style="display:flex;gap:8px;margin-top:8px">
                 <input type="text" id="customW" placeholder="largura mm">
@@ -3005,6 +3019,9 @@ function tplEtiqueta(modelo,d,barId){
     case 't14': return '<div class="left"><div class="v">'+br+'</div><div class="sz mono">-- US<br>'+br+' BR<br>-- cm</div></div>'+
       '<div class="mid"><div class="cod mono">'+cod+'</div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>'+
       '<div class="right"><div class="mi"><span class="tph">origem a preencher</span></div><div class="bc">'+BC+'</div></div>';
+    case 't15': return '<div class="top"><div class="info"><div class="lin">'+(nome||'&nbsp;')+'</div><div class="ref mono">'+(ref||cod||'')+'</div><div class="mc">'+(cor||'')+'</div></div>'+
+      '<div class="sz"><b>'+br+'</b></div></div>'+
+      '<div class="bcw">'+BC+'</div>';
     default: return '';
   }
 }
@@ -5022,7 +5039,7 @@ function peConfigModalRender(){
   var fid=_peCfgFid;var box=$('peConfigBox');if(!fid||!box)return;
   var nomeF=(peFabricas().find(function(x){return x.fid===fid;})||{}).nome||fid;
   var cfg=peEtqConfig[fid]||{};
-  var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14'];
+  var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14','t15'];
   var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
   var tplSel='<select class="pe-etqsel" onchange="peSetEtqModelo(\''+fid+'\',this.value)">'+mods.map(function(v){return '<option value="'+v+'"'+(((cfg.modelo||'padrao')===v)?' selected':'')+'>'+peEtqTplLabel(v)+'</option>';}).join('')+'</select>';
   var tamSel='<select class="pe-etqsel" onchange="peSetEtqTam(\''+fid+'\',this.value)">'+tams.map(function(o){return '<option value="'+o[0]+'"'+(((cfg.tamanho||'80,50')===o[0])?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
@@ -5063,9 +5080,9 @@ window.peCfgFiltrar=function(){
 };
 window.peAddExtraEtiq=function(fid,mid){if(!peEtqConfig[fid])peEtqConfig[fid]={};var ex=peEtqConfig[fid].extraModelos||[];if(ex.indexOf(mid)<0)ex.push(mid);peEtqConfig[fid].extraModelos=ex;peSalvarEtqConfig();peCfgFiltrar();toast('Modelo liberado só para etiqueta');};
 window.peRemExtraEtiq=function(fid,mid){if(!peEtqConfig[fid])return;peEtqConfig[fid].extraModelos=(peEtqConfig[fid].extraModelos||[]).filter(function(x){return x!==mid;});peSalvarEtqConfig();peCfgFiltrar();};
-function peEtqTplLabel(v){var m={padrao:'Padrão da loja',t1:'Modelo 1',t2:'Modelo 2',t3:'Modelo 3',t4:'Modelo 4',t5:'Modelo 5',t6:'Modelo 6',t7:'Modelo 7',t8:'Modelo 8',t9:'Modelo 9',t10:'Modelo 10',t11:'Modelo 11',t12:'Modelo 12',t13:'Modelo 13',t14:'Modelo 14'};return m[v]||v;}
+function peEtqTplLabel(v){var m={padrao:'Padrão da loja',t1:'Modelo 1',t2:'Modelo 2',t3:'Modelo 3',t4:'Modelo 4',t5:'Modelo 5',t6:'Modelo 6',t7:'Modelo 7',t8:'Modelo 8',t9:'Modelo 9',t10:'Modelo 10',t11:'Modelo 11',t12:'Modelo 12',t13:'Modelo 13',t14:'Modelo 14',t15:'Modelo 15 · Topper (Manute)'};return m[v]||v;}
 function peEtqConfigBox(fid){
-  var cfg=peEtqConfig[fid]||{};var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14'];
+  var cfg=peEtqConfig[fid]||{};var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14','t15'];
   var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
   var tplSel='<select class="pe-etqsel" onchange="peSetEtqModelo(\''+fid+'\',this.value)">'+mods.map(function(v){return '<option value="'+v+'"'+(((cfg.modelo||'padrao')===v)?' selected':'')+'>'+peEtqTplLabel(v)+'</option>';}).join('')+'</select>';
   var tamSel='<select class="pe-etqsel" onchange="peSetEtqTam(\''+fid+'\',this.value)">'+tams.map(function(o){return '<option value="'+o[0]+'"'+(((cfg.tamanho||'80,50')===o[0])?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
@@ -5813,7 +5830,7 @@ function peConfirmarEnvio(){
    mas so enxerga os modelos do pronta-entrega dela. O leao vem do nosso painel. */
 var _fabEt={mod:'',cor:'',q:{},last:null};
 var _fabTab='estoque';
-var FAB_ET_TAMS=[['80,50','80 x 50 mm'],['85,30','85 x 30 mm'],['80,40','80 x 40 mm'],['70,40','70 x 40 mm'],['60,40','60 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
+var FAB_ET_TAMS=[['80,50','80 x 50 mm'],['85,30','85 x 30 mm'],['80,40','80 x 40 mm'],['75,25','75 x 25 mm'],['70,40','70 x 40 mm'],['60,40','60 x 40 mm'],['50,30','50 x 30 mm'],['40,25','40 x 25 mm'],['33,22','33 x 22 mm'],['custom','Personalizado (mm)']];
 function fabEtMods(){
   if(!MODO_FABRICA||typeof peModelosDaFabrica!=='function')return [];
   var out=peModelosDaFabrica(MODO_FABRICA);
