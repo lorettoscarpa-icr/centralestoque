@@ -5040,7 +5040,7 @@ function peConfigModalRender(){
   var nomeF=(peFabricas().find(function(x){return x.fid===fid;})||{}).nome||fid;
   var cfg=peEtqConfig[fid]||{};
   var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14','t15'];
-  var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
+  var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['75,25','75×25 (Manutt)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
   var tplSel='<select class="pe-etqsel" onchange="peSetEtqModelo(\''+fid+'\',this.value)">'+mods.map(function(v){return '<option value="'+v+'"'+(((cfg.modelo||'padrao')===v)?' selected':'')+'>'+peEtqTplLabel(v)+'</option>';}).join('')+'</select>';
   var tamSel='<select class="pe-etqsel" onchange="peSetEtqTam(\''+fid+'\',this.value)">'+tams.map(function(o){return '<option value="'+o[0]+'"'+(((cfg.tamanho||'80,50')===o[0])?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
   var fabLogo=cfg.fabLogo?'<div class="pe-logoprev"><img src="'+escapeHtml(cfg.fabLogo)+'"></div>':'<div class="pe-logoprev vazio">sem logo</div>';
@@ -5083,7 +5083,7 @@ window.peRemExtraEtiq=function(fid,mid){if(!peEtqConfig[fid])return;peEtqConfig[
 function peEtqTplLabel(v){var m={padrao:'Padrão da loja',t1:'Modelo 1',t2:'Modelo 2',t3:'Modelo 3',t4:'Modelo 4',t5:'Modelo 5',t6:'Modelo 6',t7:'Modelo 7',t8:'Modelo 8',t9:'Modelo 9',t10:'Modelo 10',t11:'Modelo 11',t12:'Modelo 12',t13:'Modelo 13',t14:'Modelo 14',t15:'Modelo 15 · Topper (Manute)'};return m[v]||v;}
 function peEtqConfigBox(fid){
   var cfg=peEtqConfig[fid]||{};var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14','t15'];
-  var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
+  var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['75,25','75×25 (Manutt)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
   var tplSel='<select class="pe-etqsel" onchange="peSetEtqModelo(\''+fid+'\',this.value)">'+mods.map(function(v){return '<option value="'+v+'"'+(((cfg.modelo||'padrao')===v)?' selected':'')+'>'+peEtqTplLabel(v)+'</option>';}).join('')+'</select>';
   var tamSel='<select class="pe-etqsel" onchange="peSetEtqTam(\''+fid+'\',this.value)">'+tams.map(function(o){return '<option value="'+o[0]+'"'+(((cfg.tamanho||'80,50')===o[0])?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
   var fabLogo=cfg.fabLogo?'<div class="pe-logoprev"><img src="'+escapeHtml(cfg.fabLogo)+'"></div>':'<div class="pe-logoprev vazio">sem logo</div>';
