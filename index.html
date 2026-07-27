@@ -1903,7 +1903,7 @@
   .tpl15 .mc{font-size:calc(var(--lh)*var(--etNomeSz,.088));font-weight:var(--etCorW,500);text-transform:uppercase;line-height:1.02;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .tpl15 .bcw{width:100%}
   .tpl15 .tbc{justify-content:var(--etBcAlign,left);width:100%}
-  .etiqueta.tpl.tpl15 .tbc svg{height:calc(var(--lh)*var(--etBcHt,.26))!important;width:auto!important;max-width:var(--etBcW,100%)!important}
+  .etiqueta.tpl.tpl15 .tbc svg{height:calc(var(--lh)*var(--etBcHt,.30))!important;width:var(--etBcW,100%)!important;max-width:100%!important;display:block}
   .tpl15 .sz{flex:0 0 auto;align-self:stretch;border:.4em solid #000;border-radius:.25em;display:flex;align-items:center;justify-content:center;padding:.05em .45em;min-width:9em}
   .tpl15 .sz b{font-size:calc(var(--lh)*var(--etNum,.34));font-weight:var(--etNumW,800);line-height:1}
 </style>
@@ -3107,7 +3107,7 @@ window.LS_getCodigo=getCodigo;window.LS_catalogo=function(){return catalogo;};
 window.LS_fornecedores=function(){try{return Object.keys(repForn||{}).filter(function(k){return !(repForn[k]&&repForn[k].off);}).map(function(k){return {fid:k,nome:(repForn[k].apelido||repForn[k].nome||k)};}).sort(function(a,b){return a.nome.localeCompare(b.nome);});}catch(e){return [];}};
 window.LS_pedidosDaFabrica=function(fid){try{return (repoHist||[]).filter(function(p){return p&&p.fk===fid;}).sort(function(a,b){return (b.data||0)-(a.data||0);}).map(function(p){return {id:p.id,rot:new Date(p.data).toLocaleDateString('pt-BR')+' \u00b7 '+(p.status==='pendente'?'a caminho':'recebido')};});}catch(e){return [];}};
 function detectaFormato(cod){if(/^\d{13}$/.test(cod))return'EAN13';if(/^\d{12}$/.test(cod))return'UPC';return'CODE128';}
-const LAYOUT_PADRAO={font:"'Barlow', sans-serif",num:.30,leao:.19,bcW:100,bcAlign:'left',bcHeight:36,nomeB:true,corB:false,numB:true,ref:.136,nomeSz:.088,bcHt:.26};
+const LAYOUT_PADRAO={font:"'Barlow', sans-serif",num:.30,leao:.19,bcW:100,bcAlign:'left',bcHeight:36,nomeB:true,corB:false,numB:true,ref:.136,nomeSz:.088,bcHt:.30};
 let layout=Object.assign({},LAYOUT_PADRAO,carregar('loretto_layout',{}));
 const LAYOUT_SAMPLE={nome:'Birken Bahamas',cor:'Marfim',numero:'40',codigo:'BRKBAHMAR40'};
 function aplicaLayout(){const r=document.documentElement.style;
@@ -3207,7 +3207,8 @@ function montaEtiqueta(container,d,barId){
       <div class="et-bottom"><div class="et-barcode"><svg id="${barId}"></svg></div><div class="et-leao">${leao}</div></div>`;
   }
   const cod=d.codigo||'';
-  if(cod){const _bh=(typeof layout!=='undefined'&&layout.bcHeight)||36;const qz={marginTop:0,marginBottom:0,marginLeft:14,marginRight:14};try{JsBarcode('#'+barId,cod,Object.assign({format:detectaFormato(cod),displayValue:true,font:'DM Mono, monospace',fontSize:13,textMargin:1,height:_bh,width:1.4},qz));}catch(e){try{JsBarcode('#'+barId,cod,Object.assign({format:'CODE128',displayValue:true,fontSize:13,height:_bh,width:1.4},qz));}catch(e2){}}}
+  if(cod){const _bh=(typeof layout!=='undefined'&&layout.bcHeight)||36;const _t15=(_mdl==='t15');const qz={marginTop:0,marginBottom:0,marginLeft:_t15?8:14,marginRight:_t15?8:14};const _op=_t15?{format:detectaFormato(cod),displayValue:true,font:'DM Mono, monospace',fontSize:15,textMargin:1,height:70,width:2}:{format:detectaFormato(cod),displayValue:true,font:'DM Mono, monospace',fontSize:13,textMargin:1,height:_bh,width:1.4};try{JsBarcode('#'+barId,cod,Object.assign({},_op,qz));}catch(e){try{JsBarcode('#'+barId,cod,Object.assign({format:'CODE128',displayValue:true,fontSize:_t15?15:13,height:_t15?70:_bh,width:_t15?2:1.4},qz));}catch(e2){}}
+    if(_t15){var _sv=document.getElementById(barId);if(_sv){var _w=parseFloat(_sv.getAttribute('width')),_h=parseFloat(_sv.getAttribute('height'));if(_w&&_h){_sv.setAttribute('viewBox','0 0 '+_w+' '+_h);_sv.setAttribute('preserveAspectRatio','none');_sv.removeAttribute('width');_sv.removeAttribute('height');}}}}
 }
 
 function totalNaFila(m){return fila.filter(f=>f.modId===m.id).reduce((s,f)=>s+f.qtd,0);}
