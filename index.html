@@ -1892,7 +1892,7 @@
   .tpl14 .right{width:28em;flex-shrink:0;display:flex;flex-direction:column;padding:2.6em}
   .tpl14 .right .mi{font-size:2.2em;letter-spacing:.5px;text-transform:uppercase;text-align:right}
   .tpl14 .right .bc{margin-top:auto}
-  /* Modelo 15 — Topper (Manute): linha + ref grande + modelo/cor, número em caixa e código de barras embaixo */
+  /* Modelo 15 — Topper (Manutt): linha + ref grande + modelo/cor, número em caixa e código de barras embaixo */
   .tpl15{display:flex;flex-direction:column;padding:1.4em 1.9em;justify-content:center;gap:.7em}
   .tpl15 .top{display:flex;align-items:center;gap:1.6em}
   .tpl15 .info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.25em;overflow:hidden}
@@ -2077,7 +2077,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
                 <option value="80,50" selected>80 x 50 mm (padrão loja)</option>
                 <option value="85,30">85 x 30 mm (Tarragona)</option>
                 <option value="80,40">80 x 40 mm térmica (Tchwm)</option>
-                <option value="75,25">75 x 25 mm (Manute)</option>
+                <option value="75,25">75 x 25 mm (Manutt)</option>
                 <option value="70,40">70 x 40 mm</option>
                 <option value="60,40">60 x 40 mm</option>
                 <option value="50,30">50 x 30 mm</option>
@@ -2102,7 +2102,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
                 <option value="t12">Modelo 12 — Ilustração central (sem barras)</option>
                 <option value="t13">Modelo 13 — Número + linhas</option>
                 <option value="t14">Modelo 14 — 3 colunas</option>
-                <option value="t15">Modelo 15 — Topper (Manute)</option>
+                <option value="t15">Modelo 15 — Topper (Manutt)</option>
               </select>
               <div id="customWrap" class="hide" style="display:flex;gap:8px;margin-top:8px">
                 <input type="text" id="customW" placeholder="largura mm">
@@ -5080,7 +5080,7 @@ window.peCfgFiltrar=function(){
 };
 window.peAddExtraEtiq=function(fid,mid){if(!peEtqConfig[fid])peEtqConfig[fid]={};var ex=peEtqConfig[fid].extraModelos||[];if(ex.indexOf(mid)<0)ex.push(mid);peEtqConfig[fid].extraModelos=ex;peSalvarEtqConfig();peCfgFiltrar();toast('Modelo liberado só para etiqueta');};
 window.peRemExtraEtiq=function(fid,mid){if(!peEtqConfig[fid])return;peEtqConfig[fid].extraModelos=(peEtqConfig[fid].extraModelos||[]).filter(function(x){return x!==mid;});peSalvarEtqConfig();peCfgFiltrar();};
-function peEtqTplLabel(v){var m={padrao:'Padrão da loja',t1:'Modelo 1',t2:'Modelo 2',t3:'Modelo 3',t4:'Modelo 4',t5:'Modelo 5',t6:'Modelo 6',t7:'Modelo 7',t8:'Modelo 8',t9:'Modelo 9',t10:'Modelo 10',t11:'Modelo 11',t12:'Modelo 12',t13:'Modelo 13',t14:'Modelo 14',t15:'Modelo 15 · Topper (Manute)'};return m[v]||v;}
+function peEtqTplLabel(v){var m={padrao:'Padrão da loja',t1:'Modelo 1',t2:'Modelo 2',t3:'Modelo 3',t4:'Modelo 4',t5:'Modelo 5',t6:'Modelo 6',t7:'Modelo 7',t8:'Modelo 8',t9:'Modelo 9',t10:'Modelo 10',t11:'Modelo 11',t12:'Modelo 12',t13:'Modelo 13',t14:'Modelo 14',t15:'Modelo 15 · Topper (Manutt)'};return m[v]||v;}
 function peEtqConfigBox(fid){
   var cfg=peEtqConfig[fid]||{};var mods=['padrao','t1','t2','t3','t4','t5','t6','t7','t8','t9','t10','t11','t12','t13','t14','t15'];
   var tams=[['80,50','80×50 (padrão)'],['85,30','85×30 (Tarragona)'],['80,40','80×40 térmica (Tchwm)'],['75,25','75×25 (Manutt)'],['70,40','70×40'],['60,40','60×40'],['50,30','50×30'],['40,25','40×25'],['33,22','33×22']];
