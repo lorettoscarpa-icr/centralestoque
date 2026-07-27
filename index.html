@@ -1892,18 +1892,20 @@
   .tpl14 .right{width:28em;flex-shrink:0;display:flex;flex-direction:column;padding:2.6em}
   .tpl14 .right .mi{font-size:2.2em;letter-spacing:.5px;text-transform:uppercase;text-align:right}
   .tpl14 .right .bc{margin-top:auto}
-  /* Modelo 15 — Topper (Manutt): linha + ref grande + modelo/cor, número em caixa e código de barras embaixo */
-  .tpl15{display:flex;flex-direction:column;padding:1.4em 1.9em;justify-content:center;gap:.7em}
-  .tpl15 .top{display:flex;align-items:center;gap:1.6em}
-  .tpl15 .info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.25em;overflow:hidden}
-  .tpl15 .lin{font-size:4.4em;font-weight:600;letter-spacing:.5px;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tpl15 .ref{font-size:7.2em;font-weight:800;line-height:1;letter-spacing:1px}
-  .tpl15 .mc{font-size:4.4em;font-weight:600;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tpl15 .sz{flex-shrink:0;border:.5em solid #000;border-radius:.35em;display:flex;align-items:center;justify-content:center;padding:.05em .35em;min-width:6.2em;min-height:6.2em}
-  .tpl15 .sz b{font-size:9.5em;font-weight:800;line-height:1}
-  .tpl15 .bcw{width:100%}
-  .tpl15 .tbc{justify-content:flex-start}
-  .tpl15 .tbc svg{height:6.2em!important}
+  /* Modelo 15 — Topper (Manutt): linha + ref grande + modelo/cor + código; nº em caixa grande à direita, com o leão da Loretto */
+  .tpl15{display:flex;flex-direction:row;align-items:stretch;padding:1.1em 1.4em;gap:1.3em}
+  .tpl15 .l{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.22em;overflow:hidden}
+  .tpl15 .lin{font-size:4.2em;font-weight:var(--etNomeW,600);letter-spacing:.5px;text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tpl15 .ref{font-size:6.8em;font-weight:800;line-height:1;letter-spacing:1px}
+  .tpl15 .mc{font-size:4.2em;font-weight:var(--etCorW,600);text-transform:uppercase;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tpl15 .bcw{margin-top:.45em;width:100%}
+  .tpl15 .tbc{justify-content:flex-start;width:var(--etBcW,100%)}
+  .tpl15 .tbc svg{height:8.5em!important;width:100%!important;max-width:100%}
+  .tpl15 .r{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45em}
+  .tpl15 .r .lg{width:calc(var(--lh)*var(--etLeao,.19));height:calc(var(--lh)*var(--etLeao,.19));display:flex;align-items:center;justify-content:center}
+  .tpl15 .r .lg img,.tpl15 .r .lg svg{max-width:100%;max-height:100%;object-fit:contain}
+  .tpl15 .sz{border:.45em solid #000;border-radius:.3em;display:flex;align-items:center;justify-content:center;padding:.05em .5em;min-width:8.5em;min-height:7.5em}
+  .tpl15 .sz b{font-size:calc(var(--lh)*var(--etNum,.30));font-weight:var(--etNumW,800);line-height:1}
 </style>
 <style id="pageRule"></style>
 <style id="consertos-css">
@@ -2969,6 +2971,7 @@ function tplEtiqueta(modelo,d,barId){
   const _mm=(typeof catalogo!=='undefined'&&d&&d.modId)?catalogo.find(x=>x.id===d.modId):null;
   const ilus=(_mm&&_mm.img)?('<img src="'+_mm.img+'" alt="">'):SHOE_SVG;
   const site='www.lorettoscarpa.com.br',marca='LORETTO SCARPA',shoe='<span class="shoe">'+ilus+'</span>';
+  const leao=(typeof logoData!=='undefined'&&logoData)?('<img src="'+logoData+'">'):(typeof LEAO_SVG!=='undefined'?LEAO_SVG:'');
   const BC='<span class="tbc"><svg id="'+barId+'"></svg></span>';
   const ref=escapeHtml((d&&d.ref)||'');
   const PH=ref?('<b>Ref '+ref+'</b>'):'<span class="tph">a preencher</span>';
@@ -3019,9 +3022,8 @@ function tplEtiqueta(modelo,d,barId){
     case 't14': return '<div class="left"><div class="v">'+br+'</div><div class="sz mono">-- US<br>'+br+' BR<br>-- cm</div></div>'+
       '<div class="mid"><div class="cod mono">'+cod+'</div><div class="pn">'+pncor+'</div><div class="sd">'+PH+'</div><div class="site">'+site+'</div></div>'+
       '<div class="right"><div class="mi"><span class="tph">origem a preencher</span></div><div class="bc">'+BC+'</div></div>';
-    case 't15': return '<div class="top"><div class="info"><div class="lin">'+(nome||'&nbsp;')+'</div><div class="ref mono">'+(ref||cod||'')+'</div><div class="mc">'+(cor||'')+'</div></div>'+
-      '<div class="sz"><b>'+br+'</b></div></div>'+
-      '<div class="bcw">'+BC+'</div>';
+    case 't15': return '<div class="l"><div class="lin">'+(nome||'&nbsp;')+'</div><div class="ref mono">'+(ref||cod||'')+'</div><div class="mc">'+(cor||'')+'</div><div class="bcw">'+BC+'</div></div>'+
+      '<div class="r"><div class="lg">'+leao+'</div><div class="sz"><b>'+br+'</b></div></div>';
     default: return '';
   }
 }
