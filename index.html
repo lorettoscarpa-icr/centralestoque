@@ -4991,11 +4991,11 @@ function renderModoFabrica(fid){
   var _uaTs=Math.max((cache.atualizadoEm||0),(cache.lorettoEm||0));
   var _uaTxt=_uaTs?('Última atualização · '+fmtData(_uaTs)+' '+(function(){var _d=new Date(_uaTs);return ('0'+_d.getHours()).slice(-2)+':'+('0'+_d.getMinutes()).slice(-2);})()):'Sem alterações ainda';
   var _estoquePane=
+    totalGeral+
     '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><span class="fab-sech-btns"><button class="btn fab-prod-top" onclick="peProduzirAbrir(\''+fid+'\')">Produzir</button><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></span></div>'+pedHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Em produção'+(atrasados?' <span class="fab-atraso-cnt">&#9888; '+atrasados+' em atraso</span>':'')+'</div>'+emProdHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
-    '<div class="fab-sec"><div class="fab-sech">Meus modelos</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">'+_uaTxt+'</span></div>':'')+'</div>'+
-    totalGeral;
+    '<div class="fab-sec"><div class="fab-sech">Meus modelos</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">'+_uaTxt+'</span></div>':'')+'</div>';
   var _tabnav=_etHTML?('<div class="fab-subnav"><button class="fab-tab'+(_fabTab==='estoque'?' on':'')+'" data-tab="estoque" onclick="fabSetTab(\'estoque\')">Pronta-entrega</button><button class="fab-tab'+(_fabTab==='etiquetas'?' on':'')+'" data-tab="etiquetas" onclick="fabSetTab(\'etiquetas\')">Etiquetas</button></div>'):'';
   var _estOn=(!_etHTML||_fabTab==='estoque');
   var _hcfg=(typeof peEtqConfig!=='undefined'&&peEtqConfig[fid])||{};
