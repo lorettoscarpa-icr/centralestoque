@@ -4991,11 +4991,11 @@ function renderModoFabrica(fid){
   var _uaTs=Math.max((cache.atualizadoEm||0),(cache.lorettoEm||0));
   var _uaTxt=_uaTs?('Última atualização · '+fmtData(_uaTs)+' '+(function(){var _d=new Date(_uaTs);return ('0'+_d.getHours()).slice(-2)+':'+('0'+_d.getMinutes()).slice(-2);})()):'Sem alterações ainda';
   var _estoquePane=
-    totalGeral+
     '<div class="fab-sec"><div class="fab-sech fab-sech-row"><span>Pedidos da loja</span><span class="fab-sech-btns"><button class="btn fab-prod-top" onclick="peProduzirAbrir(\''+fid+'\')">Produzir</button><button class="btn btn-ouro fab-enviar-top" onclick="peEnviarMenu(\''+fid+'\')">Enviar</button></span></div>'+pedHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Em produção'+(atrasados?' <span class="fab-atraso-cnt">&#9888; '+atrasados+' em atraso</span>':'')+'</div>'+emProdHTML+'</div>'+
     '<div class="fab-sec"><div class="fab-sech">Histórico de enviados</div>'+histHTML+'</div>'+
-    '<div class="fab-sec"><div class="fab-sech">Meus modelos</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">'+_uaTxt+'</span></div>':'')+'</div>';
+    '<div class="fab-sec"><div class="fab-sech">Meus modelos</div>'+modosHTML+(mods.length?'<div class="fab-saverow"><span class="fab-status ok" id="fabStatus">'+_uaTxt+'</span></div>':'')+'</div>'+
+    totalGeral;
   var _tabnav=_etHTML?('<div class="fab-subnav"><button class="fab-tab'+(_fabTab==='estoque'?' on':'')+'" data-tab="estoque" onclick="fabSetTab(\'estoque\')">Pronta-entrega</button><button class="fab-tab'+(_fabTab==='etiquetas'?' on':'')+'" data-tab="etiquetas" onclick="fabSetTab(\'etiquetas\')">Etiquetas</button></div>'):'';
   var _estOn=(!_etHTML||_fabTab==='estoque');
   var _hcfg=(typeof peEtqConfig!=='undefined'&&peEtqConfig[fid])||{};
@@ -5394,7 +5394,9 @@ function peRenderFabrica(c,fid){
   const hist=(cache.historico||[]).slice(-8).reverse().map(h=>{const ms=(h.mudancas||[]).slice(0,7).map(x=>escapeHtml(x.label)+' '+x.de+'\u2192'+x.para).join(', ');let d=h.tipo?escapeHtml(h.tipo):'';if(ms)d=d?(d+': '+ms):ms;if(!d)d='salvou';return '<div class="pe-hist">'+peFmtDataHora(h.ts)+' \u00b7 <b>'+escapeHtml(h.por||'?')+'</b> \u2014 '+d+'</div>';}).join('');
   const ped=_pePedidoCache[f.fid];
   const pedidoBox=ped?('<div class="pe-pedbox"><div class="pe-pedh"><b>Pedido de produção</b> &middot; '+ped.totPares+' pares &middot; '+brl(ped.totCusto)+' <span class="pe-pedx" onclick="pePedidoFechar(\''+f.fid+'\')">&#10005;</span></div>'+(ped.itens.length?(ped.itens.map(function(it){return '<div class="pe-pedit"><div class="pe-pedm">'+escapeHtml(it.modelo)+' '+escapeHtml(it.cor)+(it.cod?' &middot; '+escapeHtml(it.cod):'')+'</div><div class="pe-pednums">'+it.nums.map(function(n){return '<span>'+n.tam+':<b>'+n.qtd+'</b></span>';}).join('')+'<span class="pe-pedpar">'+it.pares+' pares</span></div></div>';}).join('')+'<div class="pe-pedacts"><button class="btn btn-ouro sm" onclick="pePedidoLancar(\''+f.fid+'\')">Lançar como pedido</button><button class="btn btn-ouro sm" onclick="pePedidoWhats(\''+f.fid+'\')">Enviar no WhatsApp</button><button class="btn sm" onclick="pePedidoCopiar(\''+f.fid+'\')">Copiar pedido</button></div>'):'<div class="pe-pedempty">Nenhuma numeração em falta — a grade já está completa.</div>')+'</div>'):'';
-  c.innerHTML='<button class="pe-voltar" onclick="peVoltar()">&#8249; Todas as fábricas</button>'+
+  var _gE=0,_gP=0,_gVE=0,_gVP=0;modelos.forEach(function(m){var _c=m.custo||0;m.cores.forEach(function(co){(co.tams||[]).forEach(function(t){var _k=m.id+'|'+co.nome+'|'+t;var _e=parseInt(mapas.estoque[_k])||0,_pz=parseInt(mapas.produzindo[_k])||0;_gE+=_e;_gP+=_pz;_gVE+=_e*_c;_gVP+=_pz*_c;});});});
+  var _totalGeral='<div class="fab-totalgeral" style="margin:10px 0 14px"><span class="fab-tgh">Total geral</span><span>Estoque <b>'+_gE+'</b> pares · <b>'+brMoney(_gVE)+'</b></span><span>Produção <b>'+_gP+'</b> pares · <b>'+brMoney(_gVP)+'</b></span></div>';
+  c.innerHTML='<button class="pe-voltar" onclick="peVoltar()">&#8249; Todas as fábricas</button>'+_totalGeral+
     (cache._previa?'<div class="pe-previa-aviso">Prévia demonstrativa — dados de exemplo do PDF da Tchwm Shoes. Quando a fábrica publicar de verdade, estes números são substituídos pelos reais.</div>':'')+
     '<div class="pe-card'+(parada?' parada':'')+'"><div class="pe-cardh"><div><div class="pe-fname">'+escapeHtml(f.nome)+(parada?' <span class="pe-badge">parada '+diasSem+'d</span>':'')+'</div><div class="pe-meta">'+escapeHtml(pub)+' &middot; '+f.qtdModelos+' modelos</div></div>'+
     '<div class="pe-totbox"><div class="pe-tot">'+totEst+'</div><div class="pe-totl">em estoque</div></div></div>'+
