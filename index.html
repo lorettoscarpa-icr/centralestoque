@@ -5118,10 +5118,10 @@ function peConfigModalRender(){
       '<p class="pe-metahint">A fábrica imprime sempre neste modelo e tamanho — ela não escolhe (só ajusta detalhes de layout).</p>'+
       '<label class="pe-etqrow">Modelo de etiqueta '+tplSel+'</label>'+
       '<label class="pe-etqrow">Tamanho '+tamSel+'</label></div>'+
-    '<div class="pe-cfgsec"><div class="pe-cfgsech">📊 Planilha de produção</div>'+
+    '<div class="pe-cfgsec"><div class="pe-cfgsech">Planilha de produção</div>'+
       '<p class="pe-metahint">Quando ligado, aparece um botão <b>Gerar planilha (Excel)</b> na tela de produção desta fábrica — pra baixar a grade em Excel e mandar pra ela.</p>'+
       '<label class="pe-etqrow" style="cursor:pointer"><input type="checkbox" '+(cfg.planilhaProd?'checked':'')+' onchange="peSetPlanilhaProd(\''+fid+'\',this.checked)" style="width:18px;height:18px;margin-right:8px;vertical-align:middle"> Habilitar planilha Excel na produção</label></div>'+
-    '<div class="pe-cfgsec"><div class="pe-cfgsech">🧪 Modo de teste</div>'+
+    '<div class="pe-cfgsec"><div class="pe-cfgsech">Modo de teste</div>'+
       '<p class="pe-metahint">Liga botões de <b>excluir</b> os envios desta fábrica, pra limpar dados de teste. Desligue quando terminar — os botões de excluir somem.</p>'+
       '<label class="pe-etqrow" style="cursor:pointer"><input type="checkbox" '+(cfg.teste?'checked':'')+' onchange="peSetTeste(\''+fid+'\',this.checked)" style="width:18px;height:18px;margin-right:8px;vertical-align:middle"> Fábrica em modo de teste</label></div>'+
     '<div class="pe-cfgsec"><div class="pe-cfgsech">Cabeçalho da fábrica</div>'+logoCfg+'</div>'+
@@ -5809,19 +5809,20 @@ function peConfirmarProduzir(fid){
     var ref=_db.collection('ls_pe').doc(did);
     (exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Produção registrada');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
   }
-  if(!_db){aplica({},false);peProdSucesso(fid,grade);return;}
+  var _meta={inicioEm:inicioEm,prontoEm:prontoEm,nome:nomePed};
+  if(!_db){aplica({},false);peProdSucesso(fid,grade,_meta);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({},false);});
-  peProdSucesso(fid,grade);
+  peProdSucesso(fid,grade,_meta);
 }
-function peProdSucesso(fid,grade){
-  window._peProdGrade=grade;
+function peProdSucesso(fid,grade,meta){
+  window._peProdGrade=grade;window._peProdMeta=meta||{};
   var cfg=(typeof peEtqConfig!=='undefined'&&peEtqConfig[fid])||{};
   var box=document.getElementById('peEnvioBox');if(!box)return;
-  box.innerHTML='<div class="pe-modal-h">✓ Produção registrada</div>'+
+  box.innerHTML='<div class="pe-modal-h">Produção registrada</div>'+
     '<p class="pe-metahint">Agora baixe os arquivos pra enviar pra fábrica. As etiquetas saem com toda a numeração desta produção.</p>'+
     '<div class="pe-prodtools">'+
-      '<button type="button" class="btn btn-ouro" onclick="peImprimirEtiquetas(window._peProdGrade)">🏷️ Baixar etiquetas (PDF)</button>'+
-      (cfg.planilhaProd?'<button type="button" class="btn btn-ouro" onclick="peProdPlanilha(\''+fid+'\',window._peProdGrade)">📊 Baixar planilha (Excel)</button>':'')+
+      '<button type="button" class="btn btn-ouro" onclick="peImprimirEtiquetas(window._peProdGrade)">Baixar etiquetas (PDF)</button>'+
+      (cfg.planilhaProd?'<button type="button" class="btn btn-ouro" onclick="peProdPlanilha(\''+fid+'\',window._peProdGrade,window._peProdMeta)">Baixar planilha (Excel)</button>':'')+
     '</div>';
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Concluir';ok.onclick=function(){peEnvioFechar();};}
 }
@@ -6096,10 +6097,14 @@ window.peImprimirEtiquetasDoModal=function(){
   peImprimirEtiquetas(grade);
 };
 function peGradeDoModal(){var g={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)g[i.getAttribute('data-k')]=q;});return g;}
-async function peProdXlsx(fid,gradeArg){
+async function peProdXlsx(fid,gradeArg,meta){
   if(typeof ExcelJS==='undefined'||!ExcelJS){toast('Biblioteca de Excel indisponível — verifique a internet');return;}
   var grade=(gradeArg&&Object.keys(gradeArg).length)?gradeArg:peGradeDoModal();
   if(!Object.keys(grade).length){toast('Preencha a grade primeiro');return;}
+  meta=meta||{};
+  function _ymdData(id){var el=document.getElementById(id);if(el&&el.value){var pp=el.value.split('-');return new Date(parseInt(pp[0]),parseInt(pp[1])-1,parseInt(pp[2])).getTime();}return 0;}
+  var _ini=meta.inicioEm||_ymdData('peProdInicio');
+  var _pronto=meta.prontoEm||_ymdData('peProdData');
   var itens=peGradeParaEtiquetas(grade);
   if(!itens.length){toast('Nada para gerar');return;}
   // agrupa por modelo+cor e junta as numerações
@@ -6129,7 +6134,10 @@ async function peProdXlsx(fid,gradeArg){
   ws.mergeCells('A1:'+L(LASTC)+'1');
   var t1=ws.getCell('A1');t1.value='PEDIDO DE PRODUÇÃO — LORETTO SCARPA';t1.font={bold:true,size:15,color:{argb:VERDE}};t1.alignment={horizontal:'center'};
   ws.mergeCells('A2:'+L(LASTC)+'2');
-  var t2=ws.getCell('A2');t2.value=(nomeF?'Fábrica: '+nomeF+'   ':'')+'Data: '+fmtData(Date.now());t2.font={size:11,color:{argb:'FF666666'}};t2.alignment={horizontal:'center'};
+  var _sub=(nomeF?'Fábrica: '+nomeF+'   ·   ':'')+'Emitido: '+fmtData(Date.now());
+  if(_ini)_sub+='   ·   Início: '+fmtData(_ini);
+  if(_pronto)_sub+='   ·   Previsão de entrega: '+fmtData(_pronto);
+  var t2=ws.getCell('A2');t2.value=_sub;t2.font={size:11,color:{argb:'FF666666'}};t2.alignment={horizontal:'center'};
   ws.getRow(3).height=6;
   // cabeçalho (linha 4)
   var hr=ws.getRow(4);
@@ -6162,8 +6170,8 @@ async function peProdXlsx(fid,gradeArg){
   a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},1500);
   toast('Planilha de produção gerada · '+totGeral+' pares');
 }
-window.peProdPlanilha=function(fid,grade){peProdXlsx(fid,grade).catch(function(e){toast('Erro ao gerar: '+((e&&e.message)||''));});};
-function peOrdensPainel(fid){var cache=_peEstoqueCache[fid]||{},ordens=(cache.ordens||[]);var _teste=((typeof peEtqConfig!=='undefined'&&peEtqConfig[fid])||{}).teste;var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});var prods=ordens.filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||a.criadoEm||0)-(b.producaoEm||b.criadoEm||0);});var h='<div class="pe-ords">';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot ped"></span>Pedidos enviados <b>'+peds.length+'</b></div>';if(!peds.length)h+='<div class="pe-ordempty">Nenhum pedido aguardando produção.</div>';peds.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);h+='<div class="pe-ordcard ped"><div class="pe-ordtop"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peEnvioAbrir(\''+fid+'\',\''+o.id+'\')">Confirmar envio</button><button class="btn sm" onclick="peExcluirOrdem(\''+fid+'\',\''+o.id+'\')">Excluir</button></div></div>';});h+='</div>';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot prod"></span>Em produção <b>'+prods.length+'</b></div>';if(!prods.length)h+='<div class="pe-ordempty">Nada em produção no momento.</div>';prods.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;h+='<div class="pe-ordcard prod"><div class="pe-ordtop"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto</button></div></div>';});h+='</div>';var _peEnvCusto={};peModelosDaFabrica(fid).forEach(function(m){_peEnvCusto[m.id]=m.custo||0;});function _peEnvVal(g){var v=0;Object.keys(g||{}).forEach(function(k){v+=(parseInt(g[k])||0)*(_peEnvCusto[k.split('|')[0]]||0);});return v;}var envs=ordens.filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot env"></span>Enviados / romaneio <b>'+envs.length+'</b>'+((_teste&&envs.length)?'<button class="btn sm pe-testclear" onclick="peExcluirEnviosTodos(\''+fid+'\')">\ud83e\uddea Limpar todos</button>':'')+'</div>';if(!envs.length)h+='<div class="pe-ordempty">Nenhum envio confirmado ainda.</div>';envs.forEach(function(o){var rp=_peOrdemResumo(fid,o.grade);var rm=_peOrdemResumo(fid,o.enviado||{});var _ev=_peEnvVal(o.enviado||o.grade);h+='<details class="pe-ordcard env pe-envdet"><summary class="pe-envsum"><span class="pe-envsum-l"><b>Enviado '+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.enviadoPor?'<span class="pe-envsum-by">'+escapeHtml(o.enviadoPor)+'</span>':'')+'</span><span class="pe-envsum-r">'+rm.tot+' pares'+(_ev?' \u00b7 '+brMoney(_ev):'')+'</span></summary><div class="pe-envres"><div class="pe-envreslbl">Pediu</div>'+rp.html+'<div class="pe-envreslbl">Mandou</div>'+rm.html+_peCorrecoesHTML(o)+(_teste?'<div class="pe-testacts"><button class="btn sm pe-testdel" onclick="event.stopPropagation();peExcluirOrdem(\''+fid+'\',\''+o.id+'\')">\ud83d\uddd1\ufe0f Excluir este envio</button></div>':'')+'</div></details>';});h+='</div>';h+='</div>';return h;}
+window.peProdPlanilha=function(fid,grade,meta){peProdXlsx(fid,grade,meta).catch(function(e){toast('Erro ao gerar: '+((e&&e.message)||''));});};
+function peOrdensPainel(fid){var cache=_peEstoqueCache[fid]||{},ordens=(cache.ordens||[]);var _teste=((typeof peEtqConfig!=='undefined'&&peEtqConfig[fid])||{}).teste;var peds=ordens.filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});var prods=ordens.filter(function(o){return o.status==='producao';}).sort(function(a,b){return (a.producaoEm||a.criadoEm||0)-(b.producaoEm||b.criadoEm||0);});var h='<div class="pe-ords">';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot ped"></span>Pedidos enviados <b>'+peds.length+'</b></div>';if(!peds.length)h+='<div class="pe-ordempty">Nenhum pedido aguardando produção.</div>';peds.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);h+='<div class="pe-ordcard ped"><div class="pe-ordtop"><b>Pedido de '+fmtData(o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peEnvioAbrir(\''+fid+'\',\''+o.id+'\')">Confirmar envio</button><button class="btn sm" onclick="peExcluirOrdem(\''+fid+'\',\''+o.id+'\')">Excluir</button></div></div>';});h+='</div>';h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot prod"></span>Em produção <b>'+prods.length+'</b></div>';if(!prods.length)h+='<div class="pe-ordempty">Nada em produção no momento.</div>';prods.forEach(function(o){var r=_peOrdemResumo(fid,o.grade);var dias=o.producaoEm?Math.floor((Date.now()-o.producaoEm)/86400000):0;h+='<div class="pe-ordcard prod"><div class="pe-ordtop"><b>Produção de '+fmtData(o.producaoEm||o.criadoEm)+'</b><span class="pe-ordtot">'+r.tot+' pares · '+dias+'d</span></div>'+r.html+'<div class="pe-ordacts"><button class="btn btn-ouro sm" onclick="peOrdemPronta(\''+fid+'\',\''+o.id+'\')">Marcar como pronto</button></div></div>';});h+='</div>';var _peEnvCusto={};peModelosDaFabrica(fid).forEach(function(m){_peEnvCusto[m.id]=m.custo||0;});function _peEnvVal(g){var v=0;Object.keys(g||{}).forEach(function(k){v+=(parseInt(g[k])||0)*(_peEnvCusto[k.split('|')[0]]||0);});return v;}var envs=ordens.filter(function(o){return o.status==='enviado';}).sort(function(a,b){return (b.enviadoEm||0)-(a.enviadoEm||0);});h+='<div class="pe-ordsec"><div class="pe-ordh"><span class="pe-orddot env"></span>Enviados / romaneio <b>'+envs.length+'</b>'+((_teste&&envs.length)?'<button class="btn sm pe-testclear" onclick="peExcluirEnviosTodos(\''+fid+'\')">Limpar todos</button>':'')+'</div>';if(!envs.length)h+='<div class="pe-ordempty">Nenhum envio confirmado ainda.</div>';envs.forEach(function(o){var rp=_peOrdemResumo(fid,o.grade);var rm=_peOrdemResumo(fid,o.enviado||{});var _ev=_peEnvVal(o.enviado||o.grade);h+='<details class="pe-ordcard env pe-envdet"><summary class="pe-envsum"><span class="pe-envsum-l"><b>Enviado '+fmtData(o.enviadoEm||o.criadoEm)+'</b>'+(o.enviadoPor?'<span class="pe-envsum-by">'+escapeHtml(o.enviadoPor)+'</span>':'')+'</span><span class="pe-envsum-r">'+rm.tot+' pares'+(_ev?' \u00b7 '+brMoney(_ev):'')+'</span></summary><div class="pe-envres"><div class="pe-envreslbl">Pediu</div>'+rp.html+'<div class="pe-envreslbl">Mandou</div>'+rm.html+_peCorrecoesHTML(o)+(_teste?'<div class="pe-testacts"><button class="btn sm pe-testdel" onclick="event.stopPropagation();peExcluirOrdem(\''+fid+'\',\''+o.id+'\')">Excluir este envio</button></div>':'')+'</div></details>';});h+='</div>';h+='</div>';return h;}
 window.peExcluirEnviosTodos=function(fid){if(!window.confirm('Excluir TODOS os envios desta f\u00e1brica? (para limpar dados de teste) N\u00e3o d\u00e1 pra desfazer.'))return;peMutarOrdens(fid,function(os){return os.filter(function(o){return o.status!=='enviado';});},'Envios de teste exclu\u00eddos');};
 function pePedidoLancar(fid){var P=_pePedidoCache[fid];if(!P||!P.itens||!P.itens.length){toast('Nada a lançar');return;}var grade={};P.itens.forEach(function(it){(it.nums||[]).forEach(function(n){if(!it.mid)return;var k=it.mid+'|'+it.cor+'|'+n.tam;grade[k]=(grade[k]||0)+(parseInt(n.qtd)||0);});});peNovaOrdem(fid,grade);pePedidoFechar(fid);}
 window.pePublicar=pePublicar;window.peCopiarLink=peCopiarLink;window.peTrocarFoto=peTrocarFoto;window.peSalvarMetas=peSalvarMetas;window.peAbrir=peAbrir;window.peSalvarCritPct=peSalvarCritPct;window.peVoltar=peVoltar;window.pePedido=pePedido;window.pePedidoFechar=pePedidoFechar;window.pePedidoCopiar=pePedidoCopiar;window.pePedidoWhats=pePedidoWhats;window.peColocarProducao=peColocarProducao;window.peOrdemPronta=peOrdemPronta;window.peExcluirOrdem=peExcluirOrdem;window.peNovaOrdem=peNovaOrdem;window.pePedidoLancar=pePedidoLancar;window.peEnvioAbrir=peEnvioAbrir;window.peEnvioFechar=peEnvioFechar;window.peConfirmarEnvio=peConfirmarEnvio;window.peEnvioSelecionar=peEnvioSelecionar;
