@@ -9034,7 +9034,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   }
   window.__confAbrirHist=function(id){var arr=histLoad();var h=arr.find(function(x){return x.id===id;});if(!h)return;if(ordem.length&&totalSess()&&!confirm('Isso substitui a conferência atual na tela (que não foi salva). Continuar?'))return;linhas=JSON.parse(JSON.stringify(h.linhas||{}));ordem=(h.ordem||[]).slice();historico=[];popularForn();$('confFornecedor').value=h.fornFid||'';popularPedidos();$('confPedido').value=h.pedidoId||'';$('confNota').value=h.nota||'';salvar();render();confEditInicio(h.id,(h.fornNome||'')+' · '+new Date(h.em).toLocaleDateString('pt-BR'));msg('Conferência de '+esc(h.fornNome||'')+' aberta pra edição.',false);};
   window.__confDelHist=function(id){if(!confirm('Excluir essa conferência do histórico?'))return;histSave(histLoad().filter(function(x){return x.id!==id;}));confDelOne(id);if(_confEditId===id)confEditFim();renderHist();};
-  function parseCodigo(raw){var code=String(raw).replace(/\D/g,'');if(code.length!==18)return{erro:'Código com '+code.length+' dígitos — esperado 18.'};var ref=code.substr(4,6),corCod=code.substr(12,2),tam=parseInt(code.substr(16,2),10);if(TAMANHOS.indexOf(tam)===-1)return{erro:'Numeração '+tam+' fora da grade 37–44.'};return{ref:ref,corCod:corCod,tam:tam,code:code};}
+  function parseCodigo(raw){var code=String(raw).replace(/\D/g,'');if(code.length!==18)return{erro:'Código com '+code.length+' dígitos — esperado 18.'};var ref=code.substr(4,6),corCod=code.substr(10,4),tam=parseInt(code.substr(16,2),10);if(TAMANHOS.indexOf(tam)===-1)return{erro:'Numeração '+tam+' fora da grade 37–44.'};return{ref:ref,corCod:corCod,tam:tam,code:code};}
   function lancar(raw){
     var p=parseCodigo(raw);if(p.erro){msg(p.erro,true);beep(false);return;}
     var chave=p.ref+'|'+p.corCod;
@@ -9054,7 +9054,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     corpo.innerHTML='';var totCol={};TAMANHOS.forEach(function(t){totCol[t]=0;});var totGeral=0;
     ordem.forEach(function(chave){
       var l=linhas[chave],tr=document.createElement('tr');
-      var tdRef=document.createElement('td');tdRef.className='cf-ref';tdRef.textContent=l.ref+' /'+l.corCod;tr.appendChild(tdRef);
+      var tdRef=document.createElement('td');tdRef.className='cf-ref';tdRef.textContent=l.ref+' /'+String(l.corCod).replace(/^00/,'');tr.appendChild(tdRef);
       var cat=appCat();
       var tdM=document.createElement('td');var selM=document.createElement('select');selM.className='cf-inline cf-sel';
       selM.innerHTML='<option value="">— modelo —</option>'+cat.map(function(m){return '<option value="'+esc(m.id)+'"'+(l.modId===m.id?' selected':'')+'>'+esc(m.nome)+'</option>';}).join('');
