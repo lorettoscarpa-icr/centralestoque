@@ -5020,8 +5020,9 @@ const PE_PREVIA={tchwm:Object.assign({"fabrica": "Tchwm Shoes", "modelos": [{"id
 function peModelosDaFabrica(fid){
   const out=[];
   const ids=(peFornModelos&&peFornModelos[fid])||[];
+  const _UNI=repCatUnif();
   ids.forEach(function(mid){
-    const m=(repCatalogo||[]).find(x=>x.id===mid);if(!m)return;
+    const m=_UNI.find(x=>x.id===mid);if(!m)return;
     const cf=repCfg[m.id]||{};
     const cores=[];
     (m.cores||[]).forEach(c=>{if(cf.coresOff&&cf.coresOff[c.nome])return;const tams=Object.keys(c.skus||{});if(tams.length)cores.push({nome:c.nome,tams});});
@@ -5035,7 +5036,7 @@ window.peCadModeloFechar=function(){$('peModeloModal').classList.add('hide');_pe
 function peCadModeloRender(){
   const fid=_peCadFid;const box=$('peModeloBox');if(!fid||!box)return;
   const nomeF=repFornNome(fid);
-  if(!repCatalogo||!repCatalogo.length){box.innerHTML='<div class="pe-modal-h">Cadastrar modelos — '+escapeHtml(nomeF)+'</div><p class="pe-pick-empty">Nenhum modelo no catálogo ainda. Importe o relatório do Kigi na aba <b>Reposição</b> primeiro — os modelos vêm de lá — depois volte aqui e escolha quais esta fábrica produz.</p>';return;}
+  if(!repCatUnif().length){box.innerHTML='<div class="pe-modal-h">Cadastrar modelos — '+escapeHtml(nomeF)+'</div><p class="pe-pick-empty">Nenhum modelo no catálogo ainda. Importe o relatório do Kigi na aba <b>Reposição</b> primeiro — os modelos vêm de lá — depois volte aqui e escolha quais esta fábrica produz.</p>';return;}
   box.innerHTML='<div class="pe-modal-h">Cadastrar modelos — '+escapeHtml(nomeF)+'</div>'+
     '<p class="pe-pick-hint">Marque os modelos que <b>esta fábrica</b> produz. Eles vêm do catálogo importado do Kigi, já com as cores e numerações.</p>'+
     '<input type="text" id="peModeloBusca" placeholder="Buscar modelo..." oninput="peCadModeloFiltrar()">'+
@@ -5046,8 +5047,9 @@ function peCadModeloFiltrar(){
   const fid=_peCadFid;const lst=$('peModeloLista');if(!fid||!lst)return;
   const atuais=(peFornModelos[fid]||[]);
   const q=normKey(($('peModeloBusca')&&$('peModeloBusca').value)||'');
-  const jah=atuais.map(id=>(repCatalogo||[]).find(m=>m.id===id)).filter(Boolean).sort((a,b)=>a.nome.localeCompare(b.nome));
-  const disp=(repCatalogo||[]).filter(m=>atuais.indexOf(m.id)<0&&(!q||normKey(m.nome).includes(q))).sort((a,b)=>a.nome.localeCompare(b.nome));
+  const _UNI=repCatUnif();
+  const jah=atuais.map(id=>_UNI.find(m=>m.id===id)).filter(Boolean).sort((a,b)=>a.nome.localeCompare(b.nome));
+  const disp=_UNI.filter(m=>atuais.indexOf(m.id)<0&&(!q||normKey(m.nome).includes(q))).sort((a,b)=>a.nome.localeCompare(b.nome));
   let html='';
   if(jah.length)html+='<div class="pe-pick-jah"><div class="pe-pick-jah-t">Nesta fábrica ('+jah.length+')</div>'+jah.map(m=>'<div class="pe-pick-row on"><span>'+escapeHtml(m.nome)+'</span><button class="lnk-del" onclick="peRemModelo(\''+fid+'\',\''+m.id+'\')">tirar</button></div>').join('')+'</div>';
   html+='<div class="pe-pick-disp">'+(disp.length?disp.map(m=>'<button class="pe-pick-row add" onclick="peAddModelo(\''+m.id+'\')"><span>'+escapeHtml(m.nome)+'</span><span class="pe-pick-cor">'+(m.cores||[]).length+' cor(es)</span><span class="pe-pick-add">+ adicionar</span></button>').join(''):'<p class="pe-pick-empty">'+(q?'Nenhum modelo encontrado.':'Todos os modelos do catálogo já estão nesta fábrica.')+'</p>')+'</div>';
@@ -5136,8 +5138,9 @@ window.peCfgFiltrar=function(){
   var fid=_peCfgFid;var lst=$('peCfgLista');if(!fid||!lst)return;
   var cfg=peEtqConfig[fid]||{};var extra=(cfg.extraModelos||[]);var pe=(peFornModelos[fid]||[]);
   var q=(typeof normKey==='function')?normKey(($('peCfgBusca')&&$('peCfgBusca').value)||''):(($('peCfgBusca')&&$('peCfgBusca').value)||'').toLowerCase();
-  var jah=extra.map(function(id){return (repCatalogo||[]).find(function(m){return m.id===id;});}).filter(Boolean).sort(function(a,b){return a.nome.localeCompare(b.nome);});
-  var disp=(repCatalogo||[]).filter(function(m){return pe.indexOf(m.id)<0&&extra.indexOf(m.id)<0&&(!q||((typeof normKey==='function'?normKey(m.nome):m.nome.toLowerCase()).indexOf(q)>=0));}).sort(function(a,b){return a.nome.localeCompare(b.nome);});
+  var _UNI=repCatUnif();
+  var jah=extra.map(function(id){return _UNI.find(function(m){return m.id===id;});}).filter(Boolean).sort(function(a,b){return a.nome.localeCompare(b.nome);});
+  var disp=_UNI.filter(function(m){return pe.indexOf(m.id)<0&&extra.indexOf(m.id)<0&&(!q||((typeof normKey==='function'?normKey(m.nome):m.nome.toLowerCase()).indexOf(q)>=0));}).sort(function(a,b){return a.nome.localeCompare(b.nome);});
   var html='';
   if(jah.length)html+='<div class="pe-pick-jah"><div class="pe-pick-jah-t">Só etiqueta ('+jah.length+')</div>'+jah.map(function(m){return '<div class="pe-pick-row on"><span>'+escapeHtml(m.nome)+'</span><button class="lnk-del" onclick="peRemExtraEtiq(\''+fid+'\',\''+m.id+'\')">tirar</button></div>';}).join('')+'</div>';
   html+='<div class="pe-pick-disp">'+(disp.length?disp.map(function(m){return '<button class="pe-pick-row add" onclick="peAddExtraEtiq(\''+fid+'\',\''+m.id+'\')"><span>'+escapeHtml(m.nome)+'</span><span class="pe-pick-cor">'+(m.cores||[]).length+' cor(es)</span><span class="pe-pick-add">+ adicionar</span></button>';}).join(''):'<p class="pe-pick-empty">'+(q?'Nenhum modelo encontrado.':'Todos os modelos do catálogo já estão liberados para esta fábrica.')+'</p>')+'</div>';
@@ -6470,6 +6473,21 @@ setTimeout(function(){
 /* ==== rep module ==== */
 /* ============ MODULO REPOSICAO (relatório = fonte; inclui acessorios) ============ */
 let repCatalogo=carregar('loretto_rep_catalogo',[]);  // [{id,nome,cores:[{nome,skus:{tam:chave}}]}]
+// converte um modelo do catálogo de etiquetas (catalogo) para o formato do repCatalogo (com skus por numeração)
+function _catToRep(m){
+  var cores=(m.cores||[]).map(function(c){
+    var skus=c.skus||null;
+    if(!skus){skus={};var ini=parseInt(m.ini),fim=parseInt(m.fim);if(!isNaN(ini)&&!isNaN(fim)&&ini<=fim){for(var t=ini;t<=fim;t++){skus[String(t)]=(typeof getCodigo==='function')?getCodigo(m,c,String(t)):((m.prefixo||'')+(c.sigla||'')+t);}}}
+    return {nome:c.nome,skus:skus};
+  });
+  return {id:m.id,nome:m.nome,cores:cores,_manual:true};
+}
+// catálogo unificado: modelos do Kigi (repCatalogo) + modelos criados à mão (catalogo/etiquetas), sem duplicar por id
+function repCatUnif(){
+  var out=(repCatalogo||[]).slice();var ids={};out.forEach(function(m){if(m&&m.id)ids[m.id]=1;});
+  try{var cat=(typeof window.LS_catalogo==='function'?window.LS_catalogo():[])||[];cat.forEach(function(m){if(m&&m.id&&!ids[m.id]&&!m.oculto){out.push(_catToRep(m));ids[m.id]=1;}});}catch(e){}
+  return out;
+}
 let repEstoque=carregar('loretto_rep_estoque',{});    // {chave: qtd}
 let repInfo=carregar('loretto_rep_info',null);
 let repCfg=carregar('loretto_rep_cfg',{});            // {id:{fixo,fornId,custo,refs:{cor:code},coresOff:{cor:1}}}  (grade agora é por usuário)
@@ -6654,10 +6672,10 @@ function repImportar(file){
 function repRenderModelos(){
   const lst=$('repModLista'); if(!lst)return;
   repMigraGradeSePreciso();
-  if(!repCatalogo.length){lst.innerHTML='<div class="empty">Importe o relatório do Kigi na aba Estoque para listar os produtos.</div>';return;}
+  if(!repCatUnif().length){lst.innerHTML='<div class="empty">Importe o relatório do Kigi na aba Estoque para listar os produtos.</div>';return;}
   const busca=normKey(($('repModBusca')&&$('repModBusca').value)||'');
   const soFixos=$('repSoFixos')&&$('repSoFixos').checked;
-  const mods=repCatalogo
+  const mods=repCatUnif()
     .filter(m=>!busca||normKey(m.nome).includes(busca))
     .filter(m=>!soFixos||(repCfg[m.id]&&repCfg[m.id].fixo));
   let html=repCfgStatusHTML();
