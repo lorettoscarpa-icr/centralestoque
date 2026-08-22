@@ -9318,6 +9318,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     branco:['branco','all white','white'],
     preto:['preto','preto.','all black','preta','black'],
     cafe:['cafe','marrom'],
+    mouro:['mouro','pinhao'],
     cinza:['cinza','grafite'],
     marinho:['azul marinho','marinho']
   };
@@ -9387,7 +9388,19 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     var mod=null;
     if(ens){ mod=cat.find(function(m){return m.id===ens.modId;}) || null; }
     var mods=cat.map(function(m){return {n:nz(m.nome),m:m};}).sort(function(a,b){return b.n.length-a.n.length;});
-    if(!mod) for(var i=0;i<mods.length;i++) if(t.indexOf(mods[i].n)>=0){ mod=mods[i].m; break; }
+    /* "Loafer katar MOURO gravata" tem a cor no meio do nome. Procurar o nome inteiro e
+       seguido acharia só "Loafer Katar" e perderia o "Gravata" — modelo errado, etiqueta
+       errada. Então vale o modelo com MAIS palavras presentes no texto. */
+    if(!mod){
+      var todas=null, maisN=0;
+      for(var i=0;i<mods.length;i++){
+        var ws=mods[i].n.split(' ');
+        if(!ws.every(function(w){ return pal.indexOf(w)>=0; })) continue;
+        if(ws.length>maisN){ maisN=ws.length; todas=mods[i].m; }
+      }
+      if(todas) mod=todas;
+    }
+    if(!mod) for(var i2=0;i2<mods.length;i2++) if(t.indexOf(mods[i2].n)>=0){ mod=mods[i2].m; break; }
     if(!mod){
       /* Pontua quantas palavras do NOME DO MODELO aparecem no texto. Aguenta ordem trocada
          ("Sneaker All Black Milão") e erro de digitação ("shoro" → Soho). Duas travas:
