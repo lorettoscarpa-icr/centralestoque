@@ -514,6 +514,26 @@
   .cf-cor i{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,.25);flex:none}
   .cf-cor.outra{color:var(--ouro);border-style:dashed}
   .cf-cor.on{background:rgba(220,189,96,.2);border-color:var(--ouro);color:var(--ouro-claro);font-weight:700}
+  /* A foto do modelo na linha da conferência: ele está com o sapato na mão, então é aqui
+     que ele vê se a foto está certa — e é aqui que corrige, sem sair do que está fazendo. */
+  .cf-foto{position:relative;flex:none;width:38px;height:38px;border-radius:8px;overflow:hidden;
+    border:1px solid var(--linha);background:rgba(0,0,0,.25);cursor:pointer;padding:0}
+  .cf-foto img{width:100%;height:100%;object-fit:cover;display:block}
+  .cf-foto.vazia{border-style:dashed;color:rgba(251,249,238,.4);font-size:var(--fs-lg);
+    display:flex;align-items:center;justify-content:center}
+  .cf-foto:hover{border-color:var(--ouro)}
+  .cf-foto i{position:absolute;right:0;bottom:0;font-style:normal;font-size:9px;line-height:1;
+    padding:2px;background:rgba(0,0,0,.6);border-radius:5px 0 0 0}
+  #cfFotoOv{display:none}
+  #cfFotoOv.open{display:flex}
+  #cfFotoOv .modal{max-width:400px}
+  .cff-prev{width:100%;aspect-ratio:1;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--linha);
+    background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;margin:12px 0}
+  .cff-prev img{width:100%;height:100%;object-fit:contain}
+  .cff-prev span{color:rgba(251,249,238,.4);font-size:var(--fs-base)}
+  .cff-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .cff-btns .btn{flex:1;min-width:120px;min-height:46px}
+  @media (max-width:760px){ .cf-foto{width:46px;height:46px} }
   .cf-cores.pisca{animation:cfPisca .9s ease}
   @keyframes cfPisca{0%,100%{background:transparent}30%,70%{background:rgba(220,189,96,.16)}}
   @media (prefers-reduced-motion:reduce){.cf-cores.pisca{animation:none;outline:1px solid var(--ouro)}}
@@ -2753,6 +2773,25 @@ textarea.cons-field{min-height:80px;resize:vertical}
   <div class="cf-rodape" id="cfvRodape" style="display:none">
     <div class="cf-rod-txt"><b id="confFilaN">0</b> etiqueta(s) na fila</div>
     <button class="btn btn-ouro" onclick="trocarAba('etiquetas')">Ir para as etiquetas &rsaquo;</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="cfFotoOv">
+  <div class="modal">
+    <div class="modal-title" style="margin-bottom:2px">Foto do modelo</div>
+    <p class="cf-nota" id="cffQuem" style="margin:0">—</p>
+    <div class="cff-prev" id="cffPrev"><span>sem foto</span></div>
+    <p class="cf-nota" id="cffNota" style="margin:0 0 12px"></p>
+    <div class="cff-btns">
+      <label class="btn btn-ouro" style="display:flex;align-items:center;justify-content:center;cursor:pointer">
+        📷 Tirar foto<input type="file" accept="image/*" capture="environment" hidden onchange="cffArquivo(this)"></label>
+      <label class="btn" style="display:flex;align-items:center;justify-content:center;cursor:pointer">
+        🖼️ Da galeria<input type="file" accept="image/*" hidden onchange="cffArquivo(this)"></label>
+    </div>
+    <div class="cff-btns" style="margin-top:8px">
+      <button class="btn btn-ghost" onclick="cffFechar()">Fechar</button>
+      <button class="btn btn-ghost" id="cffRem" onclick="cffRemover()" style="display:none">Remover foto</button>
+    </div>
   </div>
 </div>
 
@@ -6799,28 +6838,39 @@ function _repPubAgora(){
   });
 }
 function _pubMarca(f){ var s=''; Object.keys(f).sort().forEach(function(c){ s+=c+':'+String(f[c]).length+';'; }); return s; }
+/* As fotos da Reposição são guardadas pelo NOME do modelo em minúsculas ("sneaker milao"),
+   e o painel de entregas procura pelo id do catálogo de etiquetas ("k39"). Sem traduzir,
+   as fotos que o Yuri já tem nunca chegavam no entregador. */
+function idDeEtiqueta(chaveRep){
+  var alvo=normKey(chaveRep);
+  var m=(typeof catalogo!=='undefined'?catalogo:[]).find(function(x){ return normKey(x.nome)===alvo; });
+  return m?m.id:null;
+}
 function _repPubEnviar(){
   if(!_db) return;
-  var t={}, n=0, ts=Date.now();
+  var t={}, n=0, ts=Date.now(), ids={};
   Object.keys(_thumbs).forEach(function(mid){
     if(!repFotos[mid]) return;                                   // foto removida: some daqui também
+    var id=idDeEtiqueta(mid); if(!id) return;                    // modelo sem etiqueta: nada a mostrar
+    ids[mid]=id;
     Object.keys(_thumbs[mid]).forEach(function(cor){
       if(!repFotos[mid][cor]) return;
       var d=_thumbs[mid][cor].d; if(!d) return;
-      (t[mid]=t[mid]||{})[cor]=d; n++;
+      (t[id]=t[id]||{})[cor]=d; n++;
     });
   });
   /* mesma coleção ls_rep_fotos: coleção nova daria permissão negada nas regras atuais */
   _db.collection('ls_rep_fotos').doc('loja_thumb').set({t:t,n:n,ts:ts})
     .catch(function(){ console.warn('miniaturas não publicadas'); });
   Object.keys(repFotos||{}).forEach(function(mid){
+    var id=ids[mid]||idDeEtiqueta(mid); if(!id) return;
     var m=repFotos[mid]||{}, f={};
     Object.keys(m).forEach(function(cor){ if(m[cor]) f[cor]=m[cor]; });
     if(!Object.keys(f).length) return;
     var marca=_pubMarca(f);
-    try{ if(localStorage.getItem('loretto_pubf_'+mid)===marca) return; }catch(e){}   // lá já está igual
-    _db.collection('ls_rep_fotos').doc('full_'+String(mid)).set({f:f,ts:ts})
-      .then(function(){ try{localStorage.setItem('loretto_pubf_'+mid,marca);}catch(e){} })
+    try{ if(localStorage.getItem('loretto_pubf_'+id)===marca) return; }catch(e){}   // lá já está igual
+    _db.collection('ls_rep_fotos').doc('full_'+String(id)).set({f:f,ts:ts})
+      .then(function(){ try{localStorage.setItem('loretto_pubf_'+id,marca);}catch(e){} })
       .catch(function(){});
   });
 }
@@ -9842,6 +9892,70 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     cfEscolhaAbrir(ent,p);
   };
 
+  /* ---------- a foto do modelo, conferida e corrigida aqui mesmo ----------
+     Ele está com o sapato na mão: é o único momento em que dá pra saber se a foto que o
+     entregador vê é a certa. Guarda no MESMO lugar da aba Reposição (uma foto só, os dois
+     lugares mostram) e publica na hora pro painel de entregas. */
+  function chaveFoto(mod){
+    if(!mod) return '';
+    var alvo=normKey(mod.nome);
+    var r=(typeof repCatalogo!=='undefined'?repCatalogo:[]).find(function(x){ return normKey(x.nome)===alvo; });
+    return r ? r.id : alvo;                      // sem par na reposição, o nome normalizado serve
+  }
+  function fotoDe(mod,cor){
+    if(!mod||!cor) return '';
+    var m=repFotos[chaveFoto(mod)];
+    return (m && (m[cor.nome]||m._modelo)) || '';
+  }
+  var _cff=null;
+  window.confFoto=function(ent,pk){
+    var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;}); if(!r) return;
+    var p=pecasDaVolta(r).find(function(x){return x.k===pk;}); if(!p) return;
+    var m=casarPeca(p);
+    if(!m.mod||!m.cor){ toast('Escolha o modelo e a cor primeiro'); return; }
+    _cff={mod:m.mod, cor:m.cor};
+    $('cffQuem').innerHTML='<b style="color:var(--ouro-claro)">'+esc(m.mod.nome)+'</b> &middot; '+esc(m.cor.nome);
+    cffPintar();
+    $('cfFotoOv').classList.add('open');
+  };
+  function cffPintar(){
+    if(!_cff) return;
+    var f=fotoDe(_cff.mod,_cff.cor), pv=$('cffPrev'), rm=$('cffRem');
+    if(pv) pv.innerHTML = f ? '<img src="'+esc(f)+'">' : '<span>este modelo ainda não tem foto</span>';
+    if(rm) rm.style.display = f ? '' : 'none';
+    var nt=$('cffNota');
+    if(nt) nt.textContent = f
+      ? 'Se não for este o sapato, troque — é esta foto que o entregador vê na hora de entregar.'
+      : 'A foto aparece pro entregador na lista da sacola, pra ele não confundir modelo parecido.';
+  }
+  window.cffFechar=function(){ var o=$('cfFotoOv'); if(o) o.classList.remove('open'); _cff=null; };
+  window.cffArquivo=function(inp){
+    var f=inp&&inp.files&&inp.files[0]; if(inp) inp.value='';
+    if(!f||!_cff) return;
+    var alvo=_cff;                                // ele pode fechar a janela enquanto carrega
+    toast('Preparando a foto…');
+    repFotoLer(f,function(d){
+      if(!d) return;
+      var k=chaveFoto(alvo.mod);
+      repFotos[k]=repFotos[k]||{};
+      repFotos[k][alvo.cor.nome]=d;
+      salvaFotos();                               // grava, manda pra nuvem e publica a miniatura
+      if(typeof repRenderModelos==='function' && typeof repSub!=='undefined' && repSub==='modelos') repRenderModelos();
+      if(_cff) cffPintar();
+      confRender();
+      toast('Foto salva ✓ o entregador já vê');
+    });
+  };
+  window.cffRemover=function(){
+    if(!_cff) return;
+    var k=chaveFoto(_cff.mod), cor=_cff.cor.nome;
+    if(!repFotos[k]||!repFotos[k][cor]) return;
+    delete repFotos[k][cor];
+    if(!Object.keys(repFotos[k]).length) delete repFotos[k];
+    salvaFotos(); cffPintar(); confRender();
+    toast('Foto removida');
+  };
+
   function chip(txt,cls){ return '<span class="cf-tag '+(cls||'')+'">'+txt+'</span>'; }
 
   window.confRender=function(){
@@ -9906,9 +10020,16 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
                     '<i style="background:'+(c.hex||'#888')+'"></i>'+esc(c.nome)+'</button>';}).join('')+
                 '<button class="cf-cor outra" onclick="confEscolher(\''+r.ent+'\',\''+p.k+'\')">outra…</button></div>'
               : '';
+            /* Só depois de saber modelo E cor faz sentido mostrar (ou pedir) a foto. */
+            var fot=(m.mod&&m.cor)?fotoDe(m.mod,m.cor):'';
+            var btFoto=(m.mod&&m.cor)
+              ? '<button class="cf-foto'+(fot?'':' vazia')+'" onclick="confFoto(\''+r.ent+'\',\''+p.k+'\')" '+
+                'title="'+(fot?'Conferir ou trocar a foto que o entregador vê':'Adicionar a foto deste modelo')+'">'+
+                (fot?('<img src="'+esc(fot)+'"><i>✎</i>'):'+')+'</button>'
+              : '';
             return '<div class="cf-peca">'+
               '<button class="cf-chk'+(on?' on':'')+'" onclick="confPeca(\''+r.ent+'\',\''+p.k+'\')" aria-label="Conferir"'+
-                (soCor?' title="escolha a cor primeiro"':'')+'>'+(on?'✓':'')+'</button>'+
+                (soCor?' title="escolha a cor primeiro"':'')+'>'+(on?'✓':'')+'</button>'+btFoto+
               '<span class="cf-pnome">'+esc(p.nome||'peça')+
                 (m.mod?'<small>'+esc(m.mod.nome)+(m.cor?' · '+esc(m.cor.nome):'')+
                   (m.daVendedora?' · cor da vendedora':(m.ensinado?' · aprendido':''))+'</small>':'')+'</span>'+
