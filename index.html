@@ -9335,19 +9335,32 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   function nz(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
   /* O Yuri corrige uma vez e o sistema não erra de novo. "birken" aparece 19 vezes na base,
      "loafer fivela" 18 — ensinar cada texto uma vez resolve 60% do que hoje ele digita. */
-  var _cfLicao={}, _cfLicaoRef=null;
-  function chaveLicao(nome){
-    var t=expande(nome).replace(/\b(3[3-9]|4[0-6])\b/g,' ').replace(/\s{2,}/g,' ').trim();
-    return t;
+  var _cfLicao={}, _cfLicaoCor={}, _cfLicaoRef=null;
+  /* Duas lições diferentes, porque são coisas diferentes:
+     · MODELO — "loafer dubai" agora é Loafer Grécia (mudou de nome). Vale pro texto todo,
+       sem a cor e sem a numeração, então uma lição cobre as 17 peças.
+     · COR — "grafite", no Loafer Verona, é o "Ártico Camurça" cadastrado. É vocabulário
+       daquele modelo, não a cor daquela peça: por isso a lição é (modelo + palavra escrita),
+       e nunca "a cor deste modelo é X". */
+  function palavrasCor(nome){
+    var V=voc();
+    return expande(nome).split(' ').filter(function(w){ return V.cores[w]||COR_AB[w]; }).sort().join(' ');
   }
+  function chaveLicao(nome){
+    var V=voc();
+    return expande(nome).replace(/\b(3[3-9]|4[0-6])\b/g,' ').split(' ')
+      .filter(function(w){ return w && !V.cores[w] && !COR_AB[w]; }).join(' ').trim();
+  }
+  function chaveCor(modId, nome){ var c=palavrasCor(nome); return c ? (modId+'|'+c) : ''; }
   function ensinar(nome, mod, cor){
-    var k=chaveLicao(nome); if(!k) return;
-    /* O MODELO é do texto e não muda: "birken" sempre vai ser Birken Bahamas se ele disser.
-       A COR muda de peça pra peça. Só guarda a cor quando a vendedora escreveu alguma cor e
-       o sistema não soube ler — senão o próximo "Birken" sairia com a cor da vez passada. */
-    var V=voc(), temCor=expande(nome).split(' ').some(function(w){ return V.cores[w]||COR_AB[w]; });
-    _cfLicao[k]={modId:mod.id, cor:(temCor&&cor&&cor.nome)||''};
-    if(_cfLicaoRef) _cfLicaoRef.set({licoes:_cfLicao, ts:Date.now()}).catch(function(){});
+    var k=chaveLicao(nome);
+    /* Guarda o NOME junto do id: id é posição no catálogo e pode mudar (o k39 do catálogo
+       do arquivo é outro modelo no da nuvem). Sem o nome, uma lição antiga apontaria pro
+       modelo errado e a etiqueta sairia errada sem ninguém perceber. */
+    if(k) _cfLicao[k]={modId:mod.id, nome:mod.nome};
+    var kc=chaveCor(mod.id, nome);
+    if(kc && cor) _cfLicaoCor[kc]=cor.nome;      // só quando ela ESCREVEU uma cor que o app não leu
+    if(_cfLicaoRef) _cfLicaoRef.set({licoes:_cfLicao, cores:_cfLicaoCor, ts:Date.now()}).catch(function(){});
     _voc=null;
   }
   function expande(t){
@@ -9386,7 +9399,12 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     var t=expande(nome), pal=t.split(' ');
     var ens=_cfLicao[chaveLicao(nome)];               // o Yuri já ensinou este texto?
     var mod=null;
-    if(ens){ mod=cat.find(function(m){return m.id===ens.modId;}) || null; }
+    if(ens){
+      var achado=cat.find(function(m){return m.id===ens.modId;});
+      if(achado && ens.nome && achado.nome!==ens.nome) achado=null;      // id mudou de dono
+      if(!achado && ens.nome) achado=cat.find(function(m){return m.nome===ens.nome;});
+      mod=achado||null;
+    }
     var mods=cat.map(function(m){return {n:nz(m.nome),m:m};}).sort(function(a,b){return b.n.length-a.n.length;});
     /* "Loafer katar MOURO gravata" tem a cor no meio do nome. Procurar o nome inteiro e
        seguido acharia só "Loafer Katar" e perderia o "Gravata" — modelo errado, etiqueta
@@ -9433,10 +9451,9 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
       }
     }
     if(!mod) return {};
-    if(ens && ens.cor){
-      var cE=(mod.cores||[]).find(function(c){return c.nome===ens.cor;});
-      if(cE) return {mod:mod, cor:cE, ensinado:true};
-    }
+    { var apr=_cfLicaoCor[chaveCor(mod.id, nome)];    // "grafite" neste modelo = "Ártico Camurça"
+      if(apr){ var cE=(mod.cores||[]).find(function(c){return c.nome===apr;});
+        if(cE) return {mod:mod, cor:cE, ensinado:true}; } }
     var cores=(mod.cores||[]).filter(function(c){return !c.off;})
       .map(function(c){return {n:nz(c.nome),c:c};}).sort(function(a,b){return b.n.length-a.n.length;});
     var cor=null, k;
@@ -9791,7 +9808,10 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
         },function(){});
         _cfLicaoRef=_cfDb.collection('ls_conf_licoes').doc('loja');
         _cfLicaoRef.onSnapshot(function(d){
-          var v=d.data(); if(v&&v.licoes){ _cfLicao=v.licoes; _voc=null; confRender(); }
+          var v=d.data(); if(!v) return;
+          if(v.licoes) _cfLicao=v.licoes;
+          if(v.cores) _cfLicaoCor=v.cores;
+          _voc=null; confRender();
         },function(){});
         _cfDb.collection('ls_catalogo').doc('loja').onSnapshot(function(d){
           var v=d.data(); if(v&&Array.isArray(v.catalogo)&&v.catalogo.length){ _cfCat=v.catalogo; confRender(); }
@@ -9808,6 +9828,8 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     cfDia=null; _cfEscolha=null; confRender(); };
   window.confCatN=function(){ return catAtual().length; };
   window.confLicoes=function(){ return _cfLicao; };
+  window.confLicoesCor=function(){ return _cfLicaoCor; };
+  window.confEnsinarTeste=function(nome,mod,cor){ ensinar(nome,mod,cor); confRender(); };
   window.confDump=function(){ return {entregas:cfEntregas, confs:cfConfs, dia:cfDia}; };
   window.confCasar=casarCatalogo;
 })();
