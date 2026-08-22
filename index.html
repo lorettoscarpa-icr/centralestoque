@@ -513,6 +513,9 @@
   .cf-cor:hover{border-color:var(--ouro);background:rgba(220,189,96,.12)}
   .cf-cor i{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,.25);flex:none}
   .cf-cor.outra{color:var(--ouro);border-style:dashed}
+  .cf-cores.pisca{animation:cfPisca .9s ease}
+  @keyframes cfPisca{0%,100%{background:transparent}30%,70%{background:rgba(220,189,96,.16)}}
+  @media (prefers-reduced-motion:reduce){.cf-cores.pisca{animation:none;outline:1px solid var(--ouro)}}
   .cf-ent-acts{display:flex;gap:10px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--linha);align-items:center}
   .cf-nota{font-size:var(--fs-sm);color:rgba(251,249,238,.5)}
   .cf-rodape{position:sticky;bottom:0;display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;
@@ -9505,22 +9508,40 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;}); if(!r) return;
     var todas=pecasDaVolta(r), p=todas.find(function(x){return x.k===pk;}); if(!p) return;
     var marc=Object.assign({},marcadas(cfDia,ent));
+    if(!marc[pk]){
+      /* Toda peça que volta precisa de etiqueta. Se o modelo é conhecido e só falta a cor,
+         conferir pela caixinha deixaria a peça sem etiqueta e sem aviso — então o toque
+         chama a escolha da cor, que confere e etiqueta de uma vez. */
+      var m=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
+      if(m.mod && !m.cor && p.num){
+        var el=document.getElementById('cor-'+p.k);
+        if(el){ el.classList.remove('pisca'); void el.offsetWidth; el.classList.add('pisca'); }
+        toast('Toque na cor pra conferir e gerar a etiqueta');
+        return;
+      }
+    }
     if(marc[pk]){ delete marc[pk]; daFila(p); }
     else {
       marc[pk]=true;
       if(paraFila(p)) toast('Conferida ✓ e etiqueta na fila');
-      else toast('Conferida ✓ — escolha o modelo pra gerar a etiqueta');
+      else toast('Conferida ✓ — sem etiqueta (peça fora do catálogo)');
     }
     gravarConf(cfDia,ent,todas.length,marc);
     confRender();
   };
   window.confTodas=function(ent){
     var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;}); if(!r) return;
-    var todas=pecasDaVolta(r), marc=Object.assign({},marcadas(cfDia,ent)), n=0;
-    todas.forEach(function(p){ if(!marc[p.k]){ marc[p.k]=true; if(paraFila(p)) n++; } });
+    var todas=pecasDaVolta(r), marc=Object.assign({},marcadas(cfDia,ent)), n=0, faltam=0;
+    todas.forEach(function(p){
+      if(marc[p.k]) return;
+      var m=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
+      if(m.mod && !m.cor && p.num){ faltam++; return; }   // essa depende da cor: deixa pra ele
+      marc[p.k]=true; if(paraFila(p)) n++;
+    });
     gravarConf(cfDia,ent,todas.length,marc);
     confRender();
-    toast(n?('Tudo conferido ✓ · '+n+' etiqueta(s) na fila'):'Tudo conferido ✓');
+    toast(faltam ? (n+' conferida(s) · faltam '+faltam+' pra escolher a cor')
+        : (n?('Tudo conferido ✓ · '+n+' etiqueta(s) na fila'):'Tudo conferido ✓'));
   };
   window.confCor=function(ent,pk,corNome){
     var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;}); if(!r) return;
@@ -9600,7 +9621,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
               : '<button class="cf-fix'+(m.mod?' achou':'')+'" onclick="confEscolher(\''+r.ent+'\',\''+p.k+'\')">'+
                 (m.mod?('⚠ falta a cor'+(p.num?'':' e o nº')):'escolher modelo')+'</button>';
             var cores = soCor
-              ? '<div class="cf-cores"><span class="cf-cores-t">qual a cor?</span>'+
+              ? '<div class="cf-cores" id="cor-'+p.k+'"><span class="cf-cores-t">qual a cor?</span>'+
                 (m.mod.cores||[]).filter(function(c){return !c.off;}).map(function(c){
                   return '<button class="cf-cor" onclick="confCor(\''+r.ent+'\',\''+p.k+'\',\''+esc(c.nome).replace(/'/g,"&#39;")+'\')">'+
                     '<i style="background:'+(c.hex||'#888')+'"></i>'+esc(c.nome)+'</button>';}).join('')+
@@ -9702,7 +9723,8 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     });
   };
   // dados de teste entram por aqui (sem nuvem)
-  window.confSemear=function(ents,confs,cat){ cfEntregas=ents||[]; cfConfs=confs||[]; if(cat) _cfCat=cat; cfDia=null; confRender(); };
+  window.confSemear=function(ents,confs,cat){ cfEntregas=ents||[]; cfConfs=confs||[]; if(cat) _cfCat=cat;
+    cfDia=null; _cfEscolha=null; confRender(); };
   window.confCatN=function(){ return catAtual().length; };
   window.confLicoes=function(){ return _cfLicao; };
   window.confDump=function(){ return {entregas:cfEntregas, confs:cfConfs, dia:cfDia}; };
