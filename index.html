@@ -9461,7 +9461,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
       if(li){
         li.forEach(function(x,idx){
           if(!i.reag && x.ficou) return;
-          out.push({k:e.id+'#'+idx, e:e, nome:x.nome, num:x.num, valor:x.valor, reag:i.reag});
+          out.push({k:e.id+'#'+idx, e:e, nome:x.nome, num:x.num, valor:x.valor, cor:x.cor||'', reag:i.reag});
         });
       } else {
         for(var n=0;n<i.volta;n++)
@@ -9486,8 +9486,18 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   }
 
   /* ---------- a peça vai (e volta) da fila de etiquetas ---------- */
+  /* Se a vendedora escolheu a cor no cadastro, ela vale — foi quem viu o sapato sair. */
+  function casarPeca(p){
+    if(_cfEscolha && _cfEscolha[p.k]) return _cfEscolha[p.k];
+    var m=casarCatalogo(p.nome);
+    if(m.mod && !m.cor && p.cor){
+      var c=(m.mod.cores||[]).find(function(x){return x.nome===p.cor;});
+      if(c) return {mod:m.mod, cor:c, daVendedora:true};
+    }
+    return m;
+  }
   function chaveFila(p){
-    var m=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
+    var m=casarPeca(p);
     if(!m.mod||!m.cor||!p.num) return null;
     return {key:m.mod.id+'|'+m.mod.cores.indexOf(m.cor)+'|'+p.num, mod:m.mod, cor:m.cor};
   }
@@ -9526,7 +9536,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
       /* Toda peça que volta precisa de etiqueta. Se o modelo é conhecido e só falta a cor,
          conferir pela caixinha deixaria a peça sem etiqueta e sem aviso — então o toque
          chama a escolha da cor, que confere e etiqueta de uma vez. */
-      var m=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
+      var m=casarPeca(p);
       if(m.mod && !m.cor && p.num){
         var el=document.getElementById('cor-'+p.k);
         if(el){ el.classList.remove('pisca'); void el.offsetWidth; el.classList.add('pisca'); }
@@ -9548,7 +9558,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     var todas=pecasDaVolta(r), marc=Object.assign({},marcadas(cfDia,ent)), n=0, faltam=0;
     todas.forEach(function(p){
       if(marc[p.k]) return;
-      var m=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
+      var m=casarPeca(p);
       if(m.mod && !m.cor && p.num){ faltam++; return; }   // essa depende da cor: deixa pra ele
       marc[p.k]=true; if(paraFila(p)) n++;
     });
@@ -9560,7 +9570,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   window.confCor=function(ent,pk,corNome){
     var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;}); if(!r) return;
     var todas=pecasDaVolta(r), p=todas.find(function(x){return x.k===pk;}); if(!p) return;
-    var m=casarCatalogo(p.nome); if(!m.mod) return;
+    var m=casarPeca(p); if(!m.mod) return;
     var cor=(m.mod.cores||[]).find(function(c){return c.nome===corNome;}); if(!cor) return;
     _cfEscolha=_cfEscolha||{};
     _cfEscolha[p.k]={mod:m.mod, cor:cor};
@@ -9624,7 +9634,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
           '<span>👤 '+esc(e.vendedora||'sem vendedora')+'</span><span>· '+sit+'</span></div>'+
           lote.map(function(p){
             var on=!!marc[p.k];
-            var m=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
+            var m=casarPeca(p);
             var pronta=!!(m.mod&&m.cor&&p.num);
             /* Só falta a cor e ele está com o sapato na mão: um toque na cor certa resolve.
                Abrir a janela pra escolher modelo+cor+nº seria três vezes mais trabalho. */
@@ -9645,7 +9655,8 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
               '<button class="cf-chk'+(on?' on':'')+'" onclick="confPeca(\''+r.ent+'\',\''+p.k+'\')" aria-label="Conferir"'+
                 (soCor?' title="escolha a cor primeiro"':'')+'>'+(on?'✓':'')+'</button>'+
               '<span class="cf-pnome">'+esc(p.nome||'peça')+
-                (m.mod?'<small>'+esc(m.mod.nome)+(m.cor?' · '+esc(m.cor.nome):'')+(m.ensinado?' · aprendido':'')+'</small>':'')+'</span>'+
+                (m.mod?'<small>'+esc(m.mod.nome)+(m.cor?' · '+esc(m.cor.nome):'')+
+                  (m.daVendedora?' · cor da vendedora':(m.ensinado?' · aprendido':''))+'</small>':'')+'</span>'+
               (p.num?'<span class="cf-num">nº '+esc(p.num)+'</span>':'')+etq+'</div>'+cores;
           }).join('')+'</div>';
       }).join('');
@@ -9657,7 +9668,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
         (pecas.length&&feitas<pecas.length
           ? (function(){
               var faltaCor=pecas.filter(function(p){ if(marc[p.k]) return false;
-                var mm=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
+                var mm=casarPeca(p);
                 return mm.mod && !mm.cor && p.num; }).length;
               var prontas=pecas.length-feitas-faltaCor;
               return '<div class="cf-ent-acts">'+
