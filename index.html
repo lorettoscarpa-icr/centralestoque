@@ -517,6 +517,20 @@
   @keyframes cfPisca{0%,100%{background:transparent}30%,70%{background:rgba(220,189,96,.16)}}
   @media (prefers-reduced-motion:reduce){.cf-cores.pisca{animation:none;outline:1px solid var(--ouro)}}
   .cf-ent-acts{display:flex;gap:10px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--linha);align-items:center}
+  /* No celular ele confere com o sapato numa mão: alvo pequeno vira toque errado, e toque
+     errado aqui é conferência falsa. 44px é o mínimo confortável pro dedo. */
+  @media (max-width:760px){
+    .cf-peca{gap:10px;padding:6px 0}
+    .cf-chk{width:44px;height:44px;font-size:var(--fs-lg)}
+    .cf-pnome{font-size:var(--fs-md)}
+    .cf-cores{padding-left:0;gap:8px}
+    .cf-cor{padding:10px 14px;font-size:var(--fs-sm);min-height:44px}
+    .cf-cor i{width:14px;height:14px}
+    .cf-ent-acts .btn{min-height:48px}
+    .cf-topo{gap:10px}
+    .cf-kpi{flex:1 1 96px;min-width:0;padding:9px 12px}
+    .cf-dia{flex:1;min-width:150px}
+  }
   .cf-nota{font-size:var(--fs-sm);color:rgba(251,249,238,.5)}
   .cf-rodape{position:sticky;bottom:0;display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;
     border:1px solid var(--linha);border-radius:var(--r-md);padding:14px 18px;background:var(--verde);margin-top:18px}
@@ -9641,8 +9655,18 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
         '<span class="cf-ent-conta"><i>'+r.saiu+'</i> saiu − <i>'+r.vendeu+'</i> vendeu = <i>'+r.volta+'</i> volta</span>'+
         '</div>'+(corpo||'<div class="cf-entrega"><span class="cf-nota">Tudo que saiu ficou com os clientes.</span></div>')+
         (pecas.length&&feitas<pecas.length
-          ? '<div class="cf-ent-acts"><button class="btn btn-ouro" onclick="confTodas(\''+r.ent+'\')">✓ Conferi '+(pecas.length===1?'a peça':('as '+pecas.length+' peças'))+'</button>'+
-            '<span class="cf-nota">cada peça conferida vira etiqueta na fila</span></div>'
+          ? (function(){
+              var faltaCor=pecas.filter(function(p){ if(marc[p.k]) return false;
+                var mm=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
+                return mm.mod && !mm.cor && p.num; }).length;
+              var prontas=pecas.length-feitas-faltaCor;
+              return '<div class="cf-ent-acts">'+
+                (prontas>0?'<button class="btn btn-ouro" onclick="confTodas(\''+r.ent+'\')">✓ Conferi '+
+                  (prontas===1?'a peça':('as '+prontas+' peças'))+'</button>':'')+
+                '<span class="cf-nota">'+(faltaCor
+                  ? (faltaCor===1?'1 peça espera você escolher a cor':faltaCor+' peças esperam você escolher a cor')
+                  : 'cada peça conferida vira etiqueta na fila')+'</span></div>';
+            })()
           : '')+'</div>';
     }).join('');
 
