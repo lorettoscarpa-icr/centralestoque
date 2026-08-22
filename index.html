@@ -9307,6 +9307,30 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   var COR_AB={ab:'all black',off:'off white',pt:'preto',preta:'preto',mar:'marfim',
     am:'azul marinho',nbk:'nobuck',cam:'camurca',caf:'cafe',gt:'grafite',car:'caramelo',
     bra:'branco',branca:'branco'};
+  /* A mesma cor tem nomes diferentes: a vendedora escreve "branco", o catálogo diz "All
+     White"; ela escreve "preto", o modelo tem "All Black". Não é cor faltando no cadastro,
+     é vocabulário. Só vale quando o modelo tem UMA cor daquela família — com duas, o
+     Yuri decide. */
+  /* Só o que é comprovadamente a MESMA cor com outro nome. Agrupar tons parecidos
+     (marfim com branco, whisky com caramelo) faria sair a etiqueta do sapato errado —
+     e medindo não trouxe ganho nenhum, então fica de fora. */
+  var COR_FAM={
+    branco:['branco','all white','white'],
+    preto:['preto','preto.','all black','preta','black'],
+    cafe:['cafe','marrom'],
+    cinza:['cinza','grafite'],
+    marinho:['azul marinho','marinho']
+  };
+  function familiaCor(c){
+    c=nz(c);
+    for(var f in COR_FAM){
+      for(var i=0;i<COR_FAM[f].length;i++){
+        var v=nz(COR_FAM[f][i]);
+        if(c===v || c.indexOf(v+' ')===0 || c.indexOf(v)>=0) return f;
+      }
+    }
+    return null;
+  }
   function nz(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
   /* O Yuri corrige uma vez e o sistema não erra de novo. "birken" aparece 19 vezes na base,
      "loafer fivela" 18 — ensinar cada texto uma vez resolve 60% do que hoje ele digita. */
@@ -9420,6 +9444,15 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
         if(cands.length===1){ cor=cands[0].c; break; }
       }
       if(cor) break;
+    }
+    if(!cor){                                          // mesma cor, outro nome
+      var fams={};
+      pal.forEach(function(w){ var f=familiaCor(COR_AB[w]||w); if(f) fams[f]=1; });
+      Object.keys(fams).forEach(function(f){
+        if(cor) return;
+        var iguais=cores.filter(function(o){ return familiaCor(o.n)===f; });
+        if(iguais.length===1) cor=iguais[0].c;           // só quando não há dúvida
+      });
     }
     if(!cor && cores.length===1) cor=cores[0].c;        // cor única: não há o que errar
     return {mod:mod, cor:cor};
