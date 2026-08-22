@@ -9295,8 +9295,13 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
       if(!usados[j] && a[i]===b[j] && Math.abs(i-j)<=2){ usados[j]=1; m++; break; }
     return (2*m)/(a.length+b.length);
   }
+  /* O catálogo do código (SEED) está sempre atrás do que a loja cadastrou: hoje são 121
+     modelos e 417 cores na nuvem contra 109 e 368 no arquivo. Casar contra o velho geraria
+     etiqueta errada — então a conferência escuta o catálogo da nuvem direto. */
+  var _cfCat=null;
+  function catAtual(){ return (_cfCat&&_cfCat.length) ? _cfCat : ((typeof catalogo!=='undefined'&&catalogo)||[]); }
   function casarCatalogo(nome){
-    var cat=(typeof catalogo!=='undefined'&&catalogo)||[]; if(!cat.length) return {};
+    var cat=catAtual(); if(!cat.length) return {};
     var t=expande(nome), pal=t.split(' ');
     var mods=cat.map(function(m){return {n:nz(m.nome),m:m};}).sort(function(a,b){return b.n.length-a.n.length;});
     var mod=null;
@@ -9548,7 +9553,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   var _cfPend=null;
   function cfEscolhaAbrir(ent,p){
     _cfPend={ent:ent,p:p};
-    var cat=(typeof catalogo!=='undefined'&&catalogo)||[];
+    var cat=catAtual();
     var m0=casarCatalogo(p.nome);
     var ov=$('cfEscOv'); if(!ov) return;
     $('cfEscTitulo').textContent=p.nome||'peça';
@@ -9560,7 +9565,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     ov.classList.add('open');
   }
   window.cfEscCores=function(){
-    var cat=(typeof catalogo!=='undefined'&&catalogo)||[];
+    var cat=catAtual();
     var m=cat.find(function(x){return x.id===$('cfEscMod').value;});
     $('cfEscCor').innerHTML='<option value="">cor…</option>'+((m&&m.cores)||[]).filter(function(c){return !c.off;})
       .map(function(c){return '<option value="'+esc(c.nome)+'">'+esc(c.nome)+'</option>';}).join('');
@@ -9568,7 +9573,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   window.cfEscFechar=function(){ var o=$('cfEscOv'); if(o) o.classList.remove('open'); _cfPend=null; };
   window.cfEscSalvar=function(){
     if(!_cfPend) return cfEscFechar();
-    var cat=(typeof catalogo!=='undefined'&&catalogo)||[];
+    var cat=catAtual();
     var m=cat.find(function(x){return x.id===$('cfEscMod').value;});
     var cor=m&&(m.cores||[]).find(function(c){return c.nome===$('cfEscCor').value;});
     var num=String($('cfEscNum').value||'').trim();
@@ -9596,6 +9601,9 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
           var arr=[]; sn.forEach(function(d){ var v=d.data(); if(v) arr.push(v); });
           cfEntregas=arr; if(!$('tab-conferencia').classList.contains('hide')) confRender(); else confRender();
         },function(){});
+        _cfDb.collection('ls_catalogo').doc('loja').onSnapshot(function(d){
+          var v=d.data(); if(v&&Array.isArray(v.catalogo)&&v.catalogo.length){ _cfCat=v.catalogo; confRender(); }
+        },function(){});
         _cfUnsubC=_cfDb.collection('conferencias').onSnapshot(function(sn){
           var arr=[]; sn.forEach(function(d){ var v=d.data(); if(v) arr.push(v); });
           cfConfs=arr; confRender();
@@ -9604,7 +9612,8 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     });
   };
   // dados de teste entram por aqui (sem nuvem)
-  window.confSemear=function(ents,confs){ cfEntregas=ents||[]; cfConfs=confs||[]; cfDia=null; confRender(); };
+  window.confSemear=function(ents,confs,cat){ cfEntregas=ents||[]; cfConfs=confs||[]; if(cat) _cfCat=cat; cfDia=null; confRender(); };
+  window.confCatN=function(){ return catAtual().length; };
   window.confDump=function(){ return {entregas:cfEntregas, confs:cfConfs, dia:cfDia}; };
   window.confCasar=casarCatalogo;
 })();
