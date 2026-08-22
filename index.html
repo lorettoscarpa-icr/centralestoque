@@ -3870,6 +3870,7 @@ function conectarSync(){
         if(typeof peRender==='function'&&$('tab-pronta')&&!$('tab-pronta').classList.contains('hide'))peRender();if(MODO_FABRICA&&typeof renderModoFabrica==='function')renderModoFabrica(MODO_FABRICA);
       },function(){});
       _rfRef.get().then(function(snp){var d=snp.exists?snp.data():null;if(!d||((d.ts||0)<repFotosTs))repPushFotos();}).catch(function(){});
+      repPubFotos();   // as fotos que já existem viram miniatura pro entregador sem esperar foto nova
       // GRADE por usuário (doc separado por usuário; nunca sobrescreve o de outro)
       repGradeReload();
       _gRef=_db.collection('ls_rep_grade').doc(repGradeUserKey());
@@ -6722,14 +6723,104 @@ function repPushGrade(){
     _gRef.set({grade:repGradeU||{},ts:_gLastPush,por:(typeof userAtual!=='undefined'?userAtual:'')||''}).catch(function(){});
   },700);
 }
+/* O Storage do Firebase nunca foi ativado neste projeto (o bucket responde 404), então
+   toda foto caiu no plano B e virou base64 aqui dentro. Um documento do Firestore só
+   aguenta 1 MB: com ~35 KB por foto, isso acaba por volta da 30ª. O .catch mudo de antes
+   fazia a foto simplesmente não salvar sem ninguém ficar sabendo. */
+function repPesoFotos(){
+  var n=0;
+  Object.keys(repFotos||{}).forEach(function(mid){
+    Object.keys(repFotos[mid]||{}).forEach(function(c){ n+=String(repFotos[mid][c]||'').length; });
+  });
+  return n;
+}
 function repPushFotos(){
   if(!_rfRef)return;
   clearTimeout(_rfPushT);
   _rfPushT=setTimeout(function(){
     _rfLastPush=Date.now(); repFotosTs=_rfLastPush;
     try{localStorage.setItem('loretto_rep_fotos_ts',String(repFotosTs));}catch(e){}
-    _rfRef.set({fotos:repFotos||{},ts:_rfLastPush}).catch(function(){});
+    var peso=repPesoFotos();
+    if(peso>820000) toast('⚠️ As fotos estão em '+Math.round(peso/10486)/100+' MB de 1 MB. Perto do limite — avise o suporte antes de subir mais.');
+    _rfRef.set({fotos:repFotos||{},ts:_rfLastPush})
+      .catch(function(e){
+        var c=(e&&e.code)||'';
+        toast(/too large|invalid-argument/i.test(c+' '+((e&&e.message)||''))
+          ? '⚠️ A foto NÃO subiu: o limite de 1 MB do documento estourou. Ela ficou só neste aparelho.'
+          : '⚠️ A foto não subiu pra nuvem'+(c?' ('+c+')':'')+' — ficou só neste aparelho.');
+      });
+    repPubFotos();
   },1000);
+}
+
+/* ---------- miniaturas pro entregador ----------
+   O painel de entregas mostra a foto do modelo pro entregador saber qual sapato é qual
+   quando dois modelos são parecidos. Ele não pode baixar as fotos inteiras: são ~35 KB
+   cada, todas num doc só, e o celular dele está na rua. Então saem daqui duas coisas:
+   · ls_fotos_thumb/loja  — só as miniaturas (~3 KB cada), tudo junto, UMA leitura;
+   · ls_fotos/{modelo}    — a foto inteira, um doc por modelo, buscada só quando ele toca.
+   Assim uma entrega de 2 modelos custa uns 6 KB na primeira vez e zero depois. */
+var _thumbs=carregar('loretto_rep_thumbs',{});
+function salvaThumbs(){ try{localStorage.setItem('loretto_rep_thumbs',JSON.stringify(_thumbs));}catch(e){} }
+function repThumb(dataUrl,cb){
+  var s=String(dataUrl||'');
+  if(!/^data:image/.test(s)){ cb(''); return; }         // já é link: não precisa de cópia
+  var img=new Image();
+  img.onload=function(){
+    var M=120,w=img.width,h=img.height;
+    if(w>h){ if(w>M){h=Math.round(h*M/w);w=M;} } else { if(h>M){w=Math.round(w*M/h);h=M;} }
+    var cv=document.createElement('canvas'); cv.width=w||1; cv.height=h||1;
+    try{ cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height); cb(cv.toDataURL('image/jpeg',0.55)); }
+    catch(e){ cb(''); }
+  };
+  img.onerror=function(){ cb(''); };
+  img.src=s;
+}
+var _pubT=null;
+function repPubFotos(){ clearTimeout(_pubT); _pubT=setTimeout(_repPubAgora,1500); }
+function _repPubAgora(){
+  if(!_db) return;
+  var faltam=[];
+  Object.keys(repFotos||{}).forEach(function(mid){
+    var m=repFotos[mid]||{};
+    Object.keys(m).forEach(function(cor){
+      var src=String(m[cor]||''); if(!src) return;
+      var t=(_thumbs[mid]||{})[cor];
+      if(!t || t.s!==src.length) faltam.push({mid:mid,cor:cor,src:src});   // origem mudou: refaz
+    });
+  });
+  if(!faltam.length) return _repPubEnviar();
+  var pend=faltam.length;
+  faltam.forEach(function(o){
+    repThumb(o.src,function(d){
+      if(d){ _thumbs[o.mid]=_thumbs[o.mid]||{}; _thumbs[o.mid][o.cor]={s:o.src.length,d:d}; }
+      if(--pend===0){ salvaThumbs(); _repPubEnviar(); }
+    });
+  });
+}
+function _pubMarca(f){ var s=''; Object.keys(f).sort().forEach(function(c){ s+=c+':'+String(f[c]).length+';'; }); return s; }
+function _repPubEnviar(){
+  if(!_db) return;
+  var t={}, n=0, ts=Date.now();
+  Object.keys(_thumbs).forEach(function(mid){
+    if(!repFotos[mid]) return;                                   // foto removida: some daqui também
+    Object.keys(_thumbs[mid]).forEach(function(cor){
+      if(!repFotos[mid][cor]) return;
+      var d=_thumbs[mid][cor].d; if(!d) return;
+      (t[mid]=t[mid]||{})[cor]=d; n++;
+    });
+  });
+  _db.collection('ls_fotos_thumb').doc('loja').set({t:t,n:n,ts:ts}).catch(function(){});
+  Object.keys(repFotos||{}).forEach(function(mid){
+    var m=repFotos[mid]||{}, f={};
+    Object.keys(m).forEach(function(cor){ if(m[cor]) f[cor]=m[cor]; });
+    if(!Object.keys(f).length) return;
+    var marca=_pubMarca(f);
+    try{ if(localStorage.getItem('loretto_pubf_'+mid)===marca) return; }catch(e){}   // lá já está igual
+    _db.collection('ls_fotos').doc(String(mid)).set({f:f,ts:ts})
+      .then(function(){ try{localStorage.setItem('loretto_pubf_'+mid,marca);}catch(e){} })
+      .catch(function(){});
+  });
 }
 function repInit(){
   if(!repForn){
@@ -6756,7 +6847,11 @@ let repFotos=carregar('loretto_rep_fotos',{});
 /* migração: foto antiga por modelo (string) -> mapa por cor */
 Object.keys(repFotos).forEach(id=>{if(typeof repFotos[id]==='string')repFotos[id]={_modelo:repFotos[id]};});
 let repFornReport=carregar('loretto_rep_forn_report',{}); /* {modelId: fornId} vindo do último relatório */
-function salvaFotos(){try{localStorage.setItem('loretto_rep_fotos',JSON.stringify(repFotos));}catch(e){toast('Memória cheia \u2014 a foto não coube. Remova alguma.');}}
+/* Guardar no aparelho não é guardar: nem repSetFoto nem repRemoveFoto mandavam pra nuvem,
+   então a foto que o Yuri colocava ficava só no celular dele — e o entregador nunca ia
+   ver. Salvar agora publica junto. */
+function salvaFotos(){_salvaFotosLocal(); if(typeof repPushFotos==='function') repPushFotos();}
+function _salvaFotosLocal(){try{localStorage.setItem('loretto_rep_fotos',JSON.stringify(repFotos));}catch(e){toast('Memória cheia \u2014 a foto não coube. Remova alguma.');}}
 function salvaFornReport(){try{localStorage.setItem('loretto_rep_forn_report',JSON.stringify(repFornReport));}catch(e){}}
 function repFotoLer(file,cb){const r=new FileReader();r.onload=function(e){const img=new Image();img.onload=function(){const M=480;let w=img.width,h=img.height;if(w>h){if(w>M){h=Math.round(h*M/w);w=M;}}else{if(h>M){w=Math.round(w*M/h);h=M;}}const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);cb(cv.toDataURL('image/jpeg',0.72));};img.onerror=function(){toast('Não consegui ler essa imagem');};img.src=e.target.result;};r.readAsDataURL(file);}
 function repFotoDe(id,cor){const m=repFotos[id];if(!m)return '';return m[cor]||m._modelo||'';}
