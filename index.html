@@ -9283,7 +9283,11 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     am:'azul marinho',nbk:'nobuck',cam:'camurca',caf:'cafe',gt:'grafite',car:'caramelo',
     bra:'branco',branca:'branco'};
   function nz(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
-  function expande(t){ return nz(t).replace(/[\/\-]/g,' ').split(/\s+/).map(function(w){return ABREV[w]||w;}).join(' '); }
+  function expande(t){
+    var x=nz(t).replace(/[\/\-]/g,' ');
+    x=x.replace(/\bmi\s*aw\b/g,'milao all white').replace(/\bmiaw\b/g,'milao all white');
+    return x.split(/\s+/).map(function(w){return ABREV[w]||w;}).join(' ');
+  }
   function _sim(a,b){                                   // parecença simples entre duas palavras
     if(a===b) return 1;
     var m=0, usados={};
@@ -9298,15 +9302,20 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     var mod=null;
     for(var i=0;i<mods.length;i++) if(t.indexOf(mods[i].n)>=0){ mod=mods[i].m; break; }
     if(!mod){                                            // erro de digitação: "Millao" → "Milão"
+      /* Palavra de COR nunca entra aqui: "areia" parece "grecia" e "preto" parece "porto".
+         Sem essa trava, o Yuri imprimiria etiqueta de outro modelo — pior que não achar. */
+      var cores0={}; cat.forEach(function(m){ (m.cores||[]).forEach(function(c){
+        nz(c.nome).split(' ').forEach(function(w){ if(w.length>2) cores0[w]=1; }); }); });
+      Object.keys(COR_AB).forEach(function(k){ nz(COR_AB[k]).split(' ').forEach(function(w){ cores0[w]=1; }); });
       var melhor=0;
       mods.forEach(function(o){
         var ps=o.n.split(' '); if(ps.length<2) return;
         var fam=ps[0], dest=ps[1];
         if(t.indexOf(fam)<0) return;
         pal.forEach(function(w){
-          if(w.length<4) return;
+          if(w.length<4 || cores0[w]) return;
           var r=_sim(w,dest);
-          if(r>=.72 && r>melhor){ melhor=r; mod=o.m; }
+          if(r>=.78 && r>melhor){ melhor=r; mod=o.m; }
         });
       });
     }
