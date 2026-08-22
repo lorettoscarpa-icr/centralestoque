@@ -6810,14 +6810,16 @@ function _repPubEnviar(){
       (t[mid]=t[mid]||{})[cor]=d; n++;
     });
   });
-  _db.collection('ls_fotos_thumb').doc('loja').set({t:t,n:n,ts:ts}).catch(function(){});
+  /* mesma coleção ls_rep_fotos: coleção nova daria permissão negada nas regras atuais */
+  _db.collection('ls_rep_fotos').doc('loja_thumb').set({t:t,n:n,ts:ts})
+    .catch(function(){ console.warn('miniaturas não publicadas'); });
   Object.keys(repFotos||{}).forEach(function(mid){
     var m=repFotos[mid]||{}, f={};
     Object.keys(m).forEach(function(cor){ if(m[cor]) f[cor]=m[cor]; });
     if(!Object.keys(f).length) return;
     var marca=_pubMarca(f);
     try{ if(localStorage.getItem('loretto_pubf_'+mid)===marca) return; }catch(e){}   // lá já está igual
-    _db.collection('ls_fotos').doc(String(mid)).set({f:f,ts:ts})
+    _db.collection('ls_rep_fotos').doc('full_'+String(mid)).set({f:f,ts:ts})
       .then(function(){ try{localStorage.setItem('loretto_pubf_'+mid,marca);}catch(e){} })
       .catch(function(){});
   });
