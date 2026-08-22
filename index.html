@@ -513,6 +513,7 @@
   .cf-cor:hover{border-color:var(--ouro);background:rgba(220,189,96,.12)}
   .cf-cor i{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,.25);flex:none}
   .cf-cor.outra{color:var(--ouro);border-style:dashed}
+  .cf-cor.on{background:rgba(220,189,96,.2);border-color:var(--ouro);color:var(--ouro-claro);font-weight:700}
   .cf-cores.pisca{animation:cfPisca .9s ease}
   @keyframes cfPisca{0%,100%{background:transparent}30%,70%{background:rgba(220,189,96,.16)}}
   @media (prefers-reduced-motion:reduce){.cf-cores.pisca{animation:none;outline:1px solid var(--ouro)}}
@@ -540,6 +541,46 @@
   .cf-esc.open{display:flex}
   .cf-esc select,.cf-esc input{width:100%;background:rgba(0,0,0,.25);border:1px solid var(--linha);border-radius:var(--r-sm);
     padding:10px 12px;color:var(--areia);font-family:'Barlow',sans-serif;font-size:var(--fs-base)}
+  .cf-esc .modal{max-width:480px;max-height:90vh;display:flex;flex-direction:column;padding:22px}
+  .cf-esc .form-label{display:block;font-family:'Barlow',sans-serif;font-size:var(--fs-micro);font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;color:rgba(251,249,238,.45);margin:14px 0 6px}
+  .cfe-rolo{overflow:auto;margin:0 -4px;padding:0 4px;flex:1}
+  /* O que a vendedora mandou naquela sacola. Ele fechou por foto, então o sistema não sabe
+     QUAL peça voltou — mas sabe quais podiam ser. Um toque resolve, sem digitar nada. */
+  .cfe-cands{display:flex;flex-direction:column;gap:6px}
+  .cfe-cand{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:rgba(0,0,0,.2);
+    border:1px solid var(--linha);border-radius:var(--r-sm);padding:10px 12px;cursor:pointer;
+    font-family:'Barlow',sans-serif;font-size:var(--fs-base);color:var(--areia);min-height:44px}
+  .cfe-cand:hover{border-color:var(--ouro);background:rgba(220,189,96,.1)}
+  .cfe-cand.usada{opacity:.42}
+  .cfe-cand i{width:12px;height:12px;border-radius:50%;border:1px solid rgba(255,255,255,.25);flex:none}
+  .cfe-cand small{display:block;font-size:var(--fs-mini);color:rgba(251,249,238,.42);margin-top:1px}
+  .cfe-cand .cfe-n{margin-left:auto;background:rgba(220,189,96,.16);color:var(--ouro-claro);
+    border-radius:var(--r-xs);padding:2px 8px;font-size:var(--fs-mini);font-weight:700;flex:none}
+  .cfe-res{display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:240px;overflow:auto}
+  .cfe-mod{border:1px solid var(--linha);border-radius:var(--r-sm);padding:9px 11px;background:rgba(0,0,0,.16)}
+  .cfe-mod-h{display:flex;align-items:center;gap:8px;font-size:var(--fs-base);color:var(--areia)}
+  .cfe-pref{font-family:'DM Mono',monospace;font-size:var(--fs-mini);color:rgba(251,249,238,.4);margin-left:auto}
+  .cfe-mod .cf-cor{margin-top:7px}
+  .cfe-cores{display:flex;gap:6px;flex-wrap:wrap}
+  .cfe-sel{display:flex;align-items:center;gap:9px;border:1px solid rgba(155,213,140,.4);background:rgba(155,213,140,.09);
+    border-radius:var(--r-sm);padding:10px 12px;margin-top:12px;font-size:var(--fs-base);color:var(--areia)}
+  .cfe-sel i{width:13px;height:13px;border-radius:50%;border:1px solid rgba(255,255,255,.25);flex:none}
+  .cfe-sel .cfe-sku{margin-left:auto;font-family:'DM Mono',monospace;font-size:var(--fs-mini);color:var(--ok)}
+  .cfe-nums{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+  .cfe-num{background:rgba(0,0,0,.2);border:1px solid var(--linha);color:var(--areia);border-radius:var(--r-sm);
+    padding:9px 0;font-family:'Barlow',sans-serif;font-size:var(--fs-base);cursor:pointer;min-height:44px}
+  .cfe-num:hover{border-color:var(--ouro)}
+  .cfe-num.on{background:rgba(220,189,96,.18);border-color:var(--ouro);color:var(--ouro-claro);font-weight:700}
+  .cfe-acts{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+  .cfe-vazio{font-size:var(--fs-sm);color:rgba(251,249,238,.42);padding:10px 2px}
+  @media (max-width:760px){
+    .cf-esc .modal{max-width:100%;max-height:94vh;padding:18px}
+    .cfe-acts .btn{flex:1;min-height:48px}
+    /* 16px no campo evita o zoom automático do iOS quando ele toca pra digitar */
+    .cf-esc input{min-height:48px;font-size:16px}
+    .cfe-cand{min-height:52px}
+  }
   .cf-vazio{border:1px dashed var(--linha);border-radius:var(--r-md);padding:34px 20px;text-align:center;color:rgba(251,249,238,.45);font-size:var(--fs-base)}
   .rep-card{border:1px solid var(--linha);border-radius:var(--r-md);padding:22px;margin-bottom:16px;background:rgba(0,0,0,.1)}
   .rep-card-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap}
@@ -2715,17 +2756,27 @@ textarea.cons-field{min-height:80px;resize:vertical}
   </div>
 </div>
 
-<div class="modal-bg cf-esc" id="cfEscOv" style="display:none">
+<!-- sem style inline: display inline venceria a regra .cf-esc.open e a janela nunca abriria -->
+<div class="modal-bg cf-esc" id="cfEscOv">
   <div class="modal">
-    <div class="modal-title" style="margin-bottom:4px">Qual modelo é este?</div>
-    <p class="cf-nota" style="margin:0 0 16px">A vendedora escreveu: <b id="cfEscTitulo" style="color:var(--ouro-claro)">—</b></p>
-    <label class="form-label">Modelo</label>
-    <select id="cfEscMod" onchange="cfEscCores()"></select>
-    <label class="form-label" style="margin-top:12px">Cor</label>
-    <select id="cfEscCor"></select>
-    <label class="form-label" style="margin-top:12px">Numeração</label>
-    <input id="cfEscNum" inputmode="numeric" placeholder="ex: 42">
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+    <div class="modal-title" style="margin-bottom:4px">Qual sapato é este?</div>
+    <p class="cf-nota" style="margin:0 0 4px" id="cfEscCtx">—</p>
+    <div class="cfe-rolo">
+      <div id="cfEscCandsBox">
+        <label class="form-label" id="cfEscCandsL">Foi nesta sacola</label>
+        <div id="cfEscCands" class="cfe-cands"></div>
+      </div>
+      <label class="form-label" for="cfEscBusca">Ou procure no catálogo</label>
+      <input id="cfEscBusca" autocomplete="off" oninput="cfEscBuscar()"
+             placeholder="nome, prefixo ou código da etiqueta">
+      <div id="cfEscRes" class="cfe-res"></div>
+      <div id="cfEscSel"></div>
+      <div id="cfEscNumBox" style="display:none">
+        <label class="form-label">Numeração</label>
+        <div id="cfEscNums" class="cfe-nums"></div>
+      </div>
+    </div>
+    <div class="cfe-acts">
       <button class="btn btn-ghost" onclick="cfEscFechar()">Cancelar</button>
       <button class="btn btn-ouro" onclick="cfEscSalvar()">Conferir e gerar etiqueta</button>
     </div>
@@ -9527,8 +9578,15 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
           out.push({k:e.id+'#'+idx, e:e, nome:x.nome, num:x.num, valor:x.valor, cor:x.cor||'', reag:i.reag});
         });
       } else {
+        /* Ele fechou pela foto: sabemos QUANTAS voltam, não quais. Mas a vendedora listou a
+           sacola — então essas peças são as candidatas, e o Yuri escolhe num toque em vez de
+           procurar o modelo do zero. Candidata não é afirmação: nada aqui marca sozinho. */
+        var sac=itensDe(e), rot=(e.produto||'peça').split('\n')[0];
         for(var n=0;n<i.volta;n++)
-          out.push({k:e.id+'#g'+n, e:e, nome:(e.produto||'peça').split('\n')[0], num:'', valor:null, reag:i.reag, semDetalhe:true});
+          out.push({k:e.id+'#g'+n, e:e,
+            nome: sac ? ('peça '+(n+1)+' de '+i.volta+' que voltou') : rot,
+            num:'', valor:null, reag:i.reag, semDetalhe:true,
+            cands: sac||null, ficouTxt: sac?String(e.produtoEntregue||'').trim():''});
       }
     });
     return out;
@@ -9536,10 +9594,41 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
 
   /* ---------- gravação da conferência (volta pra Central de Entregas) ---------- */
   function marcadas(dia,ent){ var c=confDe(dia,ent); return (c&&c.pecas)||{}; }
+  /* A escolha que ele fez à mão tem que sobreviver ao recarregar: sem isso a peça volta a
+     aparecer "sem modelo", a etiqueta some do rodapé e desmarcar tira da fila a errada. */
+  function hidratarEscolhas(){
+    var cat=catAtual(), m={};
+    cfConfs.forEach(function(c){
+      var es=c&&c.escolhas; if(!es) return;
+      Object.keys(es).forEach(function(k){
+        var v=es[k]; if(!v) return;
+        var mod=cat.find(function(x){return x.id===v.modId;});
+        if(mod && v.modNome && mod.nome!==v.modNome) mod=null;          // id mudou de dono
+        if(!mod && v.modNome) mod=cat.find(function(x){return x.nome===v.modNome;});
+        if(!mod) return;
+        var cor=(mod.cores||[]).find(function(c2){return c2.nome===v.corNome;});
+        if(!cor) return;
+        m[k]={mod:mod, cor:cor, num:v.num||'', texto:v.texto||'', cand:(v.cand==null?null:v.cand)};
+      });
+    });
+    // o que ele acabou de escolher e a nuvem ainda não devolveu continua valendo
+    Object.keys(_cfEscolha||{}).forEach(function(k){ if(!m[k]) m[k]=_cfEscolha[k]; });
+    _cfEscolha=m;
+  }
   function gravarConf(dia,ent,esperado,pecas,obs){
     var id=dia+'_'+ent, c=cfConfs.find(function(x){return x.id===id;});
     if(!c){ c={id:id,dia:dia,entregador:ent}; cfConfs.push(c); }
     var voltou=Object.keys(pecas).filter(function(k){return pecas[k];}).length;
+    /* Guarda a escolha de toda peça do dia, conferida ou não: se ele desmarcar por engano e
+       marcar de novo, o sapato que ele já tinha achado continua ali. */
+    var _r=doDia(dia).find(function(x){return x.ent===ent;});
+    var es={}, chaves=_r ? pecasDaVolta(_r).map(function(x){return x.k;}) : Object.keys(pecas);
+    chaves.forEach(function(k){
+      var x=_cfEscolha&&_cfEscolha[k]; if(!x||!x.mod||!x.cor) return;
+      es[k]={modId:x.mod.id, modNome:x.mod.nome, corNome:x.cor.nome, num:x.num||'',
+             texto:x.texto||'', cand:(x.cand==null?null:x.cand)};
+    });
+    c.escolhas=es;
     c.esperado=esperado; c.pecas=pecas; c.voltou=voltou;
     c.faltou=Math.max(0,esperado-voltou); c.sobrou=Math.max(0,voltou-esperado);
     c.obs=obs||c.obs||''; c.em=Date.now();
@@ -9559,29 +9648,34 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     }
     return m;
   }
+  // a numeração pode não vir da vendedora: quando ele fecha pela foto, quem diz é o Yuri
+  function numDe(p){
+    var x=_cfEscolha&&_cfEscolha[p.k];
+    return (x&&x.num) ? String(x.num) : String(p.num||'');
+  }
   function chaveFila(p){
-    var m=casarPeca(p);
-    if(!m.mod||!m.cor||!p.num) return null;
-    return {key:m.mod.id+'|'+m.mod.cores.indexOf(m.cor)+'|'+p.num, mod:m.mod, cor:m.cor};
+    var m=casarPeca(p), num=numDe(p);
+    if(!m.mod||!m.cor||!num) return null;
+    return {key:m.mod.id+'|'+m.mod.cores.indexOf(m.cor)+'|'+num, mod:m.mod, cor:m.cor, num:num};
   }
   function paraFila(p){
     var c=chaveFila(p); if(!c) return false;
-    var cod=(typeof getCodigo==='function')?getCodigo(c.mod,c.cor,p.num):'';
+    var cod=(typeof getCodigo==='function')?getCodigo(c.mod,c.cor,c.num):'';
     var it=fila.find(function(f){return f.key===c.key;});
     if(it) it.qtd+=1;
-    else fila.push({key:c.key,modId:c.mod.id,nome:c.mod.nome,cor:c.cor.nome,numero:p.num,codigo:cod,qtd:1});
+    else fila.push({key:c.key,modId:c.mod.id,nome:c.mod.nome,cor:c.cor.nome,numero:c.num,codigo:cod,qtd:1});
     if(typeof refreshFila==='function') refreshFila();
     return true;
   }
   /* Desmarcar tem que desfazer de verdade: se ele conferiu por engano e a etiqueta ficasse
      na fila, ele imprimiria etiqueta de sapato que não voltou. */
-  function daFila(p){
-    var c=chaveFila(p); if(!c) return;
-    var i=fila.findIndex(function(f){return f.key===c.key;});
+  function tiraFilaKey(key){
+    var i=fila.findIndex(function(f){return f.key===key;});
     if(i<0) return;
     if(fila[i].qtd>1) fila[i].qtd-=1; else fila.splice(i,1);
     if(typeof refreshFila==='function') refreshFila();
   }
+  function daFila(p){ var c=chaveFila(p); if(c) tiraFilaKey(c.key); }
 
   /* ---------- tela ---------- */
   window.confMudarDia=function(d){
@@ -9600,7 +9694,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
          conferir pela caixinha deixaria a peça sem etiqueta e sem aviso — então o toque
          chama a escolha da cor, que confere e etiqueta de uma vez. */
       var m=casarPeca(p);
-      if(m.mod && !m.cor && p.num){
+      if(m.mod && !m.cor && numDe(p)){
         var el=document.getElementById('cor-'+p.k);
         if(el){ el.classList.remove('pisca'); void el.offsetWidth; el.classList.add('pisca'); }
         toast('Toque na cor pra conferir e gerar a etiqueta');
@@ -9622,7 +9716,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     todas.forEach(function(p){
       if(marc[p.k]) return;
       var m=casarPeca(p);
-      if(m.mod && !m.cor && p.num){ faltam++; return; }   // essa depende da cor: deixa pra ele
+      if(m.mod && !m.cor && numDe(p)){ faltam++; return; }   // essa depende da cor: deixa pra ele
       marc[p.k]=true; if(paraFila(p)) n++;
     });
     gravarConf(cfDia,ent,todas.length,marc);
@@ -9697,16 +9791,17 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
           '<span>👤 '+esc(e.vendedora||'sem vendedora')+'</span><span>· '+sit+'</span></div>'+
           lote.map(function(p){
             var on=!!marc[p.k];
-            var m=casarPeca(p);
-            var pronta=!!(m.mod&&m.cor&&p.num);
+            var m=casarPeca(p), pnum=numDe(p);
+            var pronta=!!(m.mod&&m.cor&&pnum);
             /* Só falta a cor e ele está com o sapato na mão: um toque na cor certa resolve.
                Abrir a janela pra escolher modelo+cor+nº seria três vezes mais trabalho. */
-            var soCor = !!(m.mod && !m.cor && p.num && !on);
+            var soCor = !!(m.mod && !m.cor && pnum && !on);
             var etq = pronta
-              ? '<span class="cf-sku">'+esc(getCodigo(m.mod,m.cor,p.num))+'</span>'
+              ? '<span class="cf-sku">'+esc(getCodigo(m.mod,m.cor,pnum))+'</span>'
               : soCor ? ''
               : '<button class="cf-fix'+(m.mod?' achou':'')+'" onclick="confEscolher(\''+r.ent+'\',\''+p.k+'\')">'+
-                (m.mod?('⚠ falta a cor'+(p.num?'':' e o nº')):'escolher modelo')+'</button>';
+                (m.mod?('⚠ falta a cor'+(pnum?'':' e o nº'))
+                      :(p.semDetalhe?'🔎 qual sapato?':'escolher modelo'))+'</button>';
             var cores = soCor
               ? '<div class="cf-cores" id="cor-'+p.k+'"><span class="cf-cores-t">qual a cor?</span>'+
                 (m.mod.cores||[]).filter(function(c){return !c.off;}).map(function(c){
@@ -9720,7 +9815,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
               '<span class="cf-pnome">'+esc(p.nome||'peça')+
                 (m.mod?'<small>'+esc(m.mod.nome)+(m.cor?' · '+esc(m.cor.nome):'')+
                   (m.daVendedora?' · cor da vendedora':(m.ensinado?' · aprendido':''))+'</small>':'')+'</span>'+
-              (p.num?'<span class="cf-num">nº '+esc(p.num)+'</span>':'')+etq+'</div>'+cores;
+              (pnum?'<span class="cf-num">nº '+esc(pnum)+'</span>':'')+etq+'</div>'+cores;
           }).join('')+'</div>';
       }).join('');
 
@@ -9732,7 +9827,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
           ? (function(){
               var faltaCor=pecas.filter(function(p){ if(marc[p.k]) return false;
                 var mm=casarPeca(p);
-                return mm.mod && !mm.cor && p.num; }).length;
+                return mm.mod && !mm.cor && numDe(p); }).length;
               var prontas=pecas.length-feitas-faltaCor;
               return '<div class="cf-ent-acts">'+
                 (prontas>0?'<button class="btn btn-ouro" onclick="confTodas(\''+r.ent+'\')">✓ Conferi '+
@@ -9753,45 +9848,228 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
 
   function esc(s){ return (typeof escapeHtml==='function')?escapeHtml(s):String(s==null?'':s); }
 
-  /* ---------- escolher modelo à mão quando o texto não bastou ---------- */
-  var _cfPend=null;
-  function cfEscolhaAbrir(ent,p){
-    _cfPend={ent:ent,p:p};
-    var cat=catAtual();
-    var m0=casarCatalogo(p.nome);
-    var ov=$('cfEscOv'); if(!ov) return;
-    $('cfEscTitulo').textContent=p.nome||'peça';
-    $('cfEscMod').innerHTML='<option value="">escolha o modelo…</option>'+cat.map(function(m){
-      return '<option value="'+m.id+'"'+(m0.mod&&m0.mod.id===m.id?' selected':'')+'>'+esc(m.nome)+'</option>';}).join('');
-    cfEscCores();
-    if(m0.cor) $('cfEscCor').value=m0.cor.nome;
-    $('cfEscNum').value=p.num||'';
-    ov.classList.add('open');
+  /* ---------- achar o sapato à mão quando o texto não bastou ----------
+     Quando o entregador fecha pela foto, o sistema não sabe QUAL peça voltou. O Yuri está
+     com o sapato na mão: ele precisa achar o modelo do jeito que já acha no resto do
+     estoque — pelo nome ou pelo código — sem sair da conferência pra imprimir. */
+  var _cfPend=null, _cfSel=null, _cfSelNum='';
+  function tams(m,c){
+    if(typeof getTamanhos==='function'){ try{ return getTamanhos(m,c)||[]; }catch(e){} }
+    var r=[]; for(var n=(m.ini||37);n<=(m.fim||46);n++) r.push(String(n)); return r;
   }
-  window.cfEscCores=function(){
-    var cat=catAtual();
-    var m=cat.find(function(x){return x.id===$('cfEscMod').value;});
-    $('cfEscCor').innerHTML='<option value="">cor…</option>'+((m&&m.cores)||[]).filter(function(c){return !c.off;})
-      .map(function(c){return '<option value="'+esc(c.nome)+'">'+esc(c.nome)+'</option>';}).join('');
+  function cod(m,c,t){ return (typeof getCodigo==='function') ? String(getCodigo(m,c,t)) : ''; }
+  function at(s){ return esc(s).replace(/'/g,'&#39;'); }
+
+  function cfEscolhaAbrir(ent,p){
+    var ov=$('cfEscOv'); if(!ov) return;
+    _cfPend={ent:ent,p:p}; _cfSelNum=String(numDe(p)||'');
+    /* O texto da vendedora fica guardado mesmo sem casamento nenhum — é ele que vira a
+       lição quando o Yuri achar o sapato, e é justamente quando NÃO casou que ensinar vale. */
+    _cfSel={mod:null, cor:null, texto:p.semDetalhe?'':(p.nome||''), cand:null};
+    var m0=casarPeca(p);
+    if(m0.mod&&m0.cor){ _cfSel.mod=m0.mod; _cfSel.cor=m0.cor; }
+    $('cfEscCtx').innerHTML = p.semDetalhe
+      ? ('Entrega fechada por foto — ele não marcou peça a peça.'+
+         (p.ficouTxt?' O cliente ficou com: <b>'+esc(p.ficouTxt)+'</b>':''))
+      : ('A vendedora escreveu: <b style="color:var(--ouro-claro)">'+esc(p.nome||'peça')+'</b>');
+    cfEscCands();
+    var b=$('cfEscBusca'); if(b) b.value='';
+    cfEscBuscar(); cfEscPintar();
+    ov.classList.add('open');
+    if(b && !(p.cands&&p.cands.length)) setTimeout(function(){ try{b.focus();}catch(e){} },60);
+  }
+
+  /* Uma candidata já usada por outra peça da MESMA entrega não pode ser usada de novo:
+     senão a mesma sacola gera duas etiquetas do mesmo par e nenhuma da outra peça. */
+  function candUsada(p,idx){
+    var pre=p.e.id+'#g', marc=marcadas(cfDia,(_cfPend&&_cfPend.ent)||'');
+    for(var k in _cfEscolha){
+      if(k===p.k || k.indexOf(pre)!==0 || !marc[k]) continue;   // desmarcou: a candidata liberou
+      if(_cfEscolha[k] && _cfEscolha[k].cand===idx) return true;
+    }
+    return false;
+  }
+  function cfEscCands(){
+    var box=$('cfEscCands'), wrap=$('cfEscCandsBox'), p=_cfPend&&_cfPend.p;
+    if(!box||!wrap) return;
+    var cs=(p&&p.cands)||[];
+    if(!cs.length){ wrap.style.display='none'; box.innerHTML=''; return; }
+    wrap.style.display='';
+    /* O entregador escreveu a numeração do que o cliente ficou. Riscar essas da lista deixa
+       na frente exatamente as que voltaram. É palpite, não afirmação: nada marca sozinho —
+       se ele digitou o nº errado, quem decide continua sendo o Yuri com o sapato na mão. */
+    var ficouNums=(String(p.ficouTxt||'').match(/N[º°o]\s*\d{2}/gi)||[])
+      .map(function(s){ return s.replace(/\D/g,''); });
+    var jaFicou={};
+    ficouNums.forEach(function(n){
+      for(var i=0;i<cs.length;i++) if(!jaFicou[i] && String(cs[i].num||'')===n){ jaFicou[i]=1; return; }
+    });
+    var ordem=cs.map(function(it,i){ return {it:it,i:i,ficou:!!jaFicou[i]}; })
+                .sort(function(a,b){ return (a.ficou?1:0)-(b.ficou?1:0); });
+    var l=$('cfEscCandsL'), sobram=ordem.filter(function(o){return !o.ficou;}).length;
+    if(l) l.textContent = (sobram && sobram<cs.length)
+      ? 'Pelas numerações, sobr'+(sobram===1?'ou esta':'aram estas '+sobram)
+      : (cs.length===1 ? 'A vendedora mandou' : 'A vendedora mandou estas '+cs.length);
+    box.innerHTML=ordem.map(function(o){
+      var it=o.it, i=o.i;
+      var m=casarCatalogo(it.nome||'');
+      var c=m.mod&&!m.cor&&it.cor ? (m.mod.cores||[]).find(function(x){return x.nome===it.cor;}) : m.cor;
+      var usada=candUsada(p,i);
+      var nota = usada ? ' · já usada nesta entrega'
+               : o.ficou ? ' · o cliente ficou com o nº '+esc(it.num) : '';
+      return '<button type="button" class="cfe-cand'+(usada||o.ficou?' usada':'')+'" onclick="cfEscCand('+i+')">'+
+        (c?'<i style="background:'+(c.hex||'#888')+'"></i>':'')+
+        '<span>'+esc(it.nome||'peça')+
+          (m.mod?'<small>'+esc(m.mod.nome)+(c?' · '+esc(c.nome):' · falta a cor')+nota+'</small>'
+                :'<small>não achei no catálogo — use a busca'+nota+'</small>')+'</span>'+
+        (it.num?'<span class="cfe-n">nº '+esc(it.num)+'</span>':'')+'</button>';
+    }).join('');
+  }
+  window.cfEscCand=function(i){
+    var p=_cfPend&&_cfPend.p; if(!p) return;
+    var it=(p.cands||[])[i]; if(!it) return;
+    var m=casarCatalogo(it.nome||'');
+    if(!m.mod){
+      var b=$('cfEscBusca'); if(b){ b.value=String(it.nome||'').replace(/\b(3[3-9]|4[0-6])\b/g,'').trim(); b.focus(); }
+      cfEscBuscar(); toast('Esse texto não bateu com o catálogo — procure o modelo aqui');
+      return;
+    }
+    var c=m.cor || (it.cor?(m.mod.cores||[]).find(function(x){return x.nome===it.cor;}):null);
+    _cfSel={mod:m.mod, cor:c||null, texto:it.nome||'', cand:i};
+    if(it.num && (!c || tams(m.mod,c).indexOf(String(it.num))>=0)) _cfSelNum=String(it.num);
+    if(!c){                                    // achou o modelo, falta a cor: mostra as dele
+      $('cfEscRes').innerHTML=cfModHTML(m.mod,'qual a cor?');
+      _cfSel.mod=m.mod;
+    }
+    cfEscCands(); cfEscPintar();
   };
-  window.cfEscFechar=function(){ var o=$('cfEscOv'); if(o) o.classList.remove('open'); _cfPend=null; };
+
+  function cfModHTML(m,titulo){
+    var cs=(m.cores||[]).filter(function(c){return !c.off;});
+    return '<div class="cfe-mod"><div class="cfe-mod-h"><b>'+esc(m.nome)+'</b>'+
+      (titulo?'<span class="cf-cores-t" style="margin-left:8px">'+esc(titulo)+'</span>':'')+
+      (m.prefixo?'<span class="cfe-pref">'+esc(m.prefixo)+'</span>':'')+'</div>'+
+      '<div class="cfe-cores">'+(cs.map(function(c){
+        var on=_cfSel&&_cfSel.mod&&_cfSel.mod.id===m.id&&_cfSel.cor&&_cfSel.cor.nome===c.nome;
+        return '<button type="button" class="cf-cor'+(on?' on':'')+'" onclick="cfEscPick(\''+at(m.id)+'\',\''+at(c.nome)+'\')">'+
+          '<i style="background:'+(c.hex||'#888')+'"></i>'+esc(c.nome)+'</button>';
+      }).join('')||'<span class="cfe-vazio">sem cor cadastrada</span>')+'</div></div>';
+  }
+
+  window.cfEscBuscar=function(){
+    var box=$('cfEscRes'); if(!box) return;
+    var termo=String(($('cfEscBusca')||{}).value||'').trim();
+    if(termo.length<2){ box.innerHTML=''; return; }
+    var cat=catAtual();
+    /* A caixa que volta já tem etiqueta. Digitar o código dela resolve modelo, cor e
+       numeração de uma vez — é o caminho mais curto que existe. Vem antes de qualquer
+       recorte do texto: "DRBDHPT43" é um código inteiro, não um nome com nº no fim. */
+    var T=termo.toUpperCase().replace(/[\s\-]+/g,'');
+    if(T.length>=5){
+      for(var i=0;i<cat.length;i++){
+        var m=cat[i], cs=(m.cores||[]).filter(function(c){return !c.off;});
+        for(var j=0;j<cs.length;j++){
+          var ts=tams(m,cs[j]);
+          for(var q=0;q<ts.length;q++) if(cod(m,cs[j],ts[q]).toUpperCase()===T){
+            _cfSel={mod:m, cor:cs[j], texto:(_cfSel&&_cfSel.texto)||'', cand:_cfSel&&_cfSel.cand};
+            _cfSelNum=String(ts[q]);
+            box.innerHTML='<div class="cfe-vazio">✓ código <b>'+esc(T)+'</b> — é este.</div>';
+            cfEscPintar(); return;
+          }
+        }
+      }
+    }
+    /* "grecia 41" — o número separado no fim é a numeração, não parte do nome. Ele digita
+       do jeito que fala, não no formato que o sistema quer. */
+    var mn=termo.match(/[\s\-]+(3[3-9]|4[0-6])$/), busca=termo;
+    if(mn && termo.slice(0,mn.index).trim()){ busca=termo.slice(0,mn.index).trim(); _cfSelNum=mn[1]; }
+    var t=nz(busca);
+    if(!t){ box.innerHTML=''; cfEscPintar(); return; }
+    var achados=[];
+    cat.forEach(function(m){
+      if(m.oculto) return;
+      var n=nz(m.nome), pref=nz(m.prefixo||''), pos=n.indexOf(t);
+      if(pos>=0){ achados.push({m:m, r:pos===0?0:1}); return; }
+      if(pref && pref.indexOf(t)===0){ achados.push({m:m, r:2}); return; }
+      var porCor=(m.cores||[]).some(function(c){ return !c.off && nz(m.nome+' '+c.nome).indexOf(t)>=0; });
+      if(porCor) achados.push({m:m, r:3});
+    });
+    achados.sort(function(a,b){ return (a.r-b.r) || a.m.nome.localeCompare(b.m.nome); });
+    /* Procurar outro sapato desfaz a escolha anterior. Sem isso ele buscaria o modelo novo,
+       esqueceria de tocar na cor, salvaria — e sairia a etiqueta do sapato de antes. */
+    if(_cfSel && _cfSel.mod && !achados.some(function(o){ return o.m.id===_cfSel.mod.id; }))
+      _cfSel={mod:null, cor:null, texto:_cfSel.texto, cand:_cfSel.cand};
+    if(!achados.length){
+      box.innerHTML='<div class="cfe-vazio">Nada com “'+esc(busca)+'”. Tente o nome do modelo, o prefixo (ex: DRB) ou o código da etiqueta.</div>';
+      cfEscPintar(); return;
+    }
+    var corte=achados.slice(0,8);
+    box.innerHTML=corte.map(function(o){ return cfModHTML(o.m,''); }).join('')+
+      (achados.length>corte.length
+        ? '<div class="cfe-vazio">+ '+(achados.length-corte.length)+' modelo(s) — escreva mais pra afinar.</div>'
+        : '');
+    cfEscPintar();
+  };
+
+  window.cfEscPick=function(id,corNome){
+    var m=catAtual().find(function(x){return x.id===id;}); if(!m) return;
+    var c=(m.cores||[]).find(function(x){return x.nome===corNome;}); if(!c) return;
+    _cfSel={mod:m, cor:c, texto:(_cfSel&&_cfSel.texto)||'', cand:_cfSel&&_cfSel.cand};
+    if(_cfSelNum && tams(m,c).indexOf(String(_cfSelNum))<0) _cfSelNum='';   // esta cor não tem esse nº
+    cfEscBuscarRepintar(); cfEscPintar();
+  };
+  function cfEscBuscarRepintar(){
+    var box=$('cfEscRes'); if(!box || !box.querySelector('.cfe-mod')) return;
+    cfEscBuscar();
+  }
+
+  function cfEscPintar(){
+    var sel=$('cfEscSel'), nb=$('cfEscNumBox'), ng=$('cfEscNums');
+    if(!sel||!nb||!ng) return;
+    if(!_cfSel||!_cfSel.mod){ sel.innerHTML=''; nb.style.display='none'; return; }
+    if(!_cfSel.cor){
+      sel.innerHTML='<div class="cfe-sel" style="border-color:rgba(220,189,96,.4);background:rgba(220,189,96,.09)">'+
+        '<span><b>'+esc(_cfSel.mod.nome)+'</b></span><span class="cfe-sku" style="color:var(--ouro-claro)">falta a cor</span></div>';
+      nb.style.display='none'; return;
+    }
+    var c=_cfSelNum?cod(_cfSel.mod,_cfSel.cor,_cfSelNum):'';
+    sel.innerHTML='<div class="cfe-sel"><i style="background:'+(_cfSel.cor.hex||'#888')+'"></i>'+
+      '<span><b>'+esc(_cfSel.mod.nome)+'</b> · '+esc(_cfSel.cor.nome)+'</span>'+
+      '<span class="cfe-sku"'+(c?'':' style="color:var(--ouro-claro)"')+'>'+(c?esc(c):'falta o nº')+'</span></div>';
+    var ts=tams(_cfSel.mod,_cfSel.cor);
+    nb.style.display='';
+    ng.innerHTML=ts.length
+      ? ts.map(function(t){ return '<button type="button" class="cfe-num'+(String(_cfSelNum)===String(t)?' on':'')+
+          '" onclick="cfEscNum(\''+at(t)+'\')">'+esc(t)+'</button>'; }).join('')
+      : '<div class="cfe-vazio">Esta cor não tem numeração cadastrada no catálogo.</div>';
+  }
+  window.cfEscNum=function(t){ _cfSelNum=String(t); cfEscPintar(); };
+
+  window.cfEscFechar=function(){ var o=$('cfEscOv'); if(o) o.classList.remove('open'); _cfPend=null; _cfSel=null; _cfSelNum=''; };
   window.cfEscSalvar=function(){
     if(!_cfPend) return cfEscFechar();
-    var cat=catAtual();
-    var m=cat.find(function(x){return x.id===$('cfEscMod').value;});
-    var cor=m&&(m.cores||[]).find(function(c){return c.nome===$('cfEscCor').value;});
-    var num=String($('cfEscNum').value||'').trim();
-    if(!m||!cor||!num){ toast('Escolha modelo, cor e numeração'); return; }
-    _cfEscolha=_cfEscolha||{};
-    _cfEscolha[_cfPend.p.k]={mod:m,cor:cor};
-    ensinar(_cfPend.p.nome, m, cor);                   // fica sabido pra sempre
-    var p=Object.assign({},_cfPend.p,{num:num}), ent=_cfPend.ent;
-    var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;});
+    if(!_cfSel||!_cfSel.mod){ toast('Escolha o sapato'); return; }
+    if(!_cfSel.cor){ toast('Escolha a cor'); return; }
+    if(!_cfSelNum){ toast('Escolha a numeração'); return; }
+    var p=_cfPend.p, ent=_cfPend.ent;
     var marc=Object.assign({},marcadas(cfDia,ent));
-    if(!marc[p.k]){ marc[p.k]=true; gravarConf(cfDia,ent,pecasDaVolta(r).length,marc); }
+    // corrigindo uma peça já conferida: a etiqueta antiga sai da fila antes da nova entrar
+    var antiga = marc[p.k] ? chaveFila(p) : null;
+    _cfEscolha=_cfEscolha||{};
+    _cfEscolha[p.k]={mod:_cfSel.mod, cor:_cfSel.cor, num:String(_cfSelNum),
+                     texto:_cfSel.texto||'', cand:(_cfSel.cand==null?null:_cfSel.cand)};
+    /* Só ensina quando existe um texto que nomeia ESTE sapato. Numa entrega fechada por
+       foto a linha é a sacola inteira: ensinar por ela mandaria toda sacola parecida pro
+       modelo errado, e a etiqueta sairia errada sem ninguém perceber. */
+    if(_cfSel.texto) ensinar(_cfSel.texto, _cfSel.mod, _cfSel.cor);
+    if(antiga) tiraFilaKey(antiga.key);
+    var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;});
+    var novo=!marc[p.k];
+    marc[p.k]=true;
+    gravarConf(cfDia,ent,r?pecasDaVolta(r).length:0,marc);
     paraFila(p);
     cfEscFechar(); confRender();
-    toast('Etiqueta na fila ✓');
+    toast(novo?'Conferida ✓ e etiqueta na fila':'Etiqueta trocada ✓');
   };
 
   /* ---------- ligação com a base da Central de Entregas ---------- */
@@ -9814,18 +10092,19 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
           _voc=null; confRender();
         },function(){});
         _cfDb.collection('ls_catalogo').doc('loja').onSnapshot(function(d){
-          var v=d.data(); if(v&&Array.isArray(v.catalogo)&&v.catalogo.length){ _cfCat=v.catalogo; confRender(); }
+          var v=d.data(); if(v&&Array.isArray(v.catalogo)&&v.catalogo.length){
+            _cfCat=v.catalogo; hidratarEscolhas(); confRender(); }
         },function(){});
         _cfUnsubC=_cfDb.collection('conferencias').onSnapshot(function(sn){
           var arr=[]; sn.forEach(function(d){ var v=d.data(); if(v) arr.push(v); });
-          cfConfs=arr; confRender();
+          cfConfs=arr; hidratarEscolhas(); confRender();
         },function(){});
       }catch(e){}
     });
   };
   // dados de teste entram por aqui (sem nuvem)
   window.confSemear=function(ents,confs,cat){ cfEntregas=ents||[]; cfConfs=confs||[]; if(cat) _cfCat=cat;
-    cfDia=null; _cfEscolha=null; confRender(); };
+    cfDia=null; _cfEscolha=null; hidratarEscolhas(); confRender(); };
   window.confCatN=function(){ return catAtual().length; };
   window.confLicoes=function(){ return _cfLicao; };
   window.confLicoesCor=function(){ return _cfLicaoCor; };
