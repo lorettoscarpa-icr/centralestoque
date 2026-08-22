@@ -505,6 +505,14 @@
     padding:5px 11px;font-family:'Barlow',sans-serif;font-size:var(--fs-mini);cursor:pointer}
   .cf-fix:hover{background:rgba(220,189,96,.1)}
   .cf-fix.achou{border-style:solid;border-color:rgba(155,213,140,.4);color:var(--ok)}
+  .cf-cores{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:0 0 10px 38px}
+  .cf-cores-t{font-size:var(--fs-mini);color:rgba(251,249,238,.42);margin-right:2px}
+  .cf-cor{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.2);border:1px solid var(--linha);
+    color:var(--areia);border-radius:var(--r-pill);padding:5px 11px;font-family:'Barlow',sans-serif;
+    font-size:var(--fs-mini);cursor:pointer}
+  .cf-cor:hover{border-color:var(--ouro);background:rgba(220,189,96,.12)}
+  .cf-cor i{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,.25);flex:none}
+  .cf-cor.outra{color:var(--ouro);border-style:dashed}
   .cf-ent-acts{display:flex;gap:10px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--linha);align-items:center}
   .cf-nota{font-size:var(--fs-sm);color:rgba(251,249,238,.5)}
   .cf-rodape{position:sticky;bottom:0;display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;
@@ -9282,7 +9290,24 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   var COR_AB={ab:'all black',off:'off white',pt:'preto',preta:'preto',mar:'marfim',
     am:'azul marinho',nbk:'nobuck',cam:'camurca',caf:'cafe',gt:'grafite',car:'caramelo',
     bra:'branco',branca:'branco'};
-  function nz(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+  function nz(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+  /* O Yuri corrige uma vez e o sistema não erra de novo. "birken" aparece 19 vezes na base,
+     "loafer fivela" 18 — ensinar cada texto uma vez resolve 60% do que hoje ele digita. */
+  var _cfLicao={}, _cfLicaoRef=null;
+  function chaveLicao(nome){
+    var t=expande(nome).replace(/\b(3[3-9]|4[0-6])\b/g,' ').replace(/\s{2,}/g,' ').trim();
+    return t;
+  }
+  function ensinar(nome, mod, cor){
+    var k=chaveLicao(nome); if(!k) return;
+    /* O MODELO é do texto e não muda: "birken" sempre vai ser Birken Bahamas se ele disser.
+       A COR muda de peça pra peça. Só guarda a cor quando a vendedora escreveu alguma cor e
+       o sistema não soube ler — senão o próximo "Birken" sairia com a cor da vez passada. */
+    var V=voc(), temCor=expande(nome).split(' ').some(function(w){ return V.cores[w]||COR_AB[w]; });
+    _cfLicao[k]={modId:mod.id, cor:(temCor&&cor&&cor.nome)||''};
+    if(_cfLicaoRef) _cfLicaoRef.set({licoes:_cfLicao, ts:Date.now()}).catch(function(){});
+    _voc=null;
+  }
   function expande(t){
     var x=nz(t).replace(/[\/\-]/g,' ');
     x=x.replace(/\bmi\s*aw\b/g,'milao all white').replace(/\bmiaw\b/g,'milao all white');
@@ -9300,31 +9325,64 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
      etiqueta errada — então a conferência escuta o catálogo da nuvem direto. */
   var _cfCat=null;
   function catAtual(){ return (_cfCat&&_cfCat.length) ? _cfCat : ((typeof catalogo!=='undefined'&&catalogo)||[]); }
+  /* Vocabulário do catálogo, recalculado quando ele muda: quais palavras são COR e quais
+     são nome de modelo. As duas listas viram trava contra casamento errado. */
+  var _voc=null, _vocDe=null;
+  function voc(){
+    var cat=catAtual();
+    if(_voc && _vocDe===cat) return _voc;
+    var cores={}, modpal={};
+    cat.forEach(function(m){
+      (m.cores||[]).forEach(function(c){ nz(c.nome).split(' ').forEach(function(w){ if(w.length>2) cores[w]=1; }); });
+      nz(m.nome).split(' ').forEach(function(w){ if(w.length>3){ (modpal[w]=modpal[w]||{})[m.id]=1; } });
+    });
+    Object.keys(COR_AB).forEach(function(k){ nz(COR_AB[k]).split(' ').forEach(function(w){ cores[w]=1; }); });
+    _voc={cores:cores, modpal:modpal}; _vocDe=cat; return _voc;
+  }
   function casarCatalogo(nome){
     var cat=catAtual(); if(!cat.length) return {};
     var t=expande(nome), pal=t.split(' ');
-    var mods=cat.map(function(m){return {n:nz(m.nome),m:m};}).sort(function(a,b){return b.n.length-a.n.length;});
+    var ens=_cfLicao[chaveLicao(nome)];               // o Yuri já ensinou este texto?
     var mod=null;
-    for(var i=0;i<mods.length;i++) if(t.indexOf(mods[i].n)>=0){ mod=mods[i].m; break; }
-    if(!mod){                                            // erro de digitação: "Millao" → "Milão"
-      /* Palavra de COR nunca entra aqui: "areia" parece "grecia" e "preto" parece "porto".
-         Sem essa trava, o Yuri imprimiria etiqueta de outro modelo — pior que não achar. */
-      var cores0={}; cat.forEach(function(m){ (m.cores||[]).forEach(function(c){
-        nz(c.nome).split(' ').forEach(function(w){ if(w.length>2) cores0[w]=1; }); }); });
-      Object.keys(COR_AB).forEach(function(k){ nz(COR_AB[k]).split(' ').forEach(function(w){ cores0[w]=1; }); });
-      var melhor=0;
+    if(ens){ mod=cat.find(function(m){return m.id===ens.modId;}) || null; }
+    var mods=cat.map(function(m){return {n:nz(m.nome),m:m};}).sort(function(a,b){return b.n.length-a.n.length;});
+    if(!mod) for(var i=0;i<mods.length;i++) if(t.indexOf(mods[i].n)>=0){ mod=mods[i].m; break; }
+    if(!mod){
+      /* Pontua quantas palavras do NOME DO MODELO aparecem no texto. Aguenta ordem trocada
+         ("Sneaker All Black Milão") e erro de digitação ("shoro" → Soho). Duas travas:
+         palavra de cor nunca vira nome de modelo ("areia"≠"grecia", "preto"≠"porto"), e
+         palavra que é nome de outro modelo também não ("liso"≠"lisboa"). */
+      var V=voc();
+      var livres=pal.filter(function(w){ return w.length>2 && !V.cores[w]; });
+      var pont=[];
       mods.forEach(function(o){
-        var ps=o.n.split(' '); if(ps.length<2) return;
-        var fam=ps[0], dest=ps[1];
-        if(t.indexOf(fam)<0) return;
-        pal.forEach(function(w){
-          if(w.length<4 || cores0[w]) return;
-          var r=_sim(w,dest);
-          if(r>=.78 && r>melhor){ melhor=r; mod=o.m; }
+        var ws=o.n.split(' '), achou=0;
+        ws.forEach(function(w){
+          if(livres.indexOf(w)>=0){ achou+=1; return; }
+          if(w.length<4) return;
+          var melhor=0;
+          livres.forEach(function(x){
+            if(x.length<4) return;
+            if(V.modpal[x] && !V.modpal[x][o.m.id]) return;      // é nome de outro modelo
+            var r=_sim(x,w); if(r>melhor) melhor=r;
+          });
+          if(melhor>=.72) achou+=melhor;
         });
+        if(achou>=1) pont.push({p:achou/ws.length, a:achou, m:o.m});
       });
+      pont.sort(function(a,b){ return (b.p-a.p)||(b.a-a.a); });
+      if(pont.length){
+        var seg=null;
+        for(var k=1;k<pont.length;k++) if(pont[k].m.id!==pont[0].m.id){ seg=pont[k]; break; }
+        // só aceita quando o 1º é claramente melhor que o 2º — empate é dúvida, e dúvida é do Yuri
+        if(pont[0].p>=.66 && (pont[0].p-(seg?seg.p:0))>=.08) mod=pont[0].m;
+      }
     }
     if(!mod) return {};
+    if(ens && ens.cor){
+      var cE=(mod.cores||[]).find(function(c){return c.nome===ens.cor;});
+      if(cE) return {mod:mod, cor:cE, ensinado:true};
+    }
     var cores=(mod.cores||[]).filter(function(c){return !c.off;})
       .map(function(c){return {n:nz(c.nome),c:c};}).sort(function(a,b){return b.n.length-a.n.length;});
     var cor=null, k;
@@ -9464,6 +9522,21 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     confRender();
     toast(n?('Tudo conferido ✓ · '+n+' etiqueta(s) na fila'):'Tudo conferido ✓');
   };
+  window.confCor=function(ent,pk,corNome){
+    var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;}); if(!r) return;
+    var todas=pecasDaVolta(r), p=todas.find(function(x){return x.k===pk;}); if(!p) return;
+    var m=casarCatalogo(p.nome); if(!m.mod) return;
+    var cor=(m.mod.cores||[]).find(function(c){return c.nome===corNome;}); if(!cor) return;
+    _cfEscolha=_cfEscolha||{};
+    _cfEscolha[p.k]={mod:m.mod, cor:cor};
+    ensinar(p.nome, m.mod, cor);                       // da próxima vez ele não escolhe de novo
+    var marc=Object.assign({},marcadas(cfDia,ent));
+    marc[pk]=true;
+    paraFila(p);
+    gravarConf(cfDia,ent,todas.length,marc);
+    confRender();
+    toast('Conferida ✓ e etiqueta na fila');
+  };
   window.confEscolher=function(ent,pk){
     var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;}); if(!r) return;
     var p=pecasDaVolta(r).find(function(x){return x.k===pk;}); if(!p) return;
@@ -9518,15 +9591,27 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
             var on=!!marc[p.k];
             var m=(_cfEscolha&&_cfEscolha[p.k])||casarCatalogo(p.nome);
             var pronta=!!(m.mod&&m.cor&&p.num);
+            /* Só falta a cor e ele está com o sapato na mão: um toque na cor certa resolve.
+               Abrir a janela pra escolher modelo+cor+nº seria três vezes mais trabalho. */
+            var soCor = !!(m.mod && !m.cor && p.num && !on);
             var etq = pronta
               ? '<span class="cf-sku">'+esc(getCodigo(m.mod,m.cor,p.num))+'</span>'
+              : soCor ? ''
               : '<button class="cf-fix'+(m.mod?' achou':'')+'" onclick="confEscolher(\''+r.ent+'\',\''+p.k+'\')">'+
                 (m.mod?('⚠ falta a cor'+(p.num?'':' e o nº')):'escolher modelo')+'</button>';
+            var cores = soCor
+              ? '<div class="cf-cores"><span class="cf-cores-t">qual a cor?</span>'+
+                (m.mod.cores||[]).filter(function(c){return !c.off;}).map(function(c){
+                  return '<button class="cf-cor" onclick="confCor(\''+r.ent+'\',\''+p.k+'\',\''+esc(c.nome).replace(/'/g,"&#39;")+'\')">'+
+                    '<i style="background:'+(c.hex||'#888')+'"></i>'+esc(c.nome)+'</button>';}).join('')+
+                '<button class="cf-cor outra" onclick="confEscolher(\''+r.ent+'\',\''+p.k+'\')">outra…</button></div>'
+              : '';
             return '<div class="cf-peca">'+
-              '<button class="cf-chk'+(on?' on':'')+'" onclick="confPeca(\''+r.ent+'\',\''+p.k+'\')" aria-label="Conferir">'+(on?'✓':'')+'</button>'+
+              '<button class="cf-chk'+(on?' on':'')+'" onclick="confPeca(\''+r.ent+'\',\''+p.k+'\')" aria-label="Conferir"'+
+                (soCor?' title="escolha a cor primeiro"':'')+'>'+(on?'✓':'')+'</button>'+
               '<span class="cf-pnome">'+esc(p.nome||'peça')+
-                (m.mod&&m.cor?'<small>'+esc(m.mod.nome)+' · '+esc(m.cor.nome)+'</small>':'')+'</span>'+
-              (p.num?'<span class="cf-num">nº '+esc(p.num)+'</span>':'')+etq+'</div>';
+                (m.mod?'<small>'+esc(m.mod.nome)+(m.cor?' · '+esc(m.cor.nome):'')+(m.ensinado?' · aprendido':'')+'</small>':'')+'</span>'+
+              (p.num?'<span class="cf-num">nº '+esc(p.num)+'</span>':'')+etq+'</div>'+cores;
           }).join('')+'</div>';
       }).join('');
 
@@ -9580,6 +9665,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     if(!m||!cor||!num){ toast('Escolha modelo, cor e numeração'); return; }
     _cfEscolha=_cfEscolha||{};
     _cfEscolha[_cfPend.p.k]={mod:m,cor:cor};
+    ensinar(_cfPend.p.nome, m, cor);                   // fica sabido pra sempre
     var p=Object.assign({},_cfPend.p,{num:num}), ent=_cfPend.ent;
     var linhas=doDia(cfDia), r=linhas.find(function(x){return x.ent===ent;});
     var marc=Object.assign({},marcadas(cfDia,ent));
@@ -9601,6 +9687,10 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
           var arr=[]; sn.forEach(function(d){ var v=d.data(); if(v) arr.push(v); });
           cfEntregas=arr; if(!$('tab-conferencia').classList.contains('hide')) confRender(); else confRender();
         },function(){});
+        _cfLicaoRef=_cfDb.collection('ls_conf_licoes').doc('loja');
+        _cfLicaoRef.onSnapshot(function(d){
+          var v=d.data(); if(v&&v.licoes){ _cfLicao=v.licoes; _voc=null; confRender(); }
+        },function(){});
         _cfDb.collection('ls_catalogo').doc('loja').onSnapshot(function(d){
           var v=d.data(); if(v&&Array.isArray(v.catalogo)&&v.catalogo.length){ _cfCat=v.catalogo; confRender(); }
         },function(){});
@@ -9614,6 +9704,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   // dados de teste entram por aqui (sem nuvem)
   window.confSemear=function(ents,confs,cat){ cfEntregas=ents||[]; cfConfs=confs||[]; if(cat) _cfCat=cat; cfDia=null; confRender(); };
   window.confCatN=function(){ return catAtual().length; };
+  window.confLicoes=function(){ return _cfLicao; };
   window.confDump=function(){ return {entregas:cfEntregas, confs:cfConfs, dia:cfDia}; };
   window.confCasar=casarCatalogo;
 })();
