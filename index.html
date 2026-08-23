@@ -10366,6 +10366,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   var alvo=document.getElementById('app-ver'); if(alvo&&!alvo.textContent) alvo.textContent=AQUI;
   if(!AQUI) return;
   if(location.protocol==='file:') return;                 // aberto do disco: não há o que checar
+  if(window.top!==window.self) return;                   // aberto dentro da Central: quem avisa é ela, pra não avisar em dobro
   var avisada=null, ultima=0, MIN=10*60*1000, CICLO=30*60*1000;
 
   function lerVersaoPublicada(){
