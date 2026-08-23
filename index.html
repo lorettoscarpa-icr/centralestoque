@@ -490,6 +490,17 @@
   .cf-kpi.destaque{border-color:rgba(220,189,96,.5);background:rgba(220,189,96,.09)}
   .cf-kpi.destaque b{color:var(--ouro-claro)}
   .cf-sub{font-size:var(--fs-base);color:rgba(251,249,238,.6);margin:0 0 18px}
+  /* dias que ficaram pra trás — um toque pra chegar lá */
+  .cf-pend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+  .cf-pend-t{font-size:var(--fs-sm);color:rgba(251,249,238,.55)}
+  .cf-pend-b{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(220,189,96,.45);
+    border-radius:999px;padding:6px 13px;background:rgba(220,189,96,.09);color:var(--areia);
+    font-size:var(--fs-sm);cursor:pointer;min-height:34px}
+  .cf-pend-b:hover{background:rgba(220,189,96,.18)}
+  .cf-pend-b i{font-style:normal;font-weight:700;color:var(--ouro-claro)}
+  .cf-alerta{display:flex;align-items:center;gap:8px;border:1px solid rgba(214,138,74,.45);
+    border-radius:var(--r-sm);padding:9px 13px;margin:0 0 12px;background:rgba(214,138,74,.1);
+    font-size:var(--fs-sm);color:rgba(251,249,238,.78)}
   .cf-ent{border:1px solid var(--linha);border-radius:var(--r-md);margin-bottom:16px;background:rgba(0,0,0,.1);overflow:hidden}
   .cf-ent-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--linha)}
   .cf-ent-nome{font-family:'Playfair Display',serif;font-size:var(--fs-xl);color:var(--areia)}
@@ -2800,6 +2811,8 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </div>
     <div class="cf-kpis" id="confKpis"></div>
   </div>
+  <div class="cf-pend" id="confPend" style="display:none"></div>
+  <div class="cf-alerta" id="confAlerta" style="display:none"></div>
   <p class="cf-sub">Confira peça por peça o que voltou. Cada peça conferida já entra na fila de etiquetas — não precisa cadastrar de novo.</p>
   <div id="cfvCorpo"></div>
   <div class="cf-rodape" id="cfvRodape" style="display:none">
@@ -9515,6 +9528,31 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
 (function(){
   var cfEntregas=[], cfConfs=[], _cfUnsubE=null, _cfUnsubC=null, cfDia=null, _cfEscolha=null;
 
+  /* ---------- onde a conferência fica guardada ----------
+     A regra do Firestore não tem a coleção `conferencias`: toda gravação voltava 403 e o
+     .catch engolia. Resultado: o que o Yuri conferia existia só na memória daquela aba —
+     recarregou, sumiu tudo. Agora grava SEMPRE aqui no aparelho, e a nuvem por cima:
+     `conferencias` quando a regra deixar, senão espelha em `ls_fila_etiquetas`, que é a
+     coleção da própria central de estoque e a regra já aceita. */
+  var CONF_KEY='loretto_conferencias', _cfNuvem='?';   // '?' | 'ok' | 'espelho' | 'off'
+  function confLocalLer(){
+    try{ var v=JSON.parse(localStorage.getItem(CONF_KEY)||'[]'); return Array.isArray(v)?v:[]; }
+    catch(e){ return []; }
+  }
+  function confLocalGravar(){
+    try{ localStorage.setItem(CONF_KEY, JSON.stringify(cfConfs)); }catch(e){}
+  }
+  // quem gravou por último manda: o mesmo dia pode vir do aparelho, da nuvem e do espelho
+  function confMesclar(lista){
+    (lista||[]).forEach(function(n){
+      if(!n||!n.id) return;
+      var i=cfConfs.findIndex(function(x){return x.id===n.id;});
+      if(i<0){ cfConfs.push(n); return; }
+      if((n.em||0)>=(cfConfs[i].em||0)) cfConfs[i]=n;
+    });
+    confLocalGravar();
+  }
+
   var ENT_NOMES={gustavo:'Gustavo',joao:'João',ewald:'Ewald',gregory:'Gregory',hugo:'Hugo',
                  flavio:'Flavio',junior:'Junior',edson:'Edson'};
   function entNome(id){ return ENT_NOMES[id]||id||'—'; }
@@ -9740,11 +9778,44 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     return cfEntregas.some(function(e){ return dataDe(e)===dia && e.entregador &&
       ['em_rota','entregue','nao_entregue','cancelado'].indexOf(e.status)>=0; });
   }
+  /* Começa em HOJE, não em ontem. A peça volta no instante em que o entregador fecha a
+     entrega — começar em ontem escondia o dia que estava acontecendo. Foi exatamente isso
+     que aconteceu no sábado: o João fechou 11 entregas ao longo do dia, 15 peças pra
+     conferir, e a tela do Yuri abria na sexta com 1 peça, sem dizer que o sábado existia. */
   window.confDiaPadrao=function(){
-    var dt=new Date(); dt.setDate(dt.getDate()-1);
-    for(var i=0;i<7;i++){ var k=diaKey(dt); if(temMovimento(k)) return k; dt.setDate(dt.getDate()-1); }
+    var dt=new Date();
+    for(var i=0;i<8;i++){ var k=diaKey(dt); if(temMovimento(k)) return k; dt.setDate(dt.getDate()-1); }
     dt=new Date(); dt.setDate(dt.getDate()-1); return diaKey(dt);
   };
+  function rotDiaCurto(ymd){
+    var h=diaKey(), o=new Date(); o.setDate(o.getDate()-1);
+    if(ymd===h) return 'hoje';
+    if(ymd===diaKey(o)) return 'ontem';
+    var p=ymd.split('-'), dt=new Date(+p[0],+p[1]-1,+p[2]);
+    return dt.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit'}).replace(/\./g,'');
+  }
+  /* Nenhum dia pode sumir em silêncio. O padrão mostra UM dia; se sobrou peça em outro,
+     ele aparece aqui e é um toque pra chegar lá. */
+  function confPendentes(){
+    var dias={}, lim=new Date(); lim.setDate(lim.getDate()-14);
+    var min=diaKey(lim), hoje=diaKey();
+    cfEntregas.forEach(function(e){
+      var d=dataDe(e); if(d) dias[d]=1;
+      if(e.pecasVoltamEm) dias[e.pecasVoltamEm]=1;
+    });
+    var out=[];
+    Object.keys(dias).forEach(function(d){
+      if(d<min || d>hoje || d===cfDia) return;
+      var falta=0;
+      doDia(d).forEach(function(r){
+        var marc=marcadas(d,r.ent);
+        pecasDaVolta(r).forEach(function(p){ if(!marc[p.k]) falta++; });
+      });
+      if(falta) out.push({dia:d, falta:falta});
+    });
+    return out.sort(function(a,b){ return a.dia<b.dia?1:-1; }).slice(0,6);
+  }
+  window.confPendentesTeste=function(){ return confPendentes(); };
   function confDe(dia,ent){ return cfConfs.find(function(c){return c.dia===dia&&c.entregador===ent;})||null; }
 
   function doDia(dia){
@@ -9829,8 +9900,31 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     c.faltou=Math.max(0,esperado-voltou); c.sobrou=Math.max(0,voltou-esperado);
     c.obs=obs||c.obs||''; c.em=Date.now();
     c.por=(typeof userAtual!=='undefined'&&userAtual)||'operação';
-    if(_cfDb) _cfDb.collection('conferencias').doc(String(id)).set(c).catch(function(){});
+    confLocalGravar();                       // o aparelho primeiro: isso nunca pode falhar
+    if(_cfDb){
+      var doc=JSON.parse(JSON.stringify(c));
+      _cfDb.collection('conferencias').doc(String(id)).set(doc)
+        .then(function(){ if(_cfNuvem!=='ok'){ _cfNuvem='ok'; confAviso(); } })
+        .catch(function(){ confEspelhar(doc); });
+    }
     return c;
+  }
+  /* A regra recusou `conferencias`? Então guarda na coleção que ela aceita, com um prefixo
+     que diz o que é. Assim a conferência continua chegando no computador da loja e no
+     celular do Yuri — e quando a regra for arrumada, volta sozinha pro lugar certo. */
+  function confEspelhar(doc){
+    if(!_cfDb){ _cfNuvem='off'; confAviso(); return; }
+    _cfDb.collection('ls_fila_etiquetas').doc('conf_'+doc.id).set(doc)
+      .then(function(){ _cfNuvem='espelho'; confAviso(); })
+      .catch(function(){ _cfNuvem='off'; confAviso(); });
+  }
+  function confAviso(){
+    var el=$('confAlerta'); if(!el) return;
+    if(_cfNuvem!=='off'){ el.style.display='none'; el.textContent=''; return; }
+    el.style.display='';
+    el.innerHTML='⚠ <span>A nuvem não está aceitando a conferência. O que você marcar fica '+
+      'guardado <b>neste aparelho</b> e as etiquetas continuam indo pra fila — mas não '+
+      'aparece nos outros. Avise a Loretto.</span>';
   }
 
   /* ---------- a peça vai (e volta) da fila de etiquetas ---------- */
@@ -10026,6 +10120,17 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
       '<div class="cf-kpi"><b>'+totSaiu+'</b><span>saíram</span></div>'+
       '<div class="cf-kpi"><b>'+totVend+'</b><span>venderam</span></div>'+
       '<div class="cf-kpi destaque"><b>'+totConf+'/'+totVolta+'</b><span>conferidas</span></div>';
+
+    var pend=confPendentes(), pe=$('confPend');
+    if(pe){
+      pe.style.display = pend.length ? '' : 'none';
+      pe.innerHTML = pend.length
+        ? '<span class="cf-pend-t">Ainda falta conferir:</span>'+pend.map(function(x){
+            return '<button class="cf-pend-b" onclick="confIrDia(\''+x.dia+'\')">'+
+              esc(rotDiaCurto(x.dia))+' <i>'+x.falta+'</i></button>'; }).join('')
+        : '';
+    }
+    confAviso();
 
     if(!linhas.length){
       box.innerHTML='<div class="cf-vazio">Nenhuma saída de entregador neste dia.</div>';
@@ -10364,20 +10469,37 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
         },function(){});
         _cfUnsubC=_cfDb.collection('conferencias').onSnapshot(function(sn){
           var arr=[]; sn.forEach(function(d){ var v=d.data(); if(v) arr.push(v); });
-          cfConfs=arr; hidratarEscolhas(); confRender();
+          _cfNuvem='ok'; confMesclar(arr); hidratarEscolhas(); confAviso(); confRender();
+        },function(){
+          /* Silenciar isso foi o que deixou a conferência quebrada sem ninguém ver. */
+          if(_cfNuvem==='?') _cfNuvem='off';
+          confAviso();
+        });
+        // o espelho, pra quando a regra da nuvem ainda não deixa gravar em `conferencias`
+        _cfDb.collection('ls_fila_etiquetas').onSnapshot(function(sn){
+          var arr=[]; sn.forEach(function(d){
+            if(String(d.id).indexOf('conf_')!==0) return;
+            var v=d.data(); if(v&&v.id&&v.dia) arr.push(v);
+          });
+          if(!arr.length) return;
+          if(_cfNuvem!=='ok') _cfNuvem='espelho';
+          confMesclar(arr); hidratarEscolhas(); confAviso(); confRender();
         },function(){});
       }catch(e){}
     });
   };
   // dados de teste entram por aqui (sem nuvem)
-  window.confSemear=function(ents,confs,cat){ cfEntregas=ents||[]; cfConfs=confs||[]; if(cat) _cfCat=cat;
+  window.confSemear=function(ents,confs,cat){ cfEntregas=ents||[]; if(confs) cfConfs=confs; if(cat) _cfCat=cat;
     cfDia=null; _cfEscolha=null; hidratarEscolhas(); confRender(); };
   window.confCatN=function(){ return catAtual().length; };
   window.confLicoes=function(){ return _cfLicao; };
   window.confLicoesCor=function(){ return _cfLicaoCor; };
   window.confEnsinarTeste=function(nome,mod,cor){ ensinar(nome,mod,cor); confRender(); };
-  window.confDump=function(){ return {entregas:cfEntregas, confs:cfConfs, dia:cfDia}; };
+  window.confDump=function(){ return {entregas:cfEntregas, confs:cfConfs, dia:cfDia, nuvem:_cfNuvem}; };
+  window.confNuvemTeste=function(v){ _cfNuvem=v; confAviso(); };
   window.confCasar=casarCatalogo;
+  /* Antes da nuvem: o que ele conferiu neste aparelho volta na hora, mesmo sem internet. */
+  confMesclar(confLocalLer());
 })();
 
 
