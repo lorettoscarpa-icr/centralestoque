@@ -3478,23 +3478,24 @@ window.peConfigLayout=function(fid){
   var size=cfg.tamanho||'80,50';var sel=$('tamanho');
   if(sel){for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===size){sel.value=size;break;}}}
   if(typeof aplicaTamanho==='function')aplicaTamanho();
-  layout=Object.assign(layoutPadraoDe(etqModelo),cfg.layout||{});
+  var _cur=((typeof _peEstoqueCache!=='undefined'&&_peEstoqueCache[fid]&&_peEstoqueCache[fid].etqLayout))||cfg.layout||{};
+  layout=Object.assign(layoutPadraoDe(etqModelo),_cur);
   preencheLayout();aplicaLayout();previewLayout();updateLayoutControls();
   $('layoutModal').classList.remove('hide');
 };
+// salva o layout da etiqueta no PRÓPRIO doc da fábrica (ls_pe/{did}.etqLayout) — gravável pela loja E pela fábrica
 function _salvaLayoutAlvo(){
-  if(_layoutFabAlvo&&typeof peEtqConfig!=='undefined'){
-    peEtqConfig[_layoutFabAlvo]=peEtqConfig[_layoutFabAlvo]||{};
-    peEtqConfig[_layoutFabAlvo].layout=Object.assign({},layout);
-    if(typeof peSalvarEtqConfig==='function')peSalvarEtqConfig();
-    return true;
-  }
-  return false;
+  if(!_layoutFabAlvo)return false;
+  var fid=_layoutFabAlvo,lay=Object.assign({},layout);
+  if(typeof _peEstoqueCache!=='undefined'&&_peEstoqueCache[fid])_peEstoqueCache[fid].etqLayout=lay;
+  try{if(typeof peEtqConfig!=='undefined'){peEtqConfig[fid]=peEtqConfig[fid]||{};peEtqConfig[fid].layout=lay;}}catch(e){}
+  if(typeof _db!=='undefined'&&_db&&typeof peDocId==='function'){try{_db.collection('ls_pe').doc(peDocId(fid)).set({etqLayout:lay,lorettoEm:Date.now()},{merge:true}).catch(function(){});}catch(e){}}
+  return true;
 }
 function lerLayout(){layout.font=$('lFont').value;layout.num=parseFloat($('lNum').value);layout.leao=parseFloat($('lLeao').value);layout.bcHeight=parseInt($('lBcH').value,10);layout.bcW=parseInt($('lBcW').value,10);layout.bcAlign=$('lBcAlign').value;layout.nomeB=$('lNomeB').checked;layout.corB=$('lCorB').checked;layout.numB=$('lNumB').checked;if($('lRef'))layout.ref=parseFloat($('lRef').value);if($('lNomeSz'))layout.nomeSz=parseFloat($('lNomeSz').value);if($('lBcHt'))layout.bcHt=parseFloat($('lBcHt').value);if($('lSzBox'))layout.szBox=parseFloat($('lSzBox').value);if($('lSzAlign'))layout.szAlign=$('lSzAlign').value;layoutSpans();aplicaLayout();if(!_salvaLayoutAlvo())salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
 function resetLayout(){layout=layoutPadraoDe(_layoutFabAlvo?((peEtqConfig[_layoutFabAlvo]||{}).modelo||'padrao'):modeloEtqAtual());preencheLayout();aplicaLayout();if(!_salvaLayoutAlvo())salvaLayout();previewLayout();if(typeof fila!=='undefined'&&fila.length&&$('preview'))montaEtiqueta($('preview'),fila[fila.length-1],'bc-preview');}
 if($('layoutOpen'))$('layoutOpen').addEventListener('click',abrirLayout);
-if($('layoutClose'))$('layoutClose').addEventListener('click',()=>{$('layoutModal').classList.add('hide');if(_layoutFabAlvo){_layoutFabAlvo=null;if(typeof peCfgRefresh==='function')peCfgRefresh();toast&&toast('Layout salvo na nuvem para a fábrica');}if(typeof MODO_FABRICA!=='undefined'&&MODO_FABRICA&&typeof fabEtPreview==='function')fabEtPreview();});
+if($('layoutClose'))$('layoutClose').addEventListener('click',()=>{$('layoutModal').classList.add('hide');if(_layoutFabAlvo){_layoutFabAlvo=null;if(typeof peCfgRefresh==='function')peCfgRefresh();toast&&toast((typeof MODO_FABRICA!=='undefined'&&MODO_FABRICA)?'Ajuste salvo na nuvem':'Layout salvo na nuvem para a fábrica');}if(typeof MODO_FABRICA!=='undefined'&&MODO_FABRICA&&typeof fabEtPreview==='function')fabEtPreview();});
 if($('layoutReset'))$('layoutReset').addEventListener('click',resetLayout);
 if($('layoutModal'))$('layoutModal').addEventListener('click',e=>{if(e.target.id==='layoutModal'){$('layoutModal').classList.add('hide');if(_layoutFabAlvo){_layoutFabAlvo=null;if(typeof peCfgRefresh==='function')peCfgRefresh();}}});
 ['lFont','lNum','lLeao','lRef','lNomeSz','lBcH','lBcHt','lBcW','lBcAlign','lSzBox','lSzAlign','lNomeB','lCorB','lNumB'].forEach(id=>{const el=$(id);if(el){el.addEventListener('input',lerLayout);el.addEventListener('change',lerLayout);}});
@@ -5510,7 +5511,8 @@ function peEtqConfigBox(fid){
       '<div class="pe-logobtns"><button class="btn sm" onclick="peEscolherLorettoLogo(\''+fid+'\')">Escolher da galeria</button>'+(cfg.lorettoLogo?'<button class="btn btn-ghost sm" onclick="peRemLorettoLogo(\''+fid+'\')">Remover</button>':'')+'</div></div>'+
   '</div>'+
   '<p class="pe-metahint">Aparecem lado a lado no topo do painel da fábrica. Prefira PNG com fundo transparente e cores claras/douradas — o fundo do cabeçalho é escuro.</p>';
-  var layBtn='<div class="pe-etqrow" style="justify-content:space-between"><span>Ajuste fino do layout '+(cfg.layout?'<span class="pe-badge ex" style="margin-left:6px">configurado</span>':'')+'</span><button class="btn sm" onclick="peConfigLayout(\''+fid+'\')">Configurar layout</button></div><p class="pe-metahint">Você ajusta a etiqueta desta fábrica (fonte, tamanhos, código de barras…) e fica <b>salvo na nuvem</b> — a fábrica recebe pronto, sem precisar configurar.</p>';
+  var _temLay=!!(((typeof _peEstoqueCache!=='undefined'&&_peEstoqueCache[fid]&&_peEstoqueCache[fid].etqLayout))||cfg.layout);
+  var layBtn='<div class="pe-etqrow" style="justify-content:space-between"><span>Ajuste fino do layout '+(_temLay?'<span class="pe-badge ex" style="margin-left:6px">configurado</span>':'')+'</span><button class="btn sm" onclick="peConfigLayout(\''+fid+'\')">Configurar layout</button></div><p class="pe-metahint">Você ajusta a etiqueta desta fábrica (fonte, tamanhos, código de barras…) e fica <b>salvo na nuvem</b>. A fábrica também pode ajustar no painel dela — o que ela mexer também sobe e vira o padrão dela.</p>';
   return '<details class="pe-det"><summary>🏷️ Etiquetas e cabeçalho desta fábrica</summary><div class="pe-etqcfg"><p class="pe-metahint">A fábrica imprime etiquetas só dos <b>modelos liberados acima</b>, sempre neste modelo e tamanho — ela não escolhe.</p><label class="pe-etqrow">Modelo de etiqueta '+tplSel+'</label><label class="pe-etqrow">Tamanho '+tamSel+'</label>'+layBtn+logoCfg+'</div></details>';
 }
 function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({fornModelos:peFornModelos},{merge:true}).catch(function(){});}
@@ -5592,7 +5594,7 @@ function peCarregarEstoques(){
     try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens));localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}
     if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_peAcesso,fornModelos:peFornModelos,etqConfig:peEtqConfig},{merge:true});}catch(e){}}
     if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
-    if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',lotesProducao:(d&&d.lotesProducao)||[],_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&(ae.getAttribute('data-fk')||ae.getAttribute('data-etk')||(ae.closest&&ae.closest('#fabEtBox')))))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}
+    if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',lotesProducao:(d&&d.lotesProducao)||[],etqLayout:(d&&d.etqLayout)||null,_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&(ae.getAttribute('data-fk')||ae.getAttribute('data-etk')||(ae.closest&&ae.closest('#fabEtBox')))))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}
       try{_db.collection('ls_pe_fotos').doc(peDocId(MODO_FABRICA)).onSnapshot(function(sf){_peFotos[MODO_FABRICA]=(sf.exists&&sf.data()&&sf.data().fotos)||{};if(typeof renderModoFabrica==='function')renderModoFabrica(MODO_FABRICA);},function(){});}catch(e){}}
   }).catch(function(){}).then(function(){
     peFabricas().filter(function(f){return !MODO_FABRICA||f.fid===MODO_FABRICA;}).forEach(f=>{
@@ -5601,7 +5603,7 @@ function peCarregarEstoques(){
       function _temDados(x){return x&&((Object.keys(x.estoque||{}).length)||((x.ordens||[]).length)||(Object.keys(x.meta||{}).length)||(Object.keys(x.produzindo||{}).length));}
       function _setCache(d){
         var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);var t=peTotaisOrdens(ordens);
-        _peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],lotesProducao:(Array.isArray(d.lotesProducao)?d.lotesProducao:[]),atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};
+        _peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],lotesProducao:(Array.isArray(d.lotesProducao)?d.lotesProducao:[]),etqLayout:d.etqLayout||null,atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};
         peRender();
       }
       function _vazio(){ if(!MODO_FABRICA&&PE_PREVIA[f.fid]){_peEstoqueCache[f.fid]=_peSeed(f.fid);peRender();} else _setCache({}); }
@@ -5619,6 +5621,7 @@ function peCarregarEstoques(){
             ordens:((Array.isArray(d.ordens)&&d.ordens.length)?d.ordens:(Array.isArray(dl.ordens)?dl.ordens:((dl.estoque||dl.meta||dl.pedido)?_peMigraOrdens(dl):[]))),
             historico:((d.historico&&d.historico.length)?d.historico:(dl.historico||[])),
             lotesProducao:((Array.isArray(d.lotesProducao)&&d.lotesProducao.length)?d.lotesProducao:(Array.isArray(dl.lotesProducao)?dl.lotesProducao:[])),
+            etqLayout:(d.etqLayout||dl.etqLayout||null),
             atualizadoEm:d.atualizadoEm||dl.atualizadoEm||0,publicadoEm:d.publicadoEm||dl.publicadoEm||0,lorettoEm:d.lorettoEm||dl.lorettoEm||0,lorettoPor:d.lorettoPor||dl.lorettoPor||''
           };
           _setCache(merged);
@@ -6378,7 +6381,7 @@ window.fabEtTamCh=function(){
   aplicaTamanho();
   fabEtPreview();
 };
-window.fabEtLayout=function(){if(typeof fabAplicarEtqConfig==='function')fabAplicarEtqConfig();abrirLayout();};
+window.fabEtLayout=function(){if(typeof fabAplicarEtqConfig==='function')fabAplicarEtqConfig();abrirLayout();_layoutFabAlvo=MODO_FABRICA;/* o que a fábrica ajustar sobe pra nuvem e vira o padrão dela */};
 window.fabEtReset=function(){
   try{localStorage.removeItem('loretto_fab_et_tam');localStorage.removeItem('loretto_fab_et_custom');}catch(e){}
   if(typeof layout!=='undefined'){layout=layoutPadraoDe(modeloEtqAtual());try{salvaLayout();}catch(e){}if(typeof aplicaLayout==='function')aplicaLayout();}
@@ -6404,7 +6407,7 @@ window.fabEtQtd=function(inp){
   if($('fabEtTot'))$('fabEtTot').textContent=tot?tot+' etiqueta(s)':'\u00b7';
 };
 window.fabEtLimpar=function(){_fabEt.q={};_fabEt.last=null;fabEtRefreshList();fabEtPreview();};
-function fabEtCfg(){var c=(typeof peEtqConfig!=='undefined'&&MODO_FABRICA&&peEtqConfig[MODO_FABRICA])||{};return {modelo:c.modelo||'padrao',tamanho:c.tamanho||'80,50',layout:c.layout||null};}
+function fabEtCfg(){var c=(typeof peEtqConfig!=='undefined'&&MODO_FABRICA&&peEtqConfig[MODO_FABRICA])||{};var _cl=((typeof _peEstoqueCache!=='undefined'&&_peEstoqueCache[MODO_FABRICA]&&_peEstoqueCache[MODO_FABRICA].etqLayout))||c.layout||null;return {modelo:c.modelo||'padrao',tamanho:c.tamanho||'80,50',layout:_cl};}
 function fabEtSizeEff(){var o=null;try{o=localStorage.getItem('loretto_fab_et_tam');}catch(e){}return o||fabEtCfg().tamanho;}
 function fabAplicarEtqConfig(){
   var c=fabEtCfg();
