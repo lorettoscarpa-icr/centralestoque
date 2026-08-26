@@ -2,6 +2,36 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<script>
+/* ===== Guarda-cotas Loretto =====
+   Todas as centrais dividem o MESMO localStorage (~5MB, mesmo domínio do
+   GitHub Pages) e ele vive lotado de foto em base64. Uma gravação que
+   estoura a cota NÃO pode travar painel nenhum: solta os caches de
+   foto/miniatura (que re-sincronizam do Firebase) — os maiores primeiro —
+   e tenta de novo; se mesmo assim não couber, avisa no console e segue. */
+(function(){
+  try{
+    var _set = Storage.prototype.setItem;
+    var CACHES_PESADOS = /foto|thumb|imgs|_img|precos|catalogo/i;
+    Storage.prototype.setItem = function(k, v){
+      try{ return _set.call(this, k, v); }
+      catch(e){
+        try{
+          var self = this, chaves = [];
+          for(var i=0;i<self.length;i++) chaves.push(self.key(i));
+          var alvos = chaves.filter(function(c){ return c!==k && CACHES_PESADOS.test(c); });
+          alvos.sort(function(a,b){ return (self.getItem(b)||'').length - (self.getItem(a)||'').length; });
+          for(var j=0;j<alvos.length;j++){
+            self.removeItem(alvos[j]);
+            try{ return _set.call(self, k, v); }catch(_){ }
+          }
+        }catch(_){ }
+        try{ console.warn('localStorage cheio — não guardei', k); }catch(_){ }
+      }
+    };
+  }catch(e){}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="app-ver" content="e9">
 <title>Central do Estoque — Loretto Scarpa</title>
