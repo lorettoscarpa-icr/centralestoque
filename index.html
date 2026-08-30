@@ -3395,6 +3395,9 @@ function salvarCatalogo(){localStorage.setItem('loretto_catalogo',JSON.stringify
 function salvarFav(){localStorage.setItem('loretto_favoritos',JSON.stringify([...favoritos]));if(typeof syncPushPrefs==='function')syncPushPrefs();}
 function marcarUser(){localStorage.setItem('loretto_usermod','1');}
 function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+/* Cor vinda do banco não entra crua num atributo: aspas fecham o style e o resto vira
+   atributo de evento. Vale a pena ser estrito e só aceitar a forma de cor. */
+function corSegura(s,padrao){return /^#[0-9a-fA-F]{3,8}$/.test(String(s||''))?String(s):(padrao||'#888');}
 
 (function initCatalogo(){
   const userMod=localStorage.getItem('loretto_usermod')==='1';
@@ -3634,7 +3637,7 @@ function renderLista(){
       const tams=getTamanhos(m,c2);
       return `<div class="cor-bloco"><div class="cor-titulo"><span class="cor-swatch" style="background:${c2.hex||'#888'}"></span>${escapeHtml(c2.nome)}${c2.sigla?`<span class="cor-sigla">${escapeHtml(c2.sigla)}</span>`:''}</div><div class="tamanhos">${tams.map(t=>{const cod=getCodigo(m,c2,t);const it=fila.find(f=>f.key===m.id+'|'+ci+'|'+t);return `<button class="tam-btn" title="${escapeHtml(cod)}" onclick="addFila('${m.id}',${ci},'${escapeHtml(t)}')">${escapeHtml(t)}${it?`<span class="cnt">${it.qtd}</span>`:''}</button>`;}).join('')}</div></div>`;
     }).join('')}</div>`:'';
-    return `<div class="acc-item ${open?'aberto':''}"><div class="acc-head" onclick="toggleAcc('${m.id}')"><button class="star ${fav?'fav':''}" title="Favoritar" onclick="event.stopPropagation();toggleFav('${m.id}')">${fav?'&#9733;':'&#9734;'}</button><span class="acc-nome">${escapeHtml(m.nome)}</span><div class="acc-right"><div class="acc-dots">${m.cores.filter(c2=>!c2.off).slice(0,6).map(c2=>`<span class="acc-dot" style="background:${c2.hex||'#888'}"></span>`).join('')}</div>${m.prefixo?`<span class="acc-pref">${escapeHtml(m.prefixo)}</span>`:''}${tot?`<span class="acc-tot">${tot}</span>`:''}<button class="acc-toggle" onclick="event.stopPropagation();toggleAcc('${m.id}')">${open?'&minus;':'+'}</button></div></div>${body}</div>`;
+    return `<div class="acc-item ${open?'aberto':''}"><div class="acc-head" onclick="toggleAcc('${m.id}')"><button class="star ${fav?'fav':''}" title="Favoritar" onclick="event.stopPropagation();toggleFav('${m.id}')">${fav?'&#9733;':'&#9734;'}</button><span class="acc-nome">${escapeHtml(m.nome)}</span><div class="acc-right"><div class="acc-dots">${m.cores.filter(c2=>!c2.off).slice(0,6).map(c2=>`<span class="acc-dot" style="background:${corSegura(c2.hex)}"></span>`).join('')}</div>${m.prefixo?`<span class="acc-pref">${escapeHtml(m.prefixo)}</span>`:''}${tot?`<span class="acc-tot">${tot}</span>`:''}<button class="acc-toggle" onclick="event.stopPropagation();toggleAcc('${m.id}')">${open?'&minus;':'+'}</button></div></div>${body}</div>`;
   }).join('');
 }
 window.toggleAcc=(id)=>{if(abertos.has(id))abertos.delete(id);else abertos.add(id);renderLista();};
@@ -5186,7 +5189,10 @@ function peDocId(fid){return String(fid||'').trim().replace(/[^a-zA-Z0-9_-]/g,'_
 function peLink(fid){return PE_BASE+'?f='+encodeURIComponent(fid)+'&k='+encodeURIComponent(peToken(fid));}
 function peLinkApp(fid){var base=(location.origin||'')+location.pathname;return base+'?fabrica='+encodeURIComponent(fid)+'&chave='+encodeURIComponent(peToken(fid));}
 function peAcessoDe(fid){var a=_peAcesso[fid];if(!a)return {usuario:'',senha:'',email:'',perfis:[]};if(Array.isArray(a))return {usuario:(a[0]&&(a[0].nome||a[0]))||'',senha:'',email:'',perfis:[]};return {usuario:a.usuario||a.email||'',senha:a.senha||'',email:a.email||a.usuario||'',perfis:(a.perfis&&a.perfis.slice())||[]};}
-function peSalvarAcesso(){try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({pessoas:_peAcesso},{merge:true}).catch(function(){});}
+/* A fábrica entra com e-mail e senha no Firebase Auth — a senha nunca precisou ficar
+   guardada aqui, e ela ia parar no Firestore em texto claro. Some antes de subir. */
+function _semSenha(m){var r={};for(var k in m){var a=m[k];if(a&&typeof a==='object'&&!Array.isArray(a)){var c={};for(var f in a){if(f!=='senha')c[f]=a[f];}r[k]=c;}else r[k]=a;}return r;}
+function peSalvarAcesso(){try{localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({pessoas:_semSenha(_peAcesso)},{merge:true}).catch(function(){});}
 function peCopiarAcesso(fid){var l=peLinkApp(fid);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(l).then(function(){toast('Link copiado — mande pra fábrica');}).catch(function(){window.prompt('Copie o link:',l);});}else window.prompt('Copie o link:',l);}
 function peWhatsAcesso(fid){var ac=peAcessoDe(fid);var l=peLinkApp(fid);var msg='Acesso ao painel da pronta-entrega Loretto Scarpa ('+((peFabricas().find(function(x){return x.fid===fid;})||{}).nome||fid)+'):\n'+l+(ac.email?('\nE-mail: '+ac.email):'')+'\nSenha: 123456789';window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');}
 let _peAcEdit={fid:'',perfis:[]};
@@ -5638,7 +5644,7 @@ function peCarregarEstoques(){
     if(MODO_FABRICA){ _peAcesso=_td.pessoas||_peAcesso||{}; peFornModelos=_td.fornModelos||peFornModelos||{}; peEtqConfig=_td.etqConfig||peEtqConfig||{}; }
     else { _peAcesso=Object.assign({},_td.pessoas||{},_peAcesso||{}); peFornModelos=Object.assign({},_td.fornModelos||{},peFornModelos||{}); peEtqConfig=Object.assign({},_td.etqConfig||{},peEtqConfig||{}); }
     try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens));localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}
-    if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_peAcesso,fornModelos:peFornModelos,etqConfig:peEtqConfig},{merge:true});}catch(e){}}
+    if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_semSenha(_peAcesso),fornModelos:peFornModelos,etqConfig:peEtqConfig},{merge:true});}catch(e){}}
     if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
     if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',lotesProducao:(d&&d.lotesProducao)||[],etqLayout:(d&&d.etqLayout)||null,_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&(ae.getAttribute('data-fk')||ae.getAttribute('data-etk')||(ae.closest&&ae.closest('#fabEtBox')))))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}
       try{_db.collection('ls_pe_fotos').doc(peDocId(MODO_FABRICA)).onSnapshot(function(sf){_peFotos[MODO_FABRICA]=(sf.exists&&sf.data()&&sf.data().fotos)||{};if(typeof renderModoFabrica==='function')renderModoFabrica(MODO_FABRICA);},function(){});}catch(e){}}
