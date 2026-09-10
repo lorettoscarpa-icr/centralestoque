@@ -6393,7 +6393,7 @@ function fabEtSecHTML(){
       '<div class="fabet-prev"><div class="etiqueta" id="fabEtPrev"></div></div>'+
       '<div class="fabet-fila-wrap">'+
         '<div class="fabet-fila-h">Fila de impressao <span class="fabet-tot" id="fabEtTot">'+(tot?tot+' etiqueta(s)':'·')+'</span></div>'+
-        '<div class="fabet-row" style="margin:2px 0 10px"><button class="btn" style="width:100%;justify-content:center" onclick="fabEtAddTudo()">+ Estoque e produção na fila</button></div>'+
+        '<div class="fabet-row" style="gap:8px;margin:2px 0 10px;flex-wrap:wrap"><button class="btn" style="flex:1;min-width:104px;justify-content:center" onclick="fabEtAddTudo(\'estoque\')">Em estoque</button><button class="btn" style="flex:1;min-width:104px;justify-content:center" onclick="fabEtAddTudo(\'producao\')">Em produção</button><button class="btn btn-ouro" style="flex:1;min-width:130px;justify-content:center" onclick="fabEtAddTudo(\'ambos\')">Estoque + produção</button></div>'+
         '<div id="fabEtFila">'+fabEtFilaHTML()+'</div>'+
         '<div class="fabet-row" style="align-items:center;gap:10px;margin-top:12px"><button class="btn btn-ouro" onclick="fabEtImprimir()">Imprimir etiquetas</button><button class="btn" onclick="fabEtLimpar()">Limpar fila</button></div>'+
       '</div>'+
@@ -6460,19 +6460,20 @@ window.fabEtQtd=function(inp){
   if($('fabEtTot'))$('fabEtTot').textContent=tot?tot+' etiqueta(s)':'\u00b7';
 };
 window.fabEtLimpar=function(){_fabEt.q={};_fabEt.last=null;fabEtRefreshList();fabEtPreview();};
-// joga na fila TUDO que a fábrica tem: estoque + produção (1 etiqueta por par)
-window.fabEtAddTudo=function(){
+// joga na fila o que a fábrica tem — modo: 'estoque', 'producao' ou 'ambos' (1 etiqueta por par)
+window.fabEtAddTudo=function(modo){
+  modo=modo||'ambos';
   var c=(typeof _peEstoqueCache!=='undefined'&&_peEstoqueCache[MODO_FABRICA])||{};
   var est=c.estoque||{},prod=c.produzindo||{},soma={};
-  Object.keys(est).forEach(function(k){soma[k]=(soma[k]||0)+(parseInt(est[k])||0);});
-  Object.keys(prod).forEach(function(k){soma[k]=(soma[k]||0)+(parseInt(prod[k])||0);});
+  if(modo!=='producao')Object.keys(est).forEach(function(k){soma[k]=(soma[k]||0)+(parseInt(est[k])||0);});
+  if(modo!=='estoque')Object.keys(prod).forEach(function(k){soma[k]=(soma[k]||0)+(parseInt(prod[k])||0);});
   var add=0,linhas=0;
   Object.keys(soma).forEach(function(k){
     var q=soma[k];if(q<=0)return;
     var p=k.split('|');var it=fabEtItem(p[0],p[1],p[2]);if(!it||!it.nome)return;  // só modelos que dá pra etiquetar
     _fabEt.q[k]=(parseInt(_fabEt.q[k])||0)+q;_fabEt.last=it;add+=q;linhas++;
   });
-  if(!add){toast('Nenhum estoque ou produção pra etiquetar');return;}
+  if(!add){toast(modo==='estoque'?'Nada em estoque pra etiquetar':(modo==='producao'?'Nada em produção pra etiquetar':'Nenhum estoque ou produção pra etiquetar'));return;}
   fabEtRefreshList();fabEtPreview();
   toast(add+' etiqueta(s) de '+linhas+' item(ns) na fila — confira e toque em Imprimir');
 };
