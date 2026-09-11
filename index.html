@@ -5463,7 +5463,7 @@ function peProdutosOrfaos(fid){
   return Object.keys(acc).map(function(mid){
     var m=uni.find(function(x){return x.id===mid;});
     return {id:mid,nome:(m&&m.nome)||mid,noCatalogo:!!m,estoque:acc[mid].estoque,producao:acc[mid].producao,meta:acc[mid].meta};
-  }).filter(function(o){return o.estoque>0||o.producao>0;}).sort(function(a,b){return (b.estoque+b.producao)-(a.estoque+a.producao);});
+  }).filter(function(o){return o.estoque>0||o.producao>0||o.meta>0;}).sort(function(a,b){return ((b.estoque+b.producao)-(a.estoque+a.producao))||(b.meta-a.meta);});
 }
 window.peRestaurarOrfao=function(fid,mid){
   if(!peFornModelos[fid])peFornModelos[fid]=[];
@@ -5475,7 +5475,7 @@ function peOrfaosPainel(fid){
   var orf=peProdutosOrfaos(fid);
   if(!orf.length)return '';
   var linhas=orf.map(function(o){
-    var det=[];if(o.estoque>0)det.push(o.estoque+' em estoque');if(o.producao>0)det.push(o.producao+' em produção');
+    var det=[];if(o.estoque>0)det.push(o.estoque+' em estoque');if(o.producao>0)det.push(o.producao+' em produção');if(o.meta>0)det.push('meta de '+o.meta+' pares');
     var aviso=o.noCatalogo?'':' <span class="pe-orf-nocat">(fora do catálogo — reimporte o Kigi p/ ver a grade completa)</span>';
     return '<div class="pe-orf-row"><div class="pe-orf-info"><span class="pe-orf-nome">'+escapeHtml(o.nome)+'</span>'+aviso+'<span class="pe-orf-nums">'+det.join(' · ')+'</span></div><button class="btn btn-ouro sm" onclick="peRestaurarOrfao(\''+fid+'\',\''+jsq(o.id)+'\')">Restaurar</button></div>';
   }).join('');
