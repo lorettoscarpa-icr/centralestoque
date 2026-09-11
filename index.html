@@ -6375,7 +6375,7 @@ function peProdSucesso(fid,grade,meta){
   box.innerHTML='<div class="pe-modal-h">Produção registrada</div>'+
     '<p class="pe-metahint">Agora baixe os arquivos pra enviar pra fábrica. As etiquetas saem com toda a numeração desta produção.</p>'+
     '<div class="pe-prodtools">'+
-      '<button type="button" class="btn btn-ouro" onclick="peImprimirEtiquetas(window._peProdGrade)">Baixar etiquetas (PDF)</button>'+
+      '<button type="button" class="btn btn-ouro" onclick="peImprimirEtiquetas(window._peProdGrade,\''+fid+'\')">Baixar etiquetas (PDF)</button>'+
       (cfg.planilhaProd?'<button type="button" class="btn btn-ouro" onclick="peProdPlanilha(\''+fid+'\',window._peProdGrade,window._peProdMeta)">Baixar planilha (Excel)</button>':'')+
     '</div>';
   var ok=document.getElementById('peEnvioOk');if(ok){ok.style.display='';ok.textContent='Concluir';ok.onclick=function(){peEnvioFechar();};}
@@ -6454,7 +6454,7 @@ function peConfirmarEnvio(){
     _pePersistir(did,fid,_epl,exists,'Envio confirmado &mdash; baixado do estoque','',d);
   }
   var _sentEtiq=sent;
-  function _ofereceEtiq(){setTimeout(function(){if(confirm('Envio confirmado!\n\nImprimir as etiquetas Loretto para colar nas caixas?'))peImprimirEtiquetas(_sentEtiq);},150);}
+  function _ofereceEtiq(){setTimeout(function(){if(confirm('Envio confirmado!\n\nImprimir as etiquetas Loretto para colar nas caixas?'))peImprimirEtiquetas(_sentEtiq,fid);},150);}
   if(!_db){aplica({},false);peEnvioFechar();_ofereceEtiq();return;}
   _db.collection('ls_pe').doc(did).get().then(function(sp){aplica(sp.exists?sp.data():{},sp.exists);}).catch(function(){aplica({},false);});
   peEnvioFechar();_ofereceEtiq();
@@ -6660,7 +6660,25 @@ function peGradeParaEtiquetas(grade){
   });
   return itens;
 }
-function peImprimirEtiquetas(grade){
+/* Aplica no motor de impressão o TAMANHO/modelo/layout de etiqueta configurados
+   para ESTA fábrica, pra as etiquetas do pedido saírem no tamanho certo
+   (ex.: Manutt = 75x25mm). Sem isso, a loja usava o padrão dela (80x50), que
+   ocupava DUAS seções do adesivo em vez de uma. */
+function peAplicarEtqDaFab(fid){
+  if(!fid||typeof peEtqConfig==='undefined')return;
+  var cfg=peEtqConfig[fid]||{};
+  if(typeof etqModelo!=='undefined')etqModelo=cfg.modelo||'padrao';
+  var size=cfg.tamanho||'80,50';var sel=$('tamanho');
+  if(sel){var ok=false;for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===size){ok=true;break;}}
+    if(ok){sel.value=size;}
+    else if(String(size).indexOf(',')>0){sel.value='custom';var pp=String(size).split(',');if($('customW'))$('customW').value=pp[0]||'';if($('customH'))$('customH').value=pp[1]||'';}
+  }
+  if(typeof aplicaTamanho==='function')aplicaTamanho();
+  var _cur=((typeof _peEstoqueCache!=='undefined'&&_peEstoqueCache[fid]&&_peEstoqueCache[fid].etqLayout))||cfg.layout||null;
+  if(typeof aplicaLayout==='function'&&typeof layoutPadraoDe==='function'){layout=Object.assign(layoutPadraoDe(etqModelo),_cur||{});aplicaLayout();}
+}
+function peImprimirEtiquetas(grade,fid){
+  if(fid&&!MODO_FABRICA)peAplicarEtqDaFab(fid);
   var itens=peGradeParaEtiquetas(grade);
   if(!itens.length){toast('Nada para etiquetar');return false;}
   var grid=$('printGrid'); if(!grid){toast('Area de impressao indisponivel');return false;}
@@ -6672,7 +6690,7 @@ window.peImprimirEtiquetas=peImprimirEtiquetas;
 window.peImprimirEtiquetasDoModal=function(){
   var grade={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)grade[i.getAttribute('data-k')]=q;});
   if(!Object.keys(grade).length){toast('Preencha a grade primeiro');return;}
-  peImprimirEtiquetas(grade);
+  peImprimirEtiquetas(grade,(typeof _peEnvio!=='undefined'&&_peEnvio&&_peEnvio.fid)||null);
 };
 function peGradeDoModal(){var g={};document.querySelectorAll('#peEnvioModal input[data-k]').forEach(function(i){var q=parseInt(i.value)||0;if(q>0)g[i.getAttribute('data-k')]=q;});return g;}
 async function peProdXlsx(fid,gradeArg,meta){
