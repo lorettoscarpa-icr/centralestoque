@@ -5502,7 +5502,18 @@ function peCadModeloFiltrar(){
   const q=normKey(($('peModeloBusca')&&$('peModeloBusca').value)||'');
   const _UNI=repCatUnif();
   const jah=atuais.map(id=>_UNI.find(m=>m.id===id)).filter(Boolean).sort((a,b)=>a.nome.localeCompare(b.nome));
-  const disp=_UNI.filter(m=>atuais.indexOf(m.id)<0&&(!q||normKey(m.nome).includes(q))).sort((a,b)=>a.nome.localeCompare(b.nome));
+  /* Evita duplicados no picker: esconde nomes que já estão na fábrica (mesmo que
+     seja outro id com o mesmo nome) e mostra cada nome do catálogo uma vez só. */
+  const nomesNaFab={};jah.forEach(function(m){nomesNaFab[normKey(m.nome)]=1;});
+  const vistos={};
+  const disp=_UNI.filter(function(m){
+    if(!m||atuais.indexOf(m.id)>=0)return false;
+    const nk=normKey(m.nome);
+    if(nomesNaFab[nk])return false;
+    if(q&&!nk.includes(q))return false;
+    if(vistos[nk])return false;
+    vistos[nk]=1;return true;
+  }).sort((a,b)=>a.nome.localeCompare(b.nome));
   let html='';
   if(jah.length)html+='<div class="pe-pick-jah"><div class="pe-pick-jah-t">Nesta fábrica ('+jah.length+')</div>'+jah.map(m=>'<div class="pe-pick-row on"><span>'+escapeHtml(m.nome)+'</span><button class="lnk-del" onclick="peRemModelo(\''+fid+'\',\''+m.id+'\')">tirar</button></div>').join('')+'</div>';
   html+='<div class="pe-pick-disp">'+(disp.length?disp.map(m=>'<button class="pe-pick-row add" onclick="peAddModelo(\''+m.id+'\')"><span>'+escapeHtml(m.nome)+'</span><span class="pe-pick-cor">'+(m.cores||[]).length+' cor(es)</span><span class="pe-pick-add">+ adicionar</span></button>').join(''):'<p class="pe-pick-empty">'+(q?'Nenhum modelo encontrado.':'Todos os modelos do catálogo já estão nesta fábrica.')+'</p>')+'</div>';
