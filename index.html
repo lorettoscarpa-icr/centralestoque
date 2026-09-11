@@ -5467,7 +5467,29 @@ function peCadModeloFiltrar(){
 }
 window.peCadModeloFiltrar=peCadModeloFiltrar;
 window.peAddModelo=function(mid){const fid=_peCadFid;if(!fid)return;if(!peFornModelos[fid])peFornModelos[fid]=[];if(peFornModelos[fid].indexOf(mid)<0)peFornModelos[fid].push(mid);peSalvarFornModelos();peCadModeloFiltrar();peRender();};
-window.peRemModelo=function(fid,mid){peFornModelos[fid]=(peFornModelos[fid]||[]).filter(x=>x!==mid);peSalvarFornModelos();if(_peCadFid)peCadModeloFiltrar();peRender();};
+function peSomaModelo(fid,mid){
+  var cache=_peEstoqueCache[fid]||{};var est=cache.estoque||{},prod=cache.produzindo||{};var pref=mid+'|';var e=0,p=0;
+  Object.keys(est).forEach(function(k){if(k.indexOf(pref)===0)e+=(parseInt(est[k],10)||0);});
+  Object.keys(prod).forEach(function(k){if(k.indexOf(pref)===0)p+=(parseInt(prod[k],10)||0);});
+  return {estoque:e,producao:p};
+}
+window.peRemModelo=function(fid,mid){
+  var nome=((repCatUnif()||[]).find(function(x){return x.id===mid;})||{}).nome||mid;
+  var s=peSomaModelo(fid,mid);
+  if(s.estoque>0||s.producao>0){
+    /* Trava forte: modelo com estoque ou produção quase não pode ser removido.
+       Exige digitar o nome exato + confirmação final, para não sumir sem querer. */
+    var det=[];if(s.estoque>0)det.push(s.estoque+' par(es) em estoque');if(s.producao>0)det.push(s.producao+' par(es) em produção');
+    var resp=prompt('⚠ CUIDADO: "'+nome+'" ainda tem '+det.join(' e ')+'.\n\nTirar este modelo faz ele SUMIR desta fábrica para todo mundo. Os pares em estoque/produção deixam de aparecer.\n\nSe tiver mesmo certeza, digite o nome do modelo EXATAMENTE como está abaixo para liberar:\n\n'+nome,'');
+    if(resp==null)return;
+    if(normKey(resp)!==normKey(nome)){toast('Nome não confere — o modelo NÃO foi removido');return;}
+    if(!confirm('Última confirmação.\n\nRemover "'+nome+'" mesmo tendo '+det.join(' e ')+'?'))return;
+  }else{
+    if(!confirm('Tirar "'+nome+'" desta fábrica?\n\n(Está tudo zerado — sem estoque nem produção.)'))return;
+  }
+  peFornModelos[fid]=(peFornModelos[fid]||[]).filter(x=>x!==mid);peSalvarFornModelos();if(_peCadFid)peCadModeloFiltrar();peRender();
+  toast('Modelo removido de '+repFornNome(fid));
+};
 function jsq(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 window.peSetCusto=function(mid,v){var c=repCfgDe(mid);c.custo=parseFloat(v)||0;if(typeof repCusto!=='undefined')repCusto[mid]=c.custo;repSalvar();peRender();};
 window.peEsconderCor=function(fid,mid,cor){var c=repCfgDe(mid);if(!c.coresOff)c.coresOff={};c.coresOff[cor]=1;repSalvar();peRender();toast('Cor escondida');};
@@ -5579,6 +5601,22 @@ function peEtqConfigBox(fid){
   return '<details class="pe-det"><summary>🏷️ Etiquetas e cabeçalho desta fábrica</summary><div class="pe-etqcfg"><p class="pe-metahint">A fábrica imprime etiquetas só dos <b>modelos liberados acima</b>, sempre neste modelo e tamanho — ela não escolhe.</p><label class="pe-etqrow">Modelo de etiqueta '+tplSel+'</label><label class="pe-etqrow">Tamanho '+tamSel+'</label>'+layBtn+logoCfg+'</div></details>';
 }
 function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({fornModelos:peFornModelos},{merge:true}).catch(function(){});}
+/* União (nunca perde modelo): junta os modelos da nuvem com os locais por fábrica,
+   preservando a ordem da nuvem e acrescentando os que só existem localmente.
+   Evita que um cache local desatualizado apague, ao carregar a página, um modelo
+   que outra pessoa acabou de cadastrar. Remoção de modelo só pela trava do peRemModelo. */
+function peUnirFornModelos(nuvem,local){
+  nuvem=nuvem||{};local=local||{};var out={};
+  var fids={};Object.keys(nuvem).forEach(function(f){fids[f]=1;});Object.keys(local).forEach(function(f){fids[f]=1;});
+  Object.keys(fids).forEach(function(f){
+    var a=Array.isArray(nuvem[f])?nuvem[f]:[];var b=Array.isArray(local[f])?local[f]:[];
+    var vistos={};var arr=[];
+    a.forEach(function(id){if(id!=null&&!vistos[id]){vistos[id]=1;arr.push(id);}});
+    b.forEach(function(id){if(id!=null&&!vistos[id]){vistos[id]=1;arr.push(id);}});
+    out[f]=arr;
+  });
+  return out;
+}
 function peEnsureForns(){
   if(!repForn)repInit();
   var changed=false;
@@ -5653,7 +5691,7 @@ function peCarregarEstoques(){
     var _td=(snp.exists&&snp.data())||{};
     _peTokens=Object.assign({},_peTokens,_td.tokens||{});
     if(MODO_FABRICA){ _peAcesso=_td.pessoas||_peAcesso||{}; peFornModelos=_td.fornModelos||peFornModelos||{}; peEtqConfig=_td.etqConfig||peEtqConfig||{}; }
-    else { _peAcesso=Object.assign({},_td.pessoas||{},_peAcesso||{}); peFornModelos=Object.assign({},_td.fornModelos||{},peFornModelos||{}); peEtqConfig=Object.assign({},_td.etqConfig||{},peEtqConfig||{}); }
+    else { _peAcesso=Object.assign({},_td.pessoas||{},_peAcesso||{}); peFornModelos=peUnirFornModelos(_td.fornModelos||{},peFornModelos||{}); peEtqConfig=Object.assign({},_td.etqConfig||{},peEtqConfig||{}); }
     try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens));localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}
     if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_semSenha(_peAcesso),fornModelos:peFornModelos,etqConfig:peEtqConfig},{merge:true});}catch(e){}}
     if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
@@ -5805,7 +5843,7 @@ function peRenderFabrica(c,fid){
     const catM=(repCatalogo||[]).find(x=>x.id===m.id);
     const hid=catM?catM.cores.filter(c=>repCfg[m.id]&&repCfg[m.id].coresOff&&repCfg[m.id].coresOff[c.nome]):[];
     const hidHTML=hid.length?'<div class="pe-corhidden">Cores escondidas: '+hid.map(c=>'<button class="pe-corchip" title="Mostrar de novo" onclick="peMostrarCor(\''+f.fid+'\',\''+m.id+'\',\''+jsq(c.nome)+'\')">'+escapeHtml(c.nome)+' &#8634;</button>').join(' ')+'</div>':'';
-    return '<div class="pe-mod'+(critico?' pe-mod-crit':'')+'" data-fid="'+escapeHtml(f.fid)+'" data-mid="'+escapeHtml(m.id)+'"><div class="pe-modtop"><span class="pe-drag" title="Arraste para reordenar">&#8942;&#8942;</span><div class="pe-modi"><div class="pe-modh">'+escapeHtml(m.nome)+'</div><div class="pe-custo">Compra: R$ <input class="pe-custoi" type="number" min="0" step="0.01" inputmode="decimal" value="'+(m.custo||0)+'" onchange="peSetCusto(\''+m.id+'\',this.value)"></div></div><div class="pe-modacts"><button class="btn sm pe-stop" title="Zera as metas: a fábrica deixa de receber pedido de reposição deste modelo" onclick="peZerarMetas(\''+f.fid+'\',\''+m.id+'\')">Parar produção</button><button class="btn sm pe-modrem" title="Tirar modelo desta fábrica" onclick="if(confirm(\'Tirar este modelo desta fábrica?\'))peRemModelo(\''+f.fid+'\',\''+m.id+'\')">&#10005;</button></div></div>'+critAviso+cores+hidHTML+'</div>';
+    return '<div class="pe-mod'+(critico?' pe-mod-crit':'')+'" data-fid="'+escapeHtml(f.fid)+'" data-mid="'+escapeHtml(m.id)+'"><div class="pe-modtop"><span class="pe-drag" title="Arraste para reordenar">&#8942;&#8942;</span><div class="pe-modi"><div class="pe-modh">'+escapeHtml(m.nome)+'</div><div class="pe-custo">Compra: R$ <input class="pe-custoi" type="number" min="0" step="0.01" inputmode="decimal" value="'+(m.custo||0)+'" onchange="peSetCusto(\''+m.id+'\',this.value)"></div></div><div class="pe-modacts"><button class="btn sm pe-stop" title="Zera as metas: a fábrica deixa de receber pedido de reposição deste modelo" onclick="peZerarMetas(\''+f.fid+'\',\''+m.id+'\')">Parar produção</button><button class="btn sm pe-modrem" title="Tirar modelo desta fábrica" onclick="peRemModelo(\''+f.fid+'\',\''+m.id+'\')">&#10005;</button></div></div>'+critAviso+cores+hidHTML+'</div>';
   }).join('')
   :'<div class="empty">Esta fábrica ainda não tem modelos. Clique em <b>+ Cadastrar modelo</b> acima para escolher, do catálogo do Kigi, quais modelos ela produz.</div>';
   const hist=(cache.historico||[]).slice(-8).reverse().map(h=>{const ms=(h.mudancas||[]).slice(0,7).map(x=>escapeHtml(x.label)+' '+x.de+'\u2192'+x.para).join(', ');let d=h.tipo?escapeHtml(h.tipo):'';if(ms)d=d?(d+': '+ms):ms;if(!d)d='salvou';return '<div class="pe-hist">'+peFmtDataHora(h.ts)+' \u00b7 <b>'+escapeHtml(h.por||'?')+'</b> \u2014 '+d+'</div>';}).join('');
