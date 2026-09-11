@@ -5466,7 +5466,7 @@ function peCadModeloFiltrar(){
   lst.innerHTML=html;
 }
 window.peCadModeloFiltrar=peCadModeloFiltrar;
-window.peAddModelo=function(mid){const fid=_peCadFid;if(!fid)return;if(!peFornModelos[fid])peFornModelos[fid]=[];if(peFornModelos[fid].indexOf(mid)<0)peFornModelos[fid].push(mid);peSalvarFornModelos();peCadModeloFiltrar();peRender();};
+window.peAddModelo=function(mid){const fid=_peCadFid;if(!fid)return;if(!peFornModelos[fid])peFornModelos[fid]=[];if(peFornModelos[fid].indexOf(mid)<0){peFornModelos[fid].push(mid);peFornOpAdd(fid,mid);}peSalvarFornModelos();peCadModeloFiltrar();peRender();};
 function peSomaModelo(fid,mid){
   var cache=_peEstoqueCache[fid]||{};var est=cache.estoque||{},prod=cache.produzindo||{};var pref=mid+'|';var e=0,p=0;
   Object.keys(est).forEach(function(k){if(k.indexOf(pref)===0)e+=(parseInt(est[k],10)||0);});
@@ -5487,7 +5487,7 @@ window.peRemModelo=function(fid,mid){
   }else{
     if(!confirm('Tirar "'+nome+'" desta fábrica?\n\n(Está tudo zerado — sem estoque nem produção.)'))return;
   }
-  peFornModelos[fid]=(peFornModelos[fid]||[]).filter(x=>x!==mid);peSalvarFornModelos();if(_peCadFid)peCadModeloFiltrar();peRender();
+  peFornModelos[fid]=(peFornModelos[fid]||[]).filter(x=>x!==mid);peFornOpRem(fid,mid);peSalvarFornModelos();if(_peCadFid)peCadModeloFiltrar();peRender();
   toast('Modelo removido de '+repFornNome(fid));
 };
 function jsq(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
@@ -5600,7 +5600,25 @@ function peEtqConfigBox(fid){
   var layBtn='<div class="pe-etqrow" style="justify-content:space-between"><span>Ajuste fino do layout '+(_temLay?'<span class="pe-badge ex" style="margin-left:6px">configurado</span>':'')+'</span><button class="btn sm" onclick="peConfigLayout(\''+fid+'\')">Configurar layout</button></div><p class="pe-metahint">Você ajusta a etiqueta desta fábrica (fonte, tamanhos, código de barras…) e fica <b>salvo na nuvem</b>. A fábrica também pode ajustar no painel dela — o que ela mexer também sobe e vira o padrão dela.</p>';
   return '<details class="pe-det"><summary>🏷️ Etiquetas e cabeçalho desta fábrica</summary><div class="pe-etqcfg"><p class="pe-metahint">A fábrica imprime etiquetas só dos <b>modelos liberados acima</b>, sempre neste modelo e tamanho — ela não escolhe.</p><label class="pe-etqrow">Modelo de etiqueta '+tplSel+'</label><label class="pe-etqrow">Tamanho '+tamSel+'</label>'+layBtn+logoCfg+'</div></details>';
 }
-function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}if(_db)_db.collection('ls_pe_tokens').doc('loja').set({fornModelos:peFornModelos},{merge:true}).catch(function(){});}
+/* Só grava a cópia local. A nuvem é atualizada por AÇÃO (peFornOp*), nunca
+   regravando a lista inteira — assim dois usuários ao mesmo tempo não se apagam. */
+function peSalvarFornModelos(){try{localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}}
+/* ---- Sincronização por AÇÃO (estilo Google Sheets) ----
+   Em vez de mandar a lista inteira de modelos da fábrica pra nuvem (o que fazia
+   um cache velho apagar o que outra pessoa acabou de cadastrar), mandamos só a
+   ação: "adiciona este modelo" / "tira este modelo". O Firestore aplica cada
+   ação de forma atômica no servidor, então elas se somam sem sobrescrever. */
+function _peFornRef(){return (_db&&_db.collection('ls_pe_tokens').doc('loja'))||null;}
+function _peFornFP(fid){return new firebase.firestore.FieldPath('fornModelos',fid);}
+function peFornOp(fid,valorCampo,valorSet){
+  var r=_peFornRef();if(!r||typeof firebase==='undefined'||!firebase.firestore)return;
+  var o={};o[fid]=valorSet;
+  try{ r.update(_peFornFP(fid),valorCampo).catch(function(){ r.set({fornModelos:o},{merge:true}).catch(function(){}); }); }
+  catch(e){ try{ r.set({fornModelos:o},{merge:true}).catch(function(){}); }catch(_){} }
+}
+function peFornOpAdd(fid,mid){ if(typeof firebase==='undefined'||!firebase.firestore)return; var v=firebase.firestore.FieldValue.arrayUnion(mid); peFornOp(fid,v,v); }
+function peFornOpRem(fid,mid){ if(typeof firebase==='undefined'||!firebase.firestore)return; var v=firebase.firestore.FieldValue.arrayRemove(mid); peFornOp(fid,v,v); }
+function peFornOpOrdem(fid,arr){ var a=(arr||[]).slice(); peFornOp(fid,a,a); }
 /* União (nunca perde modelo): junta os modelos da nuvem com os locais por fábrica,
    preservando a ordem da nuvem e acrescentando os que só existem localmente.
    Evita que um cache local desatualizado apague, ao carregar a página, um modelo
@@ -5693,7 +5711,9 @@ function peCarregarEstoques(){
     if(MODO_FABRICA){ _peAcesso=_td.pessoas||_peAcesso||{}; peFornModelos=_td.fornModelos||peFornModelos||{}; peEtqConfig=_td.etqConfig||peEtqConfig||{}; }
     else { _peAcesso=Object.assign({},_td.pessoas||{},_peAcesso||{}); peFornModelos=peUnirFornModelos(_td.fornModelos||{},peFornModelos||{}); peEtqConfig=Object.assign({},_td.etqConfig||{},peEtqConfig||{}); }
     try{localStorage.setItem('loretto_pe_tokens',JSON.stringify(_peTokens));localStorage.setItem('loretto_pe_acesso',JSON.stringify(_peAcesso));localStorage.setItem('loretto_pe_forn_modelos',JSON.stringify(peFornModelos));}catch(e){}
-    if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_semSenha(_peAcesso),fornModelos:peFornModelos,etqConfig:peEtqConfig},{merge:true});}catch(e){}}
+    /* NÃO regravamos fornModelos aqui: a lista de modelos é sincronizada só por ação
+       (peFornOp*), pra um cache local velho nunca apagar um modelo recém-cadastrado. */
+    if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_semSenha(_peAcesso),etqConfig:peEtqConfig},{merge:true});}catch(e){}}
     if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
     if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',lotesProducao:(d&&d.lotesProducao)||[],etqLayout:(d&&d.etqLayout)||null,_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&(ae.getAttribute('data-fk')||ae.getAttribute('data-etk')||(ae.closest&&ae.closest('#fabEtBox')))))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}
       try{_db.collection('ls_pe_fotos').doc(peDocId(MODO_FABRICA)).onSnapshot(function(sf){_peFotos[MODO_FABRICA]=(sf.exists&&sf.data()&&sf.data().fotos)||{};if(typeof renderModoFabrica==='function')renderModoFabrica(MODO_FABRICA);},function(){});}catch(e){}}
@@ -5760,7 +5780,7 @@ function peBindDrag(){
   function finish(){
     if(!_peDrag)return; const fid=_peDrag.fid;
     const domMids=Array.prototype.slice.call(box.querySelectorAll('.pe-mod')).filter(function(m){return m.dataset.fid===fid;}).map(function(m){return m.dataset.mid;});
-    if(domMids.length){var all=(peFornModelos[fid]||[]);var missing=all.filter(function(x){return domMids.indexOf(x)<0;});peFornModelos[fid]=domMids.concat(missing);peSalvarFornModelos();}
+    if(domMids.length){var all=(peFornModelos[fid]||[]);var missing=all.filter(function(x){return domMids.indexOf(x)<0;});peFornModelos[fid]=domMids.concat(missing);peSalvarFornModelos();peFornOpOrdem(fid,peFornModelos[fid]);}
     if(_peDrag.el)_peDrag.el.classList.remove('dragging');
     try{box.releasePointerCapture(_peDrag.pid);}catch(_){}
     _peDrag=null; peRender();
