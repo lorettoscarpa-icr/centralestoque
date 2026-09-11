@@ -5343,7 +5343,7 @@ function peFabSalvar(fid,silent){
   if(_mud.length){var _e=peHistEntry(quem,'estoque/produ\u00e7\u00e3o',_mud);peHistLocal(fid,_e);var _u=peHistUnion(_e);if(_u)payload.historico=_u;}
   if(!_db){if(silent)peFabStatus('ok');else toast('Atualizado');return;}
   var ref=_db.collection('ls_pe').doc(did);
-  ref.get().then(function(s){return s.exists?ref.update(payload):ref.set(payload,{merge:true});}).then(function(){if(silent)peFabStatus('ok');else{toast('Atualizado \u2014 a Loretto j\u00e1 v\u00ea');if(typeof peRender==='function')peRender();}}).catch(function(e){peFabStatus('err',(e&&e.code)||(e&&e.message)||'');if(!silent)toast('Erro ao salvar');});
+  _peGravaDelta(ref,{estoque:estAnt,produzindo:prodAnt},payload).then(function(){if(silent)peFabStatus('ok');else{toast('Atualizado \u2014 a Loretto j\u00e1 v\u00ea');if(typeof peRender==='function')peRender();}}).catch(function(e){peFabStatus('err',(e&&e.code)||(e&&e.message)||'');if(!silent)toast('Erro ao salvar');});
 }
 function renderModoFabrica(fid){
   var host=document.getElementById('fabricaMode');if(!host)return;
@@ -5501,7 +5501,7 @@ window.peZerarMetas=function(fid,mid){
   Object.keys(meta).forEach(function(k){if(k.indexOf(mid+'|')===0)delete meta[k];});
   if(!_db){if(_peEstoqueCache[fid])_peEstoqueCache[fid].meta=meta;peRender();toast('Metas zeradas');return;}
   var ref=_db.collection('ls_pe').doc(peDocId(fid));var stamp={meta:meta,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'};
-  ref.update(stamp).catch(function(){return ref.set(stamp,{merge:true});}).then(function(){if(_peEstoqueCache[fid])_peEstoqueCache[fid].meta=meta;toast('Metas zeradas — a fábrica para de produzir este modelo');peRender();}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+  _peGravaDelta(ref,{meta:cache.meta||{}},stamp).then(function(){if(_peEstoqueCache[fid])_peEstoqueCache[fid].meta=meta;toast('Metas zeradas — a fábrica para de produzir este modelo');peRender();}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
 };
 const PE_PADRAO=[{fid:'manutt',nome:'Manutt'},{fid:'tchwm',nome:'Tchwm Shoes'},{fid:'tarragona',nome:'Tarragona'},{fid:'urbana',nome:'Urbana Man'}];
 let peView='lista';var PE_CRIT_PCT=50;let peFornsOpen=false;let peFornEdit=null;
@@ -5901,7 +5901,7 @@ function peSalvarMetas(fid){
   const payload={meta:meta,lorettoEm:Date.now(),lorettoPor:userAtual||'Loretto'};
   const _mud=peDiffMapas((_peEstoqueCache[fid]&&_peEstoqueCache[fid].meta)||{},meta);
   if(_mud.length){const _e=peHistEntry(userAtual||'Loretto','metas',_mud);peHistLocal(fid,_e);const _u=peHistUnion(_e);if(_u)payload.historico=_u;}
-  ref.update(payload).catch(function(){return ref.set(payload,{merge:true});}).then(function(){if(_peEstoqueCache[fid]){_peEstoqueCache[fid].meta=meta;_peEstoqueCache[fid].lorettoEm=Date.now();_peEstoqueCache[fid].lorettoPor=userAtual||'Loretto';}toast('Metas salvas — a fábrica já vê o que precisa repor');peRender();}).catch(function(e){toast('Erro ao salvar metas: '+((e&&e.message)||''));});
+  _peGravaDelta(ref,{meta:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].meta)||{}},payload).then(function(){if(_peEstoqueCache[fid]){_peEstoqueCache[fid].meta=meta;_peEstoqueCache[fid].lorettoEm=Date.now();_peEstoqueCache[fid].lorettoPor=userAtual||'Loretto';}toast('Metas salvas — a fábrica já vê o que precisa repor');peRender();}).catch(function(e){toast('Erro ao salvar metas: '+((e&&e.message)||''));});
 }
 function peTrocarFoto(fid,modId,cor){
   if(!_db){toast('Conecte à internet para salvar a foto');return;}
@@ -5951,11 +5951,32 @@ function _peMigraOrdens(d){var ordens=[],ped=(d&&d.pedido)||{},prod=(d&&d.produz
 // grava ordens (fonte da verdade) + pedido/produzindo derivados. Usa update quando o doc existe
 // para SUBSTITUIR os mapas por inteiro (set+merge faria merge profundo e deixaria chaves obsoletas,
 // fazendo pedido e producao se misturarem - exatamente o que queremos evitar).
-function _pePersistir(did,fid,payload,exists,okMsg,tipo){
+/* ---- Gravação por AÇÃO dos números (estoque / produção / meta) ----
+   Em vez de mandar o mapa inteiro (o que apagava a numeração que outra pessoa
+   mexeu ao mesmo tempo), mandamos só as numerações que ESTE usuário mudou,
+   comparando com a base que ele estava vendo. As que zeraram vão como "apagar
+   esta chave". O Firestore mescla no servidor (set merge), então mexer numa
+   numeração nunca sobrescreve outra. Ordens/lotes continuam inteiros (fase 2). */
+function _peDeltaMapa(base,novo){
+  base=base||{};novo=novo||{};var d={};
+  var DEL=(typeof firebase!=='undefined'&&firebase.firestore&&firebase.firestore.FieldValue)?firebase.firestore.FieldValue.delete():null;
+  Object.keys(novo).forEach(function(k){ if((parseInt(novo[k],10)||0)!==(parseInt(base[k],10)||0)) d[k]=novo[k]; });
+  if(DEL) Object.keys(base).forEach(function(k){ if(!(k in novo)) d[k]=DEL; });
+  return d;
+}
+function _peGravaDelta(ref,base,payload){
+  base=base||{};var out={};
+  Object.keys(payload).forEach(function(campo){
+    if(campo==='estoque'||campo==='produzindo'||campo==='meta') out[campo]=_peDeltaMapa(base[campo],payload[campo]);
+    else out[campo]=payload[campo];
+  });
+  return ref.set(out,{merge:true});
+}
+function _pePersistir(did,fid,payload,exists,okMsg,tipo,oldData){
   if(!_db){peRender();if(okMsg)toast(okMsg);return;}
   if(tipo){var _e=peHistEntry(payload.lorettoPor||'Loretto',tipo,[]);peHistLocal(fid,_e);var _u=peHistUnion(_e);if(_u)payload.historico=_u;}
   var ref=_db.collection('ls_pe').doc(did);
-  var p=exists?ref.update(payload):ref.set(payload,{merge:true});
+  var p=_peGravaDelta(ref,oldData,payload);
   p.then(function(){if(_peEstoqueCache[fid])_peEstoqueCache[fid].lorettoEm=payload.lorettoEm;peRender();if(okMsg)toast(okMsg);}).catch(function(e){toast('Erro ao salvar: '+((e&&e.message)||''));});
 }
 function peMutarOrdens(fid,mut,okMsg){
@@ -5981,7 +6002,7 @@ function peOrdemPronta(fid,oid){
     if(alvo&&alvo.grade){Object.keys(alvo.grade).forEach(function(k){var q=parseInt(alvo.grade[k])||0;if(q>0)est[k]=(parseInt(est[k])||0)+q;});}
     var t=peTotaisOrdens(ordens);
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].ordens=ordens;_peEstoqueCache[fid].pedido=t.pedido;_peEstoqueCache[fid].estoque=est;}
-    _pePersistir(did,fid,{ordens:ordens,pedido:t.pedido,estoque:est,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Produção concluída — somada ao estoque','Produção concluída');
+    _pePersistir(did,fid,{ordens:ordens,pedido:t.pedido,estoque:est,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'},exists,'Produção concluída — somada ao estoque','Produção concluída',d);
   }
   if(!_db){aplica({ordens:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],estoque:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}},false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({ordens:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].ordens)||[],estoque:(_peEstoqueCache[fid]&&_peEstoqueCache[fid].estoque)||{}},false);});
@@ -6008,7 +6029,7 @@ function peExcluirLote(fid,loteId){
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].lotesProducao=lotes;}
     var payload={estoque:est,produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now()};
     if(!_db){renderModoFabrica(fid);toast('Lote excluído');return;}
-    var ref=_db.collection('ls_pe').doc(did);(exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Lote excluído');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+    var ref=_db.collection('ls_pe').doc(did);_peGravaDelta(ref,d,payload).then(function(){toast('Lote excluído');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
   }
   if(!_db){aplica({},false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){});
@@ -6025,7 +6046,7 @@ function peLotePronto(fid,loteId){
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].lotesProducao=lotes;}
     var payload={estoque:est,produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now()};
     if(!_db){renderModoFabrica(fid);toast('Pronto — entrou no estoque');return;}
-    var ref=_db.collection('ls_pe').doc(did);(exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Pronto — entrou no estoque');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+    var ref=_db.collection('ls_pe').doc(did);_peGravaDelta(ref,d,payload).then(function(){toast('Pronto — entrou no estoque');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
   }
   if(!_db){aplica({},false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){});
@@ -6091,7 +6112,7 @@ function _peReceberAplicar(fid,loteId,receb,modo){
     var payload={estoque:est,produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now()};
     var msg=l.aplicado?(l.finalizadoParcial?'Lote fechado — entrou no estoque':'Lote completo — entrou no estoque'):('Entrou '+totReceb+' pares — falta '+faltaTot);
     if(!_db){renderModoFabrica(fid);toast(msg);return;}
-    var ref=_db.collection('ls_pe').doc(did);(exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast(msg);}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+    var ref=_db.collection('ls_pe').doc(did);_peGravaDelta(ref,d,payload).then(function(){toast(msg);}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
   }
   if(!_db){aplica({},false);return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({},false);});
@@ -6129,7 +6150,7 @@ function peSalvarLote(){
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].produzindo=prod;_peEstoqueCache[fid].lotesProducao=lotes;}
     var payload={estoque:est,produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now()};
     if(!_db){renderModoFabrica(fid);toast('Corrigido');return;}
-    var ref=_db.collection('ls_pe').doc(did);(exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Corrigido');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+    var ref=_db.collection('ls_pe').doc(did);_peGravaDelta(ref,d,payload).then(function(){toast('Corrigido');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
   }
   if(!_db){aplica({},false);_peEditLote=null;peEnvioFechar();return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({},false);});
@@ -6177,7 +6198,7 @@ function peSalvarCorrecaoEnvio(){
     if(_peEstoqueCache[fid]){_peEstoqueCache[fid].estoque=est;_peEstoqueCache[fid].ordens=ordens;}
     var payload={estoque:est,ordens:ordens,atualizadoEm:Date.now(),lorettoEm:Date.now()};
     if(!_db){renderModoFabrica(fid);toast('Correção salva');return;}
-    var ref=_db.collection('ls_pe').doc(did);(exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Correção salva');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+    var ref=_db.collection('ls_pe').doc(did);_peGravaDelta(ref,d,payload).then(function(){toast('Correção salva');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
   }
   if(!_db){aplica({},false);_peEditEnvio=null;peEnvioFechar();return;}
   _db.collection('ls_pe').doc(did).get().then(function(s){aplica(s.exists?s.data():{},s.exists);}).catch(function(){aplica({},false);});
@@ -6285,7 +6306,7 @@ function peConfirmarProduzir(fid){
     var payload={produzindo:prod,lotesProducao:lotes,atualizadoEm:Date.now(),lorettoEm:Date.now(),lorettoPor:quem};
     if(!_db){renderModoFabrica(fid);toast('Produção registrada');return;}
     var ref=_db.collection('ls_pe').doc(did);
-    (exists?ref.update(payload):ref.set(payload,{merge:true})).then(function(){toast('Produção registrada');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
+    _peGravaDelta(ref,d,payload).then(function(){toast('Produção registrada');}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
   }
   var _meta={inicioEm:inicioEm,prontoEm:prontoEm,nome:nomePed};
   if(!_db){aplica({},false);peProdSucesso(fid,grade,_meta);return;}
@@ -6320,7 +6341,7 @@ function peAplicarLotesProntos(fid){
   }
   if(!_db){move(null);renderModoFabrica(fid);return;}
   var ref=_db.collection('ls_pe').doc(did);
-  ref.get().then(function(s){var p=move(s.exists?s.data():{});var pl={estoque:p.estoque,produzindo:p.produzindo,lotesProducao:p.lotesProducao,atualizadoEm:Date.now(),lorettoEm:Date.now()};return s.exists?ref.update(pl):ref.set(pl,{merge:true});}).catch(function(){});
+  ref.get().then(function(s){var base=s.exists?s.data():{};var p=move(base);var pl={estoque:p.estoque,produzindo:p.produzindo,lotesProducao:p.lotesProducao,atualizadoEm:Date.now(),lorettoEm:Date.now()};return _peGravaDelta(ref,base,pl);}).catch(function(){});
 }
 function peEnviarMenu(fid){
   var cache=_peEstoqueCache[fid]||{};var peds=(cache.ordens||[]).filter(function(o){return o.status==='pedido';}).sort(function(a,b){return (a.criadoEm||0)-(b.criadoEm||0);});
@@ -6375,7 +6396,7 @@ function peConfirmarEnvio(){
     var _sentTot=Object.keys(sent).reduce(function(s,k){return s+(parseInt(sent[k])||0);},0);
     var _epl={ordens:ordens,estoque:est,pedido:t.pedido,lorettoEm:Date.now(),lorettoPor:(typeof userAtual!=='undefined'?userAtual:'')||'Loretto'};
     var _ee=peHistEntry(_quem,'Envio ao cliente ('+_sentTot+' pares)',[]);peHistLocal(fid,_ee);var _eu=peHistUnion(_ee);if(_eu)_epl.historico=_eu;
-    _pePersistir(did,fid,_epl,exists,'Envio confirmado &mdash; baixado do estoque');
+    _pePersistir(did,fid,_epl,exists,'Envio confirmado &mdash; baixado do estoque','',d);
   }
   var _sentEtiq=sent;
   function _ofereceEtiq(){setTimeout(function(){if(confirm('Envio confirmado!\n\nImprimir as etiquetas Loretto para colar nas caixas?'))peImprimirEtiquetas(_sentEtiq);},150);}
