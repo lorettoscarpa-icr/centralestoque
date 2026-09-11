@@ -1377,6 +1377,14 @@
   .pe-voltar{background:none;border:none;color:var(--ouro-claro);font-family:'Barlow',sans-serif;font-size:var(--fs-md);font-weight:600;cursor:pointer;padding:6px 0;margin-bottom:12px}
   .pe-badge.ex{background:rgba(220,189,96,.18);color:var(--ouro-claro);border-color:rgba(220,189,96,.5)}
   .pe-previa-aviso{background:rgba(220,189,96,.12);border:1px solid rgba(220,189,96,.4);color:var(--ouro-claro);border-radius:var(--r-md);padding:10px 13px;font-size:var(--fs-sm);margin-bottom:12px;line-height:1.45}
+  .pe-orfaos{background:rgba(224,138,106,.10);border:1px solid rgba(224,138,106,.45);border-radius:var(--r-md);padding:12px 14px;margin-bottom:14px}
+  .pe-orf-h{font-weight:700;color:#ffb59c;font-size:var(--fs-base);margin-bottom:3px}
+  .pe-orf-sub{font-size:var(--fs-sm);color:var(--txt-fraco,#b9b9c0);line-height:1.45;margin-bottom:10px}
+  .pe-orf-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+  .pe-orf-info{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+  .pe-orf-nome{font-weight:600}
+  .pe-orf-nums{font-size:var(--fs-sm);color:var(--ouro-claro)}
+  .pe-orf-nocat{font-size:var(--fs-xs,11px);color:var(--txt-fraco,#b9b9c0);font-weight:400}
   .pe-metahint{font-size:var(--fs-sm);color:var(--ouro-claro);opacity:.85;margin:4px 0 12px;line-height:1.45}
   .pe-metahint b{color:var(--ouro)}
   .pe-ords{margin:4px 0 12px;display:grid;gap:12px}
@@ -5440,6 +5448,41 @@ function peModelosDaFabrica(fid){
   });
   return out;
 }
+/* ---- Recuperação de produtos sumidos ----
+   Varre os números guardados da fábrica (estoque/produção/meta) e acha modelos
+   que têm dado salvo mas NÃO estão mais na lista de modelos da fábrica — ou seja,
+   foram tirados/sumiram mas os números continuam na nuvem. Assim dá pra trazê-los
+   de volta sem perder nada. (Só na parte interna da loja.) */
+function peProdutosOrfaos(fid){
+  var cache=_peEstoqueCache[fid]||{};
+  var naLista={};(peFornModelos[fid]||[]).forEach(function(id){naLista[id]=1;});
+  var acc={};
+  function varre(mapa,campo){ if(!mapa)return; Object.keys(mapa).forEach(function(k){ var mid=String(k).split('|')[0]; if(!mid||naLista[mid])return; var v=parseInt(mapa[k],10)||0; if(!acc[mid])acc[mid]={estoque:0,producao:0,meta:0}; acc[mid][campo]+=v; }); }
+  varre(cache.estoque,'estoque'); varre(cache.produzindo,'producao'); varre(cache.meta,'meta');
+  var uni=repCatUnif();
+  return Object.keys(acc).map(function(mid){
+    var m=uni.find(function(x){return x.id===mid;});
+    return {id:mid,nome:(m&&m.nome)||mid,noCatalogo:!!m,estoque:acc[mid].estoque,producao:acc[mid].producao,meta:acc[mid].meta};
+  }).filter(function(o){return o.estoque>0||o.producao>0;}).sort(function(a,b){return (b.estoque+b.producao)-(a.estoque+a.producao);});
+}
+window.peRestaurarOrfao=function(fid,mid){
+  if(!peFornModelos[fid])peFornModelos[fid]=[];
+  if(peFornModelos[fid].indexOf(mid)<0){peFornModelos[fid].push(mid);peFornOpAdd(fid,mid);peSalvarFornModelos();}
+  var nome=((repCatUnif()||[]).find(function(x){return x.id===mid;})||{}).nome||mid;
+  toast('"'+nome+'" restaurado nesta fábrica');peRender();
+};
+function peOrfaosPainel(fid){
+  var orf=peProdutosOrfaos(fid);
+  if(!orf.length)return '';
+  var linhas=orf.map(function(o){
+    var det=[];if(o.estoque>0)det.push(o.estoque+' em estoque');if(o.producao>0)det.push(o.producao+' em produção');
+    var aviso=o.noCatalogo?'':' <span class="pe-orf-nocat">(fora do catálogo — reimporte o Kigi p/ ver a grade completa)</span>';
+    return '<div class="pe-orf-row"><div class="pe-orf-info"><span class="pe-orf-nome">'+escapeHtml(o.nome)+'</span>'+aviso+'<span class="pe-orf-nums">'+det.join(' · ')+'</span></div><button class="btn btn-ouro sm" onclick="peRestaurarOrfao(\''+fid+'\',\''+jsq(o.id)+'\')">Restaurar</button></div>';
+  }).join('');
+  return '<div class="pe-orfaos"><div class="pe-orf-h">⚠ Produtos que sumiram desta fábrica</div>'+
+    '<div class="pe-orf-sub">Estes modelos foram tirados da lista, mas os números continuam guardados na nuvem. Clique em <b>Restaurar</b> para trazê-los de volta com o estoque/produção que tinham.</div>'+
+    linhas+'</div>';
+}
 /* cadastro manual de modelos por fábrica (escolhidos do catálogo importado) */
 window.peCadModelo=function(fid){_peCadFid=fid;$('peModeloModal').classList.remove('hide');peCadModeloRender();};
 window.peCadModeloFechar=function(){$('peModeloModal').classList.add('hide');_peCadFid=null;};
@@ -5872,6 +5915,7 @@ function peRenderFabrica(c,fid){
   var _gE=0,_gP=0,_gVE=0,_gVP=0;modelos.forEach(function(m){var _c=m.custo||0;m.cores.forEach(function(co){(co.tams||[]).forEach(function(t){var _k=m.id+'|'+co.nome+'|'+t;var _e=parseInt(mapas.estoque[_k])||0,_pz=parseInt(mapas.produzindo[_k])||0;_gE+=_e;_gP+=_pz;_gVE+=_e*_c;_gVP+=_pz*_c;});});});
   var _totalGeral='<div class="fab-totalgeral" style="margin:10px 0 14px"><span class="fab-tgh">Total geral</span><span>Estoque <b>'+_gE+'</b> pares · <b>'+brMoney(_gVE)+'</b></span><span>Produção <b>'+_gP+'</b> pares · <b>'+brMoney(_gVP)+'</b></span></div>';
   c.innerHTML='<button class="pe-voltar" onclick="peVoltar()">&#8249; Todas as fábricas</button>'+_totalGeral+
+    peOrfaosPainel(f.fid)+
     (cache._previa?'<div class="pe-previa-aviso">Prévia demonstrativa — dados de exemplo do PDF da Tchwm Shoes. Quando a fábrica publicar de verdade, estes números são substituídos pelos reais.</div>':'')+
     '<div class="pe-card'+(parada?' parada':'')+'"><div class="pe-cardh"><div><div class="pe-fname">'+escapeHtml(f.nome)+(parada?' <span class="pe-badge">parada '+diasSem+'d</span>':'')+'</div><div class="pe-meta">'+escapeHtml(pub)+' &middot; '+f.qtdModelos+' modelos</div></div>'+
     '<div class="pe-totbox"><div class="pe-tot">'+totEst+'</div><div class="pe-totl">em estoque</div></div></div>'+
