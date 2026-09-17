@@ -5355,7 +5355,7 @@ function peFabSalvar(fid,silent){
   if(_mud.length){var _e=peHistEntry(quem,'estoque/produ\u00e7\u00e3o',_mud);peHistLocal(fid,_e);var _u=peHistUnion(_e);if(_u)payload.historico=_u;}
   if(!_db){if(silent)peFabStatus('ok');else toast('Atualizado');return;}
   var ref=_db.collection('ls_pe').doc(did);
-  _peGravaDelta(ref,{estoque:estAnt,produzindo:prodAnt},payload).then(function(){if(silent)peFabStatus('ok');else{toast('Atualizado \u2014 a Loretto j\u00e1 v\u00ea');if(typeof peRender==='function')peRender();}}).catch(function(e){peFabStatus('err',(e&&e.code)||(e&&e.message)||'');if(!silent)toast('Erro ao salvar');});
+  _peGravaDelta(ref,{estoque:estAnt,produzindo:prodAnt,_syncEm:(_c._syncEm||0)},payload).then(function(){if(silent)peFabStatus('ok');else{toast('Atualizado \u2014 a Loretto j\u00e1 v\u00ea');if(typeof peRender==='function')peRender();}}).catch(function(e){peFabStatus('err',(e&&e.code)||(e&&e.message)||'');if(!silent)toast('Erro ao salvar');});
 }
 function renderModoFabrica(fid){
   var host=document.getElementById('fabricaMode');if(!host)return;
@@ -5773,7 +5773,7 @@ function peCarregarEstoques(){
        (peFornOp*), pra um cache local velho nunca apagar um modelo recém-cadastrado. */
     if(!MODO_FABRICA&&_db){try{_db.collection('ls_pe_tokens').doc('loja').set({tokens:_peTokens,pessoas:_semSenha(_peAcesso),etqConfig:peEtqConfig},{merge:true});}catch(e){}}
     if(MODO_FABRICA)renderModoFabrica(MODO_FABRICA);
-    if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',lotesProducao:(d&&d.lotesProducao)||[],etqLayout:(d&&d.etqLayout)||null,_previa:false};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&(ae.getAttribute('data-fk')||ae.getAttribute('data-etk')||(ae.closest&&ae.closest('#fabEtBox')))))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}
+    if(MODO_FABRICA&&_db){try{_db.collection('ls_pe').doc(peDocId(MODO_FABRICA)).onSnapshot(function(s2f){var d=s2f.exists?s2f.data():null;var ords=(d&&Array.isArray(d.ordens))?d.ordens:[];var tt=peTotaisOrdens(ords);_peEstoqueCache[MODO_FABRICA]={estoque:(d&&d.estoque)||{},produzindo:(d&&d.produzindo)||{},pedido:tt.pedido,ordens:ords,meta:(d&&d.meta)||{},historico:(d&&d.historico)||[],atualizadoEm:(d&&d.atualizadoEm)||0,lorettoEm:(d&&d.lorettoEm)||0,lorettoPor:(d&&d.lorettoPor)||'',lotesProducao:(d&&d.lotesProducao)||[],etqLayout:(d&&d.etqLayout)||null,_previa:false,_syncEm:Date.now()};var ae=document.activeElement;if(!(ae&&ae.getAttribute&&(ae.getAttribute('data-fk')||ae.getAttribute('data-etk')||(ae.closest&&ae.closest('#fabEtBox')))))renderModoFabrica(MODO_FABRICA);},function(err){var el=document.getElementById('fabStatus');if(el){el.textContent='SEM ACESSO AOS DADOS ('+((err&&err.code)||'firebase')+') — avise a Loretto';el.className='fab-status err';}});}catch(e){}
       try{_db.collection('ls_pe_fotos').doc(peDocId(MODO_FABRICA)).onSnapshot(function(sf){_peFotos[MODO_FABRICA]=(sf.exists&&sf.data()&&sf.data().fotos)||{};if(typeof renderModoFabrica==='function')renderModoFabrica(MODO_FABRICA);},function(){});}catch(e){}}
   }).catch(function(){}).then(function(){
     peFabricas().filter(function(f){return !MODO_FABRICA||f.fid===MODO_FABRICA;}).forEach(f=>{
@@ -5782,7 +5782,7 @@ function peCarregarEstoques(){
       function _temDados(x){return x&&((Object.keys(x.estoque||{}).length)||((x.ordens||[]).length)||(Object.keys(x.meta||{}).length)||(Object.keys(x.produzindo||{}).length));}
       function _setCache(d){
         var ordens=Array.isArray(d.ordens)?d.ordens:_peMigraOrdens(d);var t=peTotaisOrdens(ordens);
-        _peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],lotesProducao:(Array.isArray(d.lotesProducao)?d.lotesProducao:[]),etqLayout:d.etqLayout||null,atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false};
+        _peEstoqueCache[f.fid]={estoque:d.estoque||{},produzindo:d.produzindo||{},pedido:t.pedido,ordens:ordens,meta:d.meta||{},historico:d.historico||[],lotesProducao:(Array.isArray(d.lotesProducao)?d.lotesProducao:[]),etqLayout:d.etqLayout||null,atualizadoEm:d.atualizadoEm||0,publicadoEm:d.publicadoEm||0,lorettoEm:d.lorettoEm||0,lorettoPor:d.lorettoPor||'',_previa:false,_syncEm:Date.now()};
         peRender();
       }
       function _vazio(){ if(!MODO_FABRICA&&PE_PREVIA[f.fid]){_peEstoqueCache[f.fid]=_peSeed(f.fid);peRender();} else _setCache({}); }
@@ -5804,7 +5804,11 @@ function peCarregarEstoques(){
             atualizadoEm:d.atualizadoEm||dl.atualizadoEm||0,publicadoEm:d.publicadoEm||dl.publicadoEm||0,lorettoEm:d.lorettoEm||dl.lorettoEm||0,lorettoPor:d.lorettoPor||dl.lorettoPor||''
           };
           _setCache(merged);
-          if(_db&&_temDados(dl)){try{_db.collection('ls_pe').doc(did).set({estoque:merged.estoque,produzindo:merged.produzindo,meta:merged.meta,ordens:merged.ordens,atualizadoEm:merged.atualizadoEm,lorettoEm:merged.lorettoEm,lorettoPor:merged.lorettoPor},{merge:true});}catch(e){}}
+          /* PROTEÇÃO (incidente 17/09/2026): a regravação automática do merge legado
+             sobrescrevia lançamentos novos com dados velhos do doc antigo. Agora o
+             write-back SÓ acontece se o doc principal estiver realmente vazio
+             (migração de verdade) — nunca por cima de um doc que já tem dados. */
+          if(_db&&_temDados(dl)&&!_temDados(d)){try{_db.collection('ls_pe').doc(did).set({estoque:merged.estoque,produzindo:merged.produzindo,meta:merged.meta,ordens:merged.ordens,atualizadoEm:merged.atualizadoEm,lorettoEm:merged.lorettoEm,lorettoPor:merged.lorettoPor,_migradoDoLegado:Date.now()},{merge:true});}catch(e){}}
         }).catch(function(){ if(_temDados(d))_setCache(d); else _vazio(); });
       }).catch(function(){});
       if(!MODO_FABRICA){_db.collection('ls_pe_fotos').doc(did).get().then(function(s3){_peFotos[f.fid]=(s3.exists&&s3.data()&&s3.data().fotos)||{};peRender();}).catch(function(){});}
@@ -6024,12 +6028,33 @@ function _peDeltaMapa(base,novo){
   return d;
 }
 function _peGravaDelta(ref,base,payload){
-  base=base||{};var out={};
-  Object.keys(payload).forEach(function(campo){
-    if(campo==='estoque'||campo==='produzindo'||campo==='meta') out[campo]=_peDeltaMapa(base[campo],payload[campo]);
-    else out[campo]=payload[campo];
-  });
-  return ref.set(out,{merge:true});
+  base=base||{};var baseSync=base._syncEm||0;
+  var DEL=(typeof firebase!=='undefined'&&firebase.firestore&&firebase.firestore.FieldValue)?firebase.firestore.FieldValue.delete():null;
+  function _montar(atual){
+    atual=atual||{};var out={};
+    /* PROTEÇÃO (incidente 17/09/2026): só remove chaves se a visão do cliente estiver
+       em dia com o banco. Se o banco foi atualizado DEPOIS do último sync desta tela
+       (ex.: outra aba/dispositivo lançou estoque novo), os deletes são descartados —
+       nunca apagar dados que esta tela nem chegou a ver. */
+    var podeDel=!baseSync||((atual.atualizadoEm||0)<=baseSync+2000);
+    Object.keys(payload).forEach(function(campo){
+      if(campo==='estoque'||campo==='produzindo'||campo==='meta'){
+        var b=base[campo]||{},n=payload[campo]||{},d={};
+        Object.keys(n).forEach(function(k){ if((parseInt(n[k],10)||0)!==(parseInt(b[k],10)||0)) d[k]=n[k]; });
+        if(DEL&&podeDel) Object.keys(b).forEach(function(k){ if(!(k in n)) d[k]=DEL; });
+        out[campo]=d;
+      } else out[campo]=payload[campo];
+    });
+    return out;
+  }
+  /* Transação: lê o estado ATUAL e aplica só as mudanças desta sessão por cima —
+     dois dispositivos salvando ao mesmo tempo não se sobrescrevem mais. */
+  if(_db&&_db.runTransaction){
+    return _db.runTransaction(function(tx){
+      return tx.get(ref).then(function(s){ tx.set(ref,_montar(s.exists?s.data():{}),{merge:true}); });
+    });
+  }
+  return ref.set(_montar(null),{merge:true});
 }
 function _pePersistir(did,fid,payload,exists,okMsg,tipo,oldData){
   if(!_db){peRender();if(okMsg)toast(okMsg);return;}
