@@ -202,5 +202,53 @@ teste('excluir lote não aplicado devolve pra produzindo (0 → sem chave não c
   assert.deepEqual(mud[0], { label: 'x|Preto|38', de: 10, para: 0 });
 });
 
+console.log('sync de fotos/acesso não apaga dado de outro usuário (incidente Gregory 18/09/2026)');
+teste('cache local com ts alto (relógio adiantado) NÃO bloqueia snapshot novo de outro usuário', () => {
+  // aparelho com relógio adiantado empurrou uma vez com ts=9_000_000 (guardado no
+  // localStorage). Depois disso outro usuário, em aparelho com relógio certo,
+  // adicionou uma foto nova e o servidor está em ts=2_000_000 (bem "menor" que o
+  // ts salvo localmente, mas é o dado mais novo de verdade).
+  var tsDoServidorAgora = 2_000_000;
+  var ultimoPushDestaAba = 0; // esta aba não foi quem escreveu por último
+  assert.equal(PECore.deveIgnorarSnapshotProprio(tsDoServidorAgora, ultimoPushDestaAba), false,
+    'servidor deve ser aplicado — não é eco do próprio push desta aba');
+});
+teste('snapshot é ignorado só quando é eco do push que a própria aba acabou de mandar', () => {
+  var ultimoPushDestaAba = 9_000_000;
+  assert.equal(PECore.deveIgnorarSnapshotProprio(9_000_000, ultimoPushDestaAba), true);
+  assert.equal(PECore.deveIgnorarSnapshotProprio(9_000_001, ultimoPushDestaAba), false, 'algo mais novo que o próprio push sempre entra');
+});
+teste('bootstrap NUNCA reinicializa doc compartilhado (fotos/cfg) que já existe no servidor', () => {
+  assert.equal(PECore.deveGravarNaInicializacao(true), false, 'doc já existe — não pode ser pisado por um push de cache velho');
+});
+teste('cliente novo sem cache (doc do servidor ainda não existe) inicializa normalmente', () => {
+  assert.equal(PECore.deveGravarNaInicializacao(false), true);
+});
+teste('acesso/config: servidor ganha em chave que os dois têm (cache velho não ressuscita acesso removido/trocado)', () => {
+  var local = { manutt: { usuario: 'antigo@x.com', perfis: ['prod'] } }; // cache velho de dias atrás
+  var servidor = { manutt: { usuario: 'novo@x.com', perfis: ['prod', 'admin'] } }; // atualizado por outro aparelho
+  var out = PECore.mergePreferindoServidor(local, servidor);
+  assert.deepEqual(out.manutt, servidor.manutt);
+});
+teste('acesso/config: chave só local (ainda não confirmada pelo servidor) não é apagada pela junção', () => {
+  var local = { manutt: { usuario: 'a@x.com' }, novaFabricaOffline: { usuario: 'b@x.com' } };
+  var servidor = { manutt: { usuario: 'a@x.com' } }; // servidor ainda não viu "novaFabricaOffline"
+  var out = PECore.mergePreferindoServidor(local, servidor);
+  assert.deepEqual(out.novaFabricaOffline, { usuario: 'b@x.com' });
+});
+teste('delete explícito (foto removida por ação do usuário) some do push seguinte', () => {
+  // Fotos não usam mergePreferindoServidor: repRemoveFoto/cffRemover apagam a
+  // chave do mapa em memória e chamam salvaFotos()->repPushFotos(), que sobe o
+  // mapa como está — já sem a chave removida. Este teste documenta o contrato
+  // que repPushFotos depende dele (a remoção acontece ANTES do push, na função
+  // pura que simula a mutação, não dentro de nenhum merge).
+  var repFotosAntes = { modeloX: { Preto: 'url1', Branco: 'url2' } };
+  var repFotosDepoisDoDelete = JSON.parse(JSON.stringify(repFotosAntes));
+  delete repFotosDepoisDoDelete.modeloX.Branco;
+  var payloadQueSeriaEnviado = repFotosDepoisDoDelete; // é isto que repPushFotos().set({fotos:...}) manda
+  assert.equal(payloadQueSeriaEnviado.modeloX.Branco, undefined);
+  assert.equal(payloadQueSeriaEnviado.modeloX.Preto, 'url1', 'a outra cor do mesmo modelo não é afetada pelo delete');
+});
+
 console.log('\n' + passou + ' passaram, ' + falhou + ' falharam');
 process.exit(falhou ? 1 : 0);

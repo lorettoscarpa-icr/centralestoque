@@ -160,6 +160,39 @@
     return !!(focadoEmCampo||existeDirtyPendente);
   }
 
+  /* PROTEÇÃO (fotos/config sumindo, incidente relatado pelo Gregory 18/09/2026):
+     um doc "pacote inteiro" (ls_rep_fotos, ls_rep_cfg) só pode ser inicializado
+     por push automático quando ELE NÃO EXISTE no servidor ainda (primeira vez,
+     migrando o que já tinha no localStorage). Nunca decidir isso comparando um
+     ts guardado no localStorage: um aparelho com relógio adiantado ou cache
+     velho tem um ts "grande" que parece mais novo que o do servidor sem ser —
+     e empurra o bloco local inteiro por cima do que os outros já gravaram. */
+  function deveGravarNaInicializacao(existeNoServidor){
+    return !existeNoServidor;
+  }
+
+  /* Um onSnapshot só pode ignorar o que chegou se for o ECO do push que esta
+     mesma aba acabou de mandar (ultimoPushProprio, em memória, não vem do
+     localStorage). Comparar com um ts guardado no localStorage é o mesmo bug:
+     um ts velho/adiantado faz a aba parar de aceitar atualização de verdade
+     vinda de outro usuário — e foi isso que fez a foto de outro usuário sumir
+     (a aba nem chegava a aplicar o que tinha vindo da nuvem). */
+  function deveIgnorarSnapshotProprio(tsRecebido,ultimoPushProprio){
+    return (tsRecebido||0)<=(ultimoPushProprio||0);
+  }
+
+  /* Merge por chave pra mapas tipo {id:valor} vindos de doc compartilhado
+     (pessoas/tokens/etqConfig do ls_pe_tokens): o SERVIDOR ganha em cada
+     chave que os dois têm (é a fonte compartilhada entre todo mundo), mas uma
+     chave que só existe no lado local (ainda não confirmada pelo servidor —
+     ex.: criada offline ou nesta mesma sessão) NUNCA é apagada por essa junção.
+     Corrige o Object.assign({},remoto,local) que existia antes: ali a ordem
+     colocava o local por último, então um cache velho sempre vencia o que
+     estava atualizado no servidor. */
+  function mergePreferindoServidor(local,remoto){
+    return Object.assign({},local||{},remoto||{});
+  }
+
   var PECore={
     peDiffMapas:peDiffMapas,
     peTotaisOrdens:peTotaisOrdens,
@@ -171,7 +204,10 @@
     aplicarProducao:aplicarProducao,
     aplicarLotePronto:aplicarLotePronto,
     aplicarRecebimento:aplicarRecebimento,
-    devePularRenderFabrica:devePularRenderFabrica
+    devePularRenderFabrica:devePularRenderFabrica,
+    deveGravarNaInicializacao:deveGravarNaInicializacao,
+    deveIgnorarSnapshotProprio:deveIgnorarSnapshotProprio,
+    mergePreferindoServidor:mergePreferindoServidor
   };
 
   if(typeof module!=='undefined'&&module.exports) module.exports=PECore;

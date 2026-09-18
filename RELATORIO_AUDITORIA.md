@@ -157,20 +157,83 @@ original era aplicar lotes vencidos automaticamente (a função existe e faz exa
 isso), falta ligá-la a algo — um `setInterval` (o padrão já existe no arquivo, ver
 `checar()` em 11315) ou um botão manual.
 
-### M2. Pacotes de config "1 doc pra vários campos" fora do módulo pronta-entrega
-Grep de `.set(` sem `merge:true` achou vários dentro de `renderFinanceiro`, consertos,
-conferências, catálogo. Na maioria são docs 1-por-registro (`ls_fin_entradas/{id}`,
-`ls_consertos/{id}`) — cada doc representa 1 lançamento e só é editado por quem abre o
-modal daquele lançamento; overwrite total é o comportamento certo aí, risco baixo.
-Achei também alguns "pacotes" (`_fRef`, `_pRef`, `_cRef`, `_aRef`, `_rcRef`, `_rfRef`,
-`_gRef`, index.html ~4005-4126) que são configs de loja (fila de etiquetas, favoritos,
-catálogo, avarias, reposição, fotos, grade) editados como blob único — mesmo padrão
-que já causou um bug real e documentado no código (ver comentário em 9688-9692: o
-"pacote misc" de conferências sobrescrevia o histórico de quem salvasse por último, já
-corrigido virando 1-doc-por-conferência). Não tive tempo de confirmar se algum desses
-7 pacotes tem o mesmo risco (múltiplas pessoas editando o mesmo pacote ao mesmo
-tempo) — são tipicamente mexidos só pela Loretto/admin (1 pessoa por vez), risco menor
-que o pronta-entrega (várias fábricas gravando ao mesmo tempo), mas vale uma olhada.
+### M2. Pacotes de config "1 doc pra vários campos" fora do módulo pronta-entrega — **CONFIRMADO em produção pelo Gregory, CORRIGIDO (19/09/2026)**
+Esta sessão anterior só tinha tocado de raspão neste item ("vale uma olhada"). O
+Gregory confirmou em produção os dois sintomas: fotos de um usuário sumindo quando
+outro abre o painel, e cache antigo restaurando acesso/config velhos por cima do
+servidor. Investigação a fundo confirmou o mecanismo exato:
+
+**Causa raiz (2 antipatterns, sempre juntos):** cada um destes "pacotes" grava um
+timestamp (`ts`) no documento Firestore E TAMBÉM guarda uma cópia desse `ts` no
+`localStorage` do aparelho (`loretto_rep_fotos_ts`, `loretto_rep_cfg_ts`,
+`ls_misc_ts`). Ao abrir o painel:
+1. O `onSnapshot` só aceitava a atualização vinda do servidor se `servidor.ts >
+   tsGuardadoNoLocalStorage`. Um aparelho com relógio adiantado (ou que, por
+   qualquer motivo, tenha gravado esse número errado uma vez) passa a IGNORAR
+   PARA SEMPRE as atualizações reais de outros usuários — porque qualquer `ts`
+   novo e real do servidor parece "mais velho" que o número inflado guardado
+   localmente.
+2. Pior: o bootstrap então comparava esse mesmo `ts` do servidor com o do
+   `localStorage` e, se achasse o local "mais novo", **empurrava o bloco inteiro
+   local (`.set()`, sem merge) por cima do documento do servidor** — apagando
+   dados reais que outros usuários tinham acabado de gravar, sem gerar nenhum
+   aviso.
+
+Achei e corrigi **3 instâncias** desse padrão exato:
+- `_rfRef` (`ls_rep_fotos/loja`, index.html ~4109-4120) — **este é o bug das
+  fotos relatado pelo Gregory.**
+- `_rcRef` (`ls_rep_cfg/loja`, index.html ~4088-4108) — config/curva de
+  reposição (fixos, fábrica, custo, referência por cor, catálogo, estoque).
+- `_miscRef`/`miscApplyIfNewer` (`ls_misc/loja`, index.html ~3903-3917) —
+  **achado nesta sessão, não estava no relato do Gregory nem citado no prompt**:
+  o mesmo mecanismo protegia um bundle que inclui `loretto_usuarios` (lista de
+  usuários do painel principal), `loretto_repo_config`/`loretto_repo_estoque`,
+  curvas e catálogo de conferência. Risco pelo menos tão grande quanto o das
+  fotos — um cache velho podia reescrever a lista de usuários do painel inteiro.
+
+Também achei e corrigi um **segundo antipattern**, específico do acesso de
+fábrica (`ls_pe_tokens/loja`, index.html ~5765-5775, relatado como "usuário com
+cache antigo apaga tudo"): `_peAcesso`/`peEtqConfig` eram montados com
+`Object.assign({}, remoto, local)` — o LOCAL por último, então vencia o
+servidor em qualquer chave conflitante — e esse resultado (já contaminado pelo
+cache velho) era regravado no servidor incondicionalmente TODA VEZ que a loja
+abria o painel, mesmo quando o doc do servidor já tinha dados bons. Corrigido
+invertendo a ordem do merge (servidor ganha, mesmo padrão que `_peTokens` já
+usava corretamente) e travando a regravação pra só acontecer quando o doc do
+servidor ainda não existe (migração de verdade, primeira vez).
+
+**Não são o mesmo antipattern (auditados e considerados seguros):** `_fRef`
+(fila de etiquetas), `_pRef` (favoritos) e `_cRef` (catálogo) — os três já
+faziam bootstrap só com `if(!snp.exists)`, sem depender de nenhum `ts` do
+localStorage. `_gRef` (grade por usuário, um doc por pessoa) também já usava
+só um guard em memória (`_gLastPush`) pra ignorar o eco do próprio push, nunca
+um valor do localStorage — correto desde antes desta sessão.
+
+**Fix aplicado** (mesma filosofia em todos os 4 pontos, ver `pe-core.js`:
+`PECore.deveGravarNaInicializacao`, `PECore.deveIgnorarSnapshotProprio`,
+`PECore.mergePreferindoServidor`):
+- `onSnapshot` só ignora um update se for o eco do push que a própria aba
+  ACABOU de mandar (comparação em memória, nunca com valor do localStorage).
+- Bootstrap só inicializa/empurra o bloco inteiro quando o doc do servidor
+  **não existe** — nunca por comparação de timestamps.
+- Merge de mapas tipo `{id: valor}` (pessoas/tokens/etqConfig): servidor ganha
+  em toda chave que os dois têm; uma chave só local (edição desta sessão ainda
+  não confirmada, ex. offline) não é apagada.
+- Testes novos em `tests/test_pe.mjs` (7 casos, seção "sync de fotos/acesso não
+  apaga dado de outro usuário").
+
+**O que ficou de fora, documentado mas não mexido:** não implementei merge por
+chave individual (cor a cor) para o conteúdo de `repFotos` em si — o
+`onSnapshot` continua substituindo o mapa inteiro de fotos pelo do servidor
+(fonte da verdade), e o push continua sendo o mapa local inteiro. Isso é
+seguro dado o fix acima (o `onSnapshot` agora sempre recebe e aplica o dado
+mais novo antes de qualquer push local acontecer), mas ainda existe uma janela
+teórica: dois usuários editando fotos de CORES DIFERENTES do MESMO modelo, nos
+poucos segundos entre a abertura do painel e a primeira sincronização, podem
+fazer um sobrescrever a edição do outro (last-write-wins no nível do
+`modeloId`, não da cor). Não vi evidência de que isso já tenha acontecido —
+diferente do bug relatado, que era 100% causado pelo antipattern do `ts` do
+localStorage, já eliminado.
 
 ### M3. `app-ver` sem disciplina automática de bump
 Já era sabido (ver `RELATORIO_ZERAMENTO.md`): `app-ver` ficou parado em `e9` por todos
@@ -243,14 +306,34 @@ usar o padrão modal como referência pra qualquer edição ao vivo nova.
   `index.html` sempre tem algo pra logar quando algo muda). 22 testes, 0 falhas.
 - `node --check` nos 6 blocos `<script>` inline: sem erro de sintaxe.
 
+### Sessão de 19/09/2026 (continuação — M2 confirmado em produção pelo Gregory)
+- `_rfRef` (fotos), `_rcRef` (config reposição), `_miscRef` (bundle misc/usuários):
+  onSnapshot não ignora mais atualizações reais com base num `ts` do
+  `localStorage`; bootstrap não empurra mais o bloco inteiro por cima do
+  servidor com base nesse mesmo `ts` — só inicializa se o doc do servidor não
+  existir (M2, ver detalhe acima).
+- `ls_pe_tokens` (acesso/tokens/etqConfig de fábrica): merge corrigido pra
+  servidor ganhar em conflito (era o local que ganhava); write-back automático
+  no load agora só ocorre se o doc do servidor não existir (era incondicional).
+- `pe-core.js`: 3 funções puras novas (`deveGravarNaInicializacao`,
+  `deveIgnorarSnapshotProprio`, `mergePreferindoServidor`) reunindo a decisão
+  que antes vivia espalhada e duplicada nos 4 pontos acima.
+- `<meta name="app-ver">`: `e11` → `e12`.
+- `tests/test_pe.mjs`: +7 casos novos (seção "sync de fotos/acesso não apaga
+  dado de outro usuário"). 29 testes, 0 falhas.
+- `node --check` nos 6 blocos `<script>` inline: sem erro de sintaxe (repetido
+  após as mudanças desta sessão).
+
 ## O que foi só documentado (arriscado/estrutural, não corrigido)
 
 - C2 (ordens/producao inatingível + render morto)
 - A1 (grid Produzindo desconectada de lotesProducao)
 - A2 (delta calculado fora da transação)
 - M1 (peAplicarLotesProntos sem chamador)
-- M2 (pacotes de config 1-doc-vários-campos fora do pronta-entrega)
 - M4 (duplicação do padrão de diff pro historico)
+- Dentro do próprio M2 (agora corrigido na causa raiz confirmada): o conteúdo
+  de `repFotos` ainda é substituído/empurrado como mapa inteiro (por modeloId),
+  não com merge cor-a-cor — ver justificativa detalhada na seção M2 acima.
 
 ## Mecanismo exato do wipe de `produzindo` às 12:54-12:55 da Manutt
 
