@@ -1,0 +1,166 @@
+// Node puro, sem framework: node tests/test_pe.mjs
+// Cobre a lógica pura extraída em pe-core.js (ver index.html pe*).
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const PECore = require('../pe-core.js');
+
+const DEL = Symbol('delete'); // sentinela de "apagar campo", no lugar de firebase.firestore.FieldValue.delete()
+
+let passou = 0, falhou = 0;
+function teste(nome, fn) {
+  try { fn(); passou++; console.log('  ok  ' + nome); }
+  catch (e) { falhou++; console.log('FALHOU ' + nome + '\n       ' + (e && e.message)); }
+}
+
+console.log('digitação simultânea em 2 abas (montarGravacao)');
+teste('duas abas editando chaves diferentes: as duas sobrevivem', () => {
+  // servidor começa com A=5
+  var servidor = { estoque: { A: 5 }, atualizadoEm: 1000 };
+  // aba 1 via A=5 (mesmo estado) e digita B=10 (chave nova)
+  var baseAba1 = { estoque: { A: 5 }, _syncEm: 1000 };
+  var payloadAba1 = { estoque: { A: 5, B: 10 } };
+  var out1 = PECore.montarGravacao(payloadAba1, baseAba1, servidor, DEL);
+  assert.deepEqual(out1.estoque, { B: 10 }); // só a chave que mudou
+  // aplica no "servidor"
+  servidor = { estoque: { A: 5, B: 10 }, atualizadoEm: 1001 };
+  // aba 2 (mesma visão inicial que a aba 1, NÃO viu o B=10 ainda) digita C=7
+  var baseAba2 = { estoque: { A: 5 }, _syncEm: 1000 };
+  var payloadAba2 = { estoque: { A: 5, C: 7 } };
+  var out2 = PECore.montarGravacao(payloadAba2, baseAba2, servidor, DEL);
+  assert.deepEqual(out2.estoque, { C: 7 }); // não mexe em B, que ela nem viu
+});
+
+teste('aba velha (base desatualizada) não apaga lançamento novo de outra aba', () => {
+  // TCHWM: doc tinha 852 pares lançados por uma aba nova (atualizadoEm recente).
+  // Uma aba velha, com _syncEm de antes desse lançamento, tenta salvar sem
+  // conhecer a chave nova — não pode emitir delete pra ela.
+  var servidorAgora = { estoque: { novo: 852, velho: 3 }, atualizadoEm: 5_000_000 };
+  var baseAbaVelha = { estoque: { velho: 3 }, _syncEm: 1_000_000 }; // sync bem antigo
+  var payloadAbaVelha = { estoque: { velho: 0 } }; // ela apagou o campo "velho" (dela)
+  var out = PECore.montarGravacao(payloadAbaVelha, baseAbaVelha, servidorAgora, DEL);
+  assert.equal(out.estoque.novo, undefined, '"novo" não pode ser tocado, muito menos apagado');
+  assert.equal(out.estoque.velho, 0, 'a edição real da aba velha (o campo que ela via) ainda vale');
+});
+
+teste('aba em dia (_syncEm recente) pode apagar chave que sumiu da sua visão', () => {
+  var servidor = { estoque: { A: 5 }, atualizadoEm: 1000 };
+  var base = { estoque: { A: 5, B: 3 }, _syncEm: 1000 }; // ela via A e B
+  var payload = { estoque: { A: 5 } }; // e agora só manda A: B zerou (dirty apagou)
+  var out = PECore.montarGravacao(payload, base, servidor, DEL);
+  assert.equal(out.estoque.B, DEL);
+});
+
+console.log('re-render durante digitação (devePularRenderFabrica)');
+teste('pula render com campo da grade focado', () => {
+  assert.equal(PECore.devePularRenderFabrica(true, false), true);
+});
+teste('pula render com dirty pendente mesmo sem foco (ex.: stepper +/-)', () => {
+  assert.equal(PECore.devePularRenderFabrica(false, true), true);
+});
+teste('renderiza normalmente quando não tem foco nem dirty pendente', () => {
+  assert.equal(PECore.devePularRenderFabrica(false, false), false);
+});
+
+console.log('lote registrado → produzindo populado (aplicarProducao)');
+teste('colocar grade em produção soma em produzindo e cria o lote', () => {
+  var atual = { produzindo: { 'x|Preto|38': 2 } };
+  var r = PECore.aplicarProducao(atual, {}, { 'x|Preto|38': 10, 'x|Preto|39': 5 }, { nome: 'Lote A' }, 'Manutt', 1_700_000);
+  assert.deepEqual(r.produzindo, { 'x|Preto|38': 12, 'x|Preto|39': 5 });
+  assert.equal(r.lotesProducao.length, 1);
+  assert.equal(r.lotesProducao[0].aplicado, false);
+  assert.deepEqual(r.lotesProducao[0].grade, { 'x|Preto|38': 10, 'x|Preto|39': 5 });
+});
+teste('lote pronto tira de produzindo e soma em estoque', () => {
+  var prod = PECore.aplicarProducao({}, {}, { 'x|Preto|38': 10 }, {}, 'q', 1);
+  var loteId = prod.lotesProducao[0].id;
+  var r = PECore.aplicarLotePronto({ estoque: { 'x|Preto|38': 3 }, produzindo: prod.produzindo, lotesProducao: prod.lotesProducao }, {}, loteId, 2);
+  assert.equal(r.estoque['x|Preto|38'], 13);
+  assert.equal(r.produzindo['x|Preto|38'], undefined);
+  assert.equal(r.lotesProducao[0].aplicado, true);
+});
+teste('marcar lote já aplicado como pronto de novo não faz nada (idempotente)', () => {
+  var prod = PECore.aplicarProducao({}, {}, { k: 1 }, {}, 'q', 1);
+  var loteId = prod.lotesProducao[0].id;
+  var r1 = PECore.aplicarLotePronto({ produzindo: prod.produzindo, lotesProducao: prod.lotesProducao }, {}, loteId, 2);
+  var r2 = PECore.aplicarLotePronto({ produzindo: r1.produzindo, lotesProducao: r1.lotesProducao }, {}, loteId, 3);
+  assert.equal(r2, null);
+});
+
+console.log('recebimento parcial (aplicarRecebimento)');
+teste('recebe parte do lote: resto continua em produzindo', () => {
+  var prod = PECore.aplicarProducao({}, {}, { 'x|Preto|38': 10 }, {}, 'q', 1);
+  var loteId = prod.lotesProducao[0].id;
+  var doc = { estoque: {}, produzindo: prod.produzindo, lotesProducao: prod.lotesProducao };
+  var r = PECore.aplicarRecebimento(doc, {}, loteId, { 'x|Preto|38': 4 }, 'entrada', 'Manutt', 2);
+  assert.equal(r.estoque['x|Preto|38'], 4);
+  assert.equal(r.produzindo['x|Preto|38'], 6);
+  assert.equal(r.faltaTot, 6);
+  var lote = r.lotesProducao.find(l => l.id === loteId);
+  assert.equal(lote.aplicado, false); // ainda falta, não fecha sozinho
+});
+teste('fechar lote com sobra desiste do que falta (não fica represado)', () => {
+  var prod = PECore.aplicarProducao({}, {}, { 'x|Preto|38': 10 }, {}, 'q', 1);
+  var loteId = prod.lotesProducao[0].id;
+  var doc = { estoque: {}, produzindo: prod.produzindo, lotesProducao: prod.lotesProducao };
+  var r = PECore.aplicarRecebimento(doc, {}, loteId, { 'x|Preto|38': 4 }, 'fechar', 'Manutt', 2);
+  assert.equal(r.estoque['x|Preto|38'], 4);
+  assert.equal(r.produzindo['x|Preto|38'], undefined, 'fechar não deixa resíduo em produzindo');
+  var lote = r.lotesProducao.find(l => l.id === loteId);
+  assert.equal(lote.aplicado, true);
+  assert.equal(lote.finalizadoParcial, true);
+  assert.deepEqual(lote.faltou, { 'x|Preto|38': 6 });
+});
+teste('receber tudo de uma vez fecha o lote automaticamente', () => {
+  var prod = PECore.aplicarProducao({}, {}, { 'x|Preto|38': 10 }, {}, 'q', 1);
+  var loteId = prod.lotesProducao[0].id;
+  var doc = { estoque: {}, produzindo: prod.produzindo, lotesProducao: prod.lotesProducao };
+  var r = PECore.aplicarRecebimento(doc, {}, loteId, { 'x|Preto|38': 10 }, 'entrada', 'Manutt', 2);
+  var lote = r.lotesProducao.find(l => l.id === loteId);
+  assert.equal(lote.aplicado, true);
+  assert.equal(lote.finalizadoParcial, undefined);
+});
+
+console.log('write-back do doc legado (mergeLegado)');
+teste('doc principal vazio, legado com dados: migra e AUTORIZA gravar de volta', () => {
+  var d = {};
+  var dl = { estoque: { A: 5 }, produzindo: {}, meta: {} };
+  var r = PECore.mergeLegado(d, dl);
+  assert.deepEqual(r.merged.estoque, { A: 5 });
+  assert.equal(r.deveGravarLegado, true);
+});
+teste('doc principal já tem dados novos: NUNCA regrava por cima (incidente 17/09/2026)', () => {
+  var d = { estoque: { A: 852 } }; // lançamento novo, real
+  var dl = { estoque: { A: 3 } };  // doc legado, velho
+  var r = PECore.mergeLegado(d, dl);
+  assert.deepEqual(r.merged.estoque, { A: 852 }, 'usa o principal, não o legado');
+  assert.equal(r.deveGravarLegado, false, 'não pode regravar — apagaria os 852 pares');
+});
+teste('nenhum dos dois tem dados: não tenta migrar nada', () => {
+  var r = PECore.mergeLegado({}, {});
+  assert.equal(r.deveGravarLegado, false);
+});
+
+console.log('funções auxiliares (peTotaisOrdens / peMigraOrdens / peDiffMapas)');
+teste('peTotaisOrdens soma só pedido e producao, ignora outros status', () => {
+  var t = PECore.peTotaisOrdens([
+    { status: 'pedido', grade: { A: 2 } },
+    { status: 'producao', grade: { A: 3 } },
+    { status: 'enviado', grade: { A: 100 } },
+  ]);
+  assert.deepEqual(t.pedido, { A: 2 });
+  assert.deepEqual(t.produzindo, { A: 3 });
+});
+teste('peMigraOrdens cria ordem migrada só quando tem pedido/produzindo de verdade', () => {
+  var ordens = PECore.peMigraOrdens({ pedido: { A: 1 }, produzindo: {} });
+  assert.equal(ordens.length, 1);
+  assert.equal(ordens[0].status, 'pedido');
+});
+teste('peDiffMapas só lista o que mudou', () => {
+  var out = PECore.peDiffMapas({ A: 5, B: 2 }, { A: 5, B: 3, C: 1 });
+  var labels = out.map(x => x.label).sort();
+  assert.deepEqual(labels, ['B', 'C']);
+});
+
+console.log('\n' + passou + ' passaram, ' + falhou + ' falharam');
+process.exit(falhou ? 1 : 0);
