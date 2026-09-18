@@ -162,5 +162,45 @@ teste('peDiffMapas só lista o que mudou', () => {
   assert.deepEqual(labels, ['B', 'C']);
 });
 
+console.log('toda mudança de produzindo/estoque gera diff pro historico (incidente 18/09/2026 — Manutt)');
+// pe-core.js não mexe em Firestore; index.html usa peDiffMapas(antes,depois) pra montar a
+// entrada de historico antes de cada _peGravaDelta. Estes testes garantem que as funções
+// puras que mudam estoque/produzindo sempre produzem um diff não-vazio — ou seja, que o
+// ponto de gravação em index.html (peConfirmarProduzir, peLotePronto, _peReceberAplicar,
+// peExcluirLote, peSalvarLote) sempre tem algo pra logar quando algo realmente mudou.
+// Isso é o que faltava no incidente: várias dessas funções gravavam no Firestore sem
+// passar pelo historico (delete silencioso).
+teste('colocar em produção (peConfirmarProduzir) sempre deixa rastro no historico', () => {
+  var antesProd = {};
+  var r = PECore.aplicarProducao({ produzindo: antesProd }, {}, { 'x|Preto|38': 37 }, {}, 'Manutt', 1);
+  var mud = PECore.peDiffMapas(antesProd, r.produzindo);
+  assert.equal(mud.length, 1);
+  assert.deepEqual(mud[0], { label: 'x|Preto|38', de: 0, para: 37 });
+});
+teste('lote pronto (peLotePronto) sempre deixa rastro no historico', () => {
+  var prod = PECore.aplicarProducao({}, {}, { 'x|Preto|38': 10 }, {}, 'q', 1);
+  var antes = { estoque: {}, produzindo: prod.produzindo, lotesProducao: prod.lotesProducao };
+  var r = PECore.aplicarLotePronto(antes, {}, prod.lotesProducao[0].id, 2);
+  var mud = PECore.peDiffMapas(antes.estoque, r.estoque).concat(PECore.peDiffMapas(antes.produzindo, r.produzindo));
+  assert.equal(mud.length, 2, 'estoque subiu e produzindo desceu — duas mudanças');
+});
+teste('recebimento de lote (_peReceberAplicar) sempre deixa rastro no historico', () => {
+  var prod = PECore.aplicarProducao({}, {}, { 'x|Preto|38': 10 }, {}, 'q', 1);
+  var antes = { estoque: {}, produzindo: prod.produzindo, lotesProducao: prod.lotesProducao };
+  var r = PECore.aplicarRecebimento(antes, {}, prod.lotesProducao[0].id, { 'x|Preto|38': 4 }, 'entrada', 'Manutt', 2);
+  var mud = PECore.peDiffMapas(antes.estoque, r.estoque).concat(PECore.peDiffMapas(antes.produzindo, r.produzindo));
+  assert.equal(mud.length, 2);
+});
+teste('excluir lote não aplicado devolve pra produzindo (0 → sem chave não conta como mudança fantasma)', () => {
+  var prod = PECore.aplicarProducao({}, {}, { 'x|Preto|38': 10 }, {}, 'q', 1);
+  var antesProd = prod.produzindo;
+  // simula peExcluirLote: tira a grade do lote de produzindo (não estava aplicado)
+  var depoisProd = Object.assign({}, antesProd);
+  delete depoisProd['x|Preto|38'];
+  var mud = PECore.peDiffMapas({}, {}).concat(PECore.peDiffMapas(antesProd, depoisProd));
+  assert.equal(mud.length, 1);
+  assert.deepEqual(mud[0], { label: 'x|Preto|38', de: 10, para: 0 });
+});
+
 console.log('\n' + passou + ' passaram, ' + falhou + ' falharam');
 process.exit(falhou ? 1 : 0);
