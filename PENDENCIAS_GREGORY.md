@@ -1,3 +1,17 @@
+# Pendências — gate de versão total 22/09/2026
+
+- [ ] **Firestore Security Rules**: o gate de versão total implementado hoje
+      (overlay bloqueante + fechamento dos 3 caminhos de escrita que
+      bypassavam `_peGravaDelta`) é 100% do lado do cliente (JS no navegador).
+      Alguém que abrisse o DevTools e chamasse o SDK do Firestore direto no
+      console ainda conseguiria escrever em `ls_pe` sem passar pelo gate —
+      isso só se fecha de verdade com regras do lado do servidor (Firestore
+      Security Rules, ex.: exigir que toda escrita em `ls_pe/{doc}` traga um
+      `appVerMin` >= o que já está salvo). Não mexi nas rules porque não
+      tenho acesso a elas neste ambiente (não tem arquivo `firestore.rules`
+      no repo) — precisa ser feito direto no console do Firebase. Ver
+      `RELATORIO_GATE_TOTAL_22SET.md`.
+
 # Pendências — restauração TCHWM 22/09/2026
 
 Gravei no Firebase (`ls_pe/tchwm-industria-e-comercio-de-calcados-ltda`, campo

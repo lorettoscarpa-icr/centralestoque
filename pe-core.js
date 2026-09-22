@@ -210,6 +210,17 @@
     return parseAppVer(versaoLocal)<parseAppVer(appVerMin);
   }
 
+  /* GATE TOTAL DE UI (incidente 22/09/2026: Manutt zerada de novo, sem log —
+     o gate de escrita sozinho não bastava, aba velha continuava livre pra
+     navegar/digitar). Mesma comparação de versaoBloqueiaEscrita, mas só
+     trava a tela quando a leitura do appVerMin no Firestore deu certo —
+     offline/erro de rede NUNCA bloqueia o uso, só degrada pro gate de
+     escrita (comportamento antigo, já existente em _peGravaDelta). */
+  function deveMostrarGateTotal(appVerMin,versaoLocal,leituraOk){
+    if(!leituraOk) return false;
+    return versaoBloqueiaEscrita(appVerMin,versaoLocal);
+  }
+
   var PECore={
     peDiffMapas:peDiffMapas,
     peTotaisOrdens:peTotaisOrdens,
@@ -226,7 +237,8 @@
     deveIgnorarSnapshotProprio:deveIgnorarSnapshotProprio,
     mergePreferindoServidor:mergePreferindoServidor,
     parseAppVer:parseAppVer,
-    versaoBloqueiaEscrita:versaoBloqueiaEscrita
+    versaoBloqueiaEscrita:versaoBloqueiaEscrita,
+    deveMostrarGateTotal:deveMostrarGateTotal
   };
 
   if(typeof module!=='undefined'&&module.exports) module.exports=PECore;

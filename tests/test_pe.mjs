@@ -269,5 +269,20 @@ teste('parseAppVer extrai o número de "eNN"', () => {
   assert.equal(PECore.parseAppVer(undefined), 0);
 });
 
+console.log('gate TOTAL de UI (incidente 22/09/2026: Manutt zerada de novo, sem log no historico)');
+teste('leitura do appVerMin deu certo e versão local está atrás -> trava a tela', () => {
+  assert.equal(PECore.deveMostrarGateTotal('e14', 'e13', true), true);
+  assert.equal(PECore.deveMostrarGateTotal('e14', 'e9', true), true);
+});
+teste('leitura deu certo e versão local está em dia -> não trava', () => {
+  assert.equal(PECore.deveMostrarGateTotal('e14', 'e14', true), false);
+  assert.equal(PECore.deveMostrarGateTotal('e14', 'e15', true), false);
+  assert.equal(PECore.deveMostrarGateTotal(undefined, 'e1', true), false);
+});
+teste('leitura do appVerMin FALHOU (offline/erro) -> nunca trava, mesmo com versão velha', () => {
+  assert.equal(PECore.deveMostrarGateTotal('e14', 'e13', false), false);
+  assert.equal(PECore.deveMostrarGateTotal('e14', 'e1', false), false);
+});
+
 console.log('\n' + passou + ' passaram, ' + falhou + ' falharam');
 process.exit(falhou ? 1 : 0);
