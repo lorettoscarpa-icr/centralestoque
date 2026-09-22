@@ -110,3 +110,21 @@ depois da edição.
 ## Publicação
 
 Commit + push feito; GitHub Pages publica a versão `e13` automaticamente.
+
+
+## Fechamento (Lia, 22/09 tarde — decisões do Gregory)
+
+Gregory confirmou os mapeamentos que faltavam:
+- **19005 = Derby Moscow / 19002 = Loafer Moscow** ("o Tokio é o Moscow"; a grade
+  do 19005 Allblack bateu 100% com o último Derby Moscow All Black do histórico).
+- **26007 "Florida" = Loafer Grécia** (modelo criado no meta, Preto/Mouro 37-44).
+- **500 = Derby Lisboa / 501 = Loafer Lisboa** (modelos criados no meta).
+
+Gravações complementares (mesmo rito: transação, delta, histórico, releitura):
+- Tokio→Moscow: 32 chaves / 292 pares ✓
+- Loafer Grécia: 10 chaves / 28 pares (+16 chaves de meta) ✓
+- Lisboa: 32 chaves / 214 pares (+32 chaves de meta) ✓
+
+**RESULTADO FINAL: estoque TCHWM = 1.000 pares / 122 chaves — bate 100% com a
+planilha do Gregory.** Histórico com 568 entradas (564 originais + 4 restaurações).
+Vigia anti-zeramento ativo (cron 164ab6d9dae6, 15min, 48h).
