@@ -78,3 +78,16 @@ avisar.
 Milano, Katar). 534 pares (Tokio 292, Florida 28, 500/501 214) ficaram de fora
 à espera de confirmação — ver checklist acima. Nada foi inventado nem
 aproximado.
+
+- [x] [gate-versao] BUG visto pelo Gregory 22/09 ~16h: loop "atualizar infinito" logo apos deploy — o botao ATUALIZAR recarrega mas o cache do GitHub Pages (max-age=600) devolve a versao antiga por ate 10min, e o overlay reaparece. RESOLVIDO nesta sessão (22/09, e16): `atualizar()` agora recarrega com `location.href=location.pathname+'?v='+Date.now()` (cache-buster), nunca `location.reload()` puro. O appVerMin=e16 só foi gravado no Firestore depois de confirmar via `curl` que o Pages já servia `app-ver` e16 — ver `CACA_FANTASMA_22SET.md`.
+
+# Pendências — escrita fantasma (CAÇA_FANTASMA) 22/09/2026
+
+- [x] **Causa raiz encontrada e corrigida** (e16): `montarGravacao` (pe-core.js)
+      mandava `{}` pro Firestore quando um mapa (estoque/produzindo/meta) não
+      tinha nenhuma edição na sessão — e `set(...,{merge:true})` com um mapa
+      vazio ZERA o campo inteiro no servidor (não tem como o Firestore gerar
+      uma field mask de um objeto sem chaves). Como `peFabSalvar` sempre manda
+      estoque+produzindo juntos, editar só um dos dois zerava o outro, sem
+      historico (o diff também dava vazio). Ver `CACA_FANTASMA_22SET.md` pra
+      prova, reprodução e fix completos.

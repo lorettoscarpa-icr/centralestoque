@@ -99,6 +99,63 @@ teste('replay não desfaz o que outra aba gravou numa chave diferente enquanto a
   assert.equal(out.estoque.C, undefined, 'C (de outra aba) não é tocado pelo replay');
 });
 
+console.log('escrita fantasma (incidente 22/09/2026 — Manutt): campo sem diff não pode zerar o mapa inteiro');
+teste('peFabSalvar edita só ESTOQUE: produzindo intocado não entra na gravação (nem como {})', () => {
+  // Reproduz exatamente o payload que peFabSalvar manda: estoque+produzindo
+  // JUNTOS (mapas completos), mesmo quando só um dos dois foi editado. A
+  // fábrica tinha 356 pares reais em produzindo, ninguém mexeu neles.
+  var prodReal = { 'a|Preto|37': 100, 'a|Preto|38': 120, 'a|Preto|39': 136 };
+  var servidor = { estoque: { x: 1 }, produzindo: prodReal, atualizadoEm: 1000 };
+  var base = { estoque: { x: 1 }, produzindo: prodReal, _syncEm: 1000 };
+  var payload = { estoque: { x: 1, y: 5 }, produzindo: prodReal }; // só "y" é novo, em estoque
+  var out = PECore.montarGravacao(payload, base, servidor, DEL);
+  assert.deepEqual(out.estoque, { y: 5 });
+  assert.equal('produzindo' in out, false, 'produzindo não pode aparecer no set() — nem como {} (Firestore merge:true trataria {} como "zera o mapa inteiro")');
+});
+teste('peFabSalvar edita só PRODUZINDO: estoque intocado não entra na gravação', () => {
+  var estReal = { 'a|Preto|37': 40, 'a|Preto|38': 60 };
+  var servidor = { estoque: estReal, produzindo: { z: 1 }, atualizadoEm: 1000 };
+  var base = { estoque: estReal, produzindo: { z: 1 }, _syncEm: 1000 };
+  var payload = { estoque: estReal, produzindo: { z: 1, w: 9 } };
+  var out = PECore.montarGravacao(payload, base, servidor, DEL);
+  assert.deepEqual(out.produzindo, { w: 9 });
+  assert.equal('estoque' in out, false);
+});
+teste('nada mudou em nenhum mapa: gravação não manda estoque/produzindo/meta de jeito nenhum', () => {
+  var servidor = { estoque: { a: 1 }, produzindo: { b: 2 }, meta: { c: 3 }, atualizadoEm: 1000 };
+  var base = { estoque: { a: 1 }, produzindo: { b: 2 }, meta: { c: 3 }, _syncEm: 1000 };
+  var payload = { estoque: { a: 1 }, produzindo: { b: 2 }, meta: { c: 3 }, lorettoEm: 5000 };
+  var out = PECore.montarGravacao(payload, base, servidor, DEL);
+  assert.deepEqual(out, { lorettoEm: 5000 });
+});
+
+console.log('guard-rail: deleção em massa de um mapa aborta a gravação (pedido Gregory 22/09/2026)');
+teste('apagar >30% das chaves não-zero de um mapa de uma vez lança erro e não grava nada', () => {
+  var prodReal = {}; for (var i = 0; i < 10; i++) prodReal['k' + i] = 10 + i; // 10 chaves não-zero
+  var servidor = { produzindo: prodReal, atualizadoEm: 1000 };
+  var base = { produzindo: prodReal, _syncEm: 1000 }; // aba em dia — pode gerar delete
+  var payload = { produzindo: { k0: 10, k1: 11, k2: 12 } }; // sumiram 7 de 10 chaves (70%)
+  assert.throws(() => PECore.montarGravacao(payload, base, servidor, DEL), function(e) {
+    return e.code === 'delecao-suspeita';
+  });
+});
+teste('apagar poucas chaves (edição real, abaixo de 30%) passa normalmente', () => {
+  var prodReal = {}; for (var i = 0; i < 10; i++) prodReal['k' + i] = 10 + i;
+  var servidor = { produzindo: prodReal, atualizadoEm: 1000 };
+  var base = { produzindo: prodReal, _syncEm: 1000 };
+  var payload = Object.assign({}, prodReal); delete payload.k9; // 1 de 10 (10%)
+  var out = PECore.montarGravacao({ produzindo: payload }, base, servidor, DEL);
+  assert.equal(out.produzindo.k9, DEL);
+});
+teste('mapa pequeno (menos de 5 chaves não-zero) não aciona o guard-rail mesmo apagando tudo', () => {
+  // evita falso-positivo em fábricas pequenas/começando: exclusão legítima de
+  // um lote pequeno não pode ficar bloqueada pelo guard-rail.
+  var base = { produzindo: { a: 1, b: 2 }, _syncEm: 1000 };
+  var servidor = { produzindo: { a: 1, b: 2 }, atualizadoEm: 1000 };
+  var out = PECore.montarGravacao({ produzindo: {} }, base, servidor, DEL);
+  assert.deepEqual(out.produzindo, { a: DEL, b: DEL });
+});
+
 console.log('re-render durante digitação (devePularRenderFabrica)');
 teste('pula render com campo da grade focado', () => {
   assert.equal(PECore.devePularRenderFabrica(true, false), true);

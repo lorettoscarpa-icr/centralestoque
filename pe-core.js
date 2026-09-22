@@ -59,7 +59,21 @@
      Se outra aba/dispositivo atualizou depois do último sync desta tela, os deletes
      são descartados — nunca apaga dado que esta tela nem chegou a ver. Os SETS de
      valor não têm essa restrição porque só existem para chaves que esta sessão
-     realmente editou (dirty), então nunca pisam em chave alheia. */
+     realmente editou (dirty), então nunca pisam em chave alheia.
+     GHOST BUG (achado 22/09/2026 — 3º zeramento do dia, produzindo sumindo sem
+     historico enquanto a fábrica digitava estoque normalmente): quando um campo
+     mapa (estoque/produzindo/meta) não teve NENHUMA mudança nesta gravação,
+     deltaCampo devolve {} — e {} é exatamente o valor que acaba sendo mandado
+     quando "nada mudou aqui". O problema é que o Firestore, num
+     set(...,{merge:true}), não tem como gerar uma "field mask" a partir de um
+     objeto sem chaves — ele trata o CAMPO INTEIRO como a unidade a mesclar e
+     SUBSTITUI o mapa inteiro do servidor por {} (apaga tudo). Como o
+     peFabSalvar sempre manda estoque+produzindo juntos mesmo quando só um dos
+     dois foi editado, TODA gravação de estoque sozinha zerava produzindo (e
+     vice-versa) — sem log, porque o diff pro historico também dava vazio.
+     Por isso: nunca incluir no objeto final um campo cujo delta ficou vazio —
+     omitir a chave inteira faz o merge do Firestore simplesmente não tocar
+     nela, que é o comportamento certo pra "nada mudou". */
   function montarGravacao(payload,base,atual,DEL){
     payload=payload||{};base=base||{};atual=atual||{};
     var baseSync=base._syncEm||0;
@@ -67,7 +81,21 @@
     var out={};
     Object.keys(payload).forEach(function(campo){
       if(campo==='estoque'||campo==='produzindo'||campo==='meta'){
-        out[campo]=deltaCampo(base[campo],payload[campo],podeDel?DEL:null);
+        var d=deltaCampo(base[campo],payload[campo],podeDel?DEL:null);
+        if(!Object.keys(d).length) return; // nada mudou nesse campo — não manda a chave (ver GHOST BUG acima)
+        /* GUARD-RAIL (pedido Gregory 22/09/2026): mesmo com o fix acima, se
+           algum caminho futuro gerar um delete em massa de um mapa, aborta em
+           vez de deixar passar — isso teria parado os zeramentos de hoje
+           mesmo sem saber a causa exata. */
+        var baseCampo=base[campo]||{};
+        var baseNaoZero=Object.keys(baseCampo).filter(function(k){return (parseInt(baseCampo[k],10)||0)!==0;});
+        var dels=Object.keys(d).filter(function(k){return d[k]===DEL;}).length;
+        if(baseNaoZero.length>=5 && dels>baseNaoZero.length*0.3){
+          var err=new Error('Gravação bloqueada: apagaria '+dels+' de '+baseNaoZero.length+' chaves de "'+campo+'" de uma vez — parece bug, não edição real.');
+          err.code='delecao-suspeita';
+          throw err;
+        }
+        out[campo]=d;
       } else out[campo]=payload[campo];
     });
     return out;
