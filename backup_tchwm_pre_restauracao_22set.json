@@ -1,0 +1,7269 @@
+{
+  "lorettoPor": "Ana flora",
+  "etqLayout": {
+    "numB": true,
+    "leao": 0.31,
+    "font": "'DM Mono', monospace",
+    "bcHeight": 33,
+    "szBox": 0.9,
+    "corB": true,
+    "bcHt": 0.3,
+    "bcAlign": "center",
+    "num": 0.38,
+    "nomeSz": 0.09,
+    "ref": 0.135,
+    "nomeB": true,
+    "szAlign": "center",
+    "bcW": 100
+  },
+  "produzindo": {},
+  "lotesProducao": [],
+  "ordens": [
+    {
+      "repoId": "p1782241768349",
+      "grade": {
+        "derby moscow|Mouro|41": 2,
+        "sneaker milao|All Black|40": 7,
+        "derby moscow|Mouro|39": 3,
+        "loafer moscow|All Black|37": 1,
+        "loafer paris fivela|Mouro|37": 2,
+        "sneaker milao|All Black|43": 3,
+        "loafer moscow|All Black|39": 1,
+        "loafer paris fivela|Mouro|41": 1,
+        "sneaker milao|All White|41": 7,
+        "loafer paris fivela|Mouro|39": 1,
+        "sneaker milao|All Black|38": 4,
+        "derby moscow|All Black|40": 5,
+        "derby moscow|All Black|44": 1,
+        "sneaker milao|All Black|37": 3,
+        "sneaker milao|All White|40": 7,
+        "loafer moscow|All Black|40": 2,
+        "derby moscow|Mouro|40": 5,
+        "loafer paris fivela|Preto|41": 2,
+        "derby moscow|All Black|39": 5,
+        "loafer moscow|Mouro|42": 1,
+        "loafer moscow|Mouro|38": 1,
+        "sneaker milao|All White|44": 2,
+        "derby moscow|All Black|38": 3,
+        "sneaker milao|All Black|42": 6,
+        "loafer moscow|All Black|38": 1,
+        "loafer moscow|Mouro|39": 1,
+        "loafer paris fivela|Preto|38": 3,
+        "loafer paris fivela|Mouro|38": 1,
+        "sneaker milao|All White|43": 2,
+        "derby moscow|Mouro|42": 2,
+        "sneaker milao|All White|42": 4,
+        "loafer moscow|All Black|43": 1,
+        "sneaker milao|All White|38": 4,
+        "derby moscow|Mouro|38": 3,
+        "sneaker milao|All White|37": 3,
+        "loafer paris fivela|Preto|39": 3,
+        "derby moscow|All Black|41": 5,
+        "sneaker milao|All Black|41": 7,
+        "sneaker milao|All White|39": 7,
+        "derby moscow|Mouro|37": 1,
+        "derby moscow|All Black|42": 4,
+        "derby moscow|All Black|43": 2,
+        "sneaker milao|All Black|44": 2,
+        "sneaker milao|All Black|39": 7
+      },
+      "producaoEm": 1782407909200,
+      "status": "recebido",
+      "id": "o1782241768349i6n",
+      "criadoEm": 1782241768349,
+      "por": "Edson",
+      "recebidoEm": 1782407934793
+    }
+  ],
+  "historico": [
+    {
+      "ts": 1785245967225,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785245969384,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 2,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785246688801,
+      "tipo": "metas",
+      "por": "Edson",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        },
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785246698035,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785246701859,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 2,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785246703737,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 3,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785248900778,
+      "tipo": "Envios de teste excluídos",
+      "por": "Edson",
+      "mudancas": []
+    },
+    {
+      "ts": 1785250603926,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250604780,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250605931,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Sneaker Milão All White 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250606355,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250607525,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 10,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250608500,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 9,
+          "label": "Sneaker Milão All White 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250609286,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Sneaker Milão All White 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250610058,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 7,
+          "label": "Sneaker Milão All White 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250610554,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250611260,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250611700,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Sneaker Milão All White 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250612723,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250613117,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250613891,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250614300,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250615037,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250616131,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 12,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250616956,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 19,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250617732,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 19,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250618722,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 19,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250619402,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250619805,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250620928,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250621939,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Loafer Paris Fivela Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250622812,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Loafer Paris Fivela Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250623604,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 22,
+          "label": "Loafer Paris Fivela Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250624339,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 12,
+          "label": "Loafer Paris Fivela Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250624892,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Loafer Paris Fivela Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250626132,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 10,
+          "label": "Loafer Paris Fivela Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250626858,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 7,
+          "label": "Loafer Paris Fivela Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250627285,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 7,
+          "label": "Loafer Paris Fivela Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250628274,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Paris Fivela Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250628820,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Loafer Paris Fivela Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250629984,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Loafer Paris Fivela Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250630548,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Loafer Paris Fivela Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250631444,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Loafer Paris Fivela Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250632138,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Loafer Paris Fivela Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250632595,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Loafer Paris Fivela Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250633474,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 12,
+          "label": "Loafer Paris Fivela Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250634314,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 13,
+          "label": "Loafer Paris Fivela Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250635003,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 16,
+          "label": "Loafer Paris Fivela Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250635796,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Loafer Paris Fivela Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250636180,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Loafer Paris Fivela Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250637306,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Paris Fivela Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250637820,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Loafer Paris Fivela Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250638979,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Paris Fivela Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250734222,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Derby Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250734987,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 11,
+          "label": "Derby Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250735898,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Derby Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250736530,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 18,
+          "label": "Derby Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250737227,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 18,
+          "label": "Derby Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250737877,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 16,
+          "label": "Derby Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250738675,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 14,
+          "label": "Derby Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250739308,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 7,
+          "label": "Derby Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250740428,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Derby Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250741003,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Derby Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250741403,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Derby Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250742044,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Derby Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250742764,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Derby Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250743388,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Derby Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250743898,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Derby Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250744722,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Derby Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250745450,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Derby Moscow Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250745834,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Derby Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250746579,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Derby Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250747258,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Derby Moscow Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250748704,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Derby Moscow Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250750029,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 9,
+          "label": "Loafer Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250751164,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 11,
+          "label": "Loafer Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250751635,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Loafer Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250752404,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Loafer Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250752956,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250753556,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Loafer Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250754323,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Loafer Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250755460,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250756178,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250757083,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Loafer Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250758201,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Loafer Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250759371,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250808066,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250808634,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Loafer Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250809994,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250810859,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250811484,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 9,
+          "label": "Loafer Moscow Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250812133,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Loafer Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250813146,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 9,
+          "label": "Loafer Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250813898,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Loafer Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250814289,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250814898,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250815666,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250816890,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250818881,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Loafer Katar Gravata Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250819674,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Loafer Katar Gravata Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250820298,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Loafer Katar Gravata Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250820610,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Loafer Katar Gravata Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250821309,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Loafer Katar Gravata Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250822415,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Katar Gravata Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250823258,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Loafer Katar Gravata Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250824369,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Loafer Katar Gravata Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250824730,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Loafer Katar Gravata Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250825259,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Loafer Katar Gravata Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250825587,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 9,
+          "label": "Loafer Katar Gravata Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250826108,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Loafer Katar Gravata Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250826433,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Loafer Katar Gravata Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250827162,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 7,
+          "label": "Loafer Katar Gravata Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250827515,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Loafer Katar Gravata Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250828209,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 7,
+          "label": "Loafer Katar Gravata Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785250829028,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Loafer Katar Gravata Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785250830171,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Loafer Katar Gravata Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785250894489,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785250897458,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Sneaker Milão All White 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785250904073,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785250918576,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Sneaker Milão All White 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785250920259,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Sneaker Milão All White 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785250924019,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Sneaker Milão All White 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251063257,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All White 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251064386,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All White 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251068252,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251071201,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All White 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251075442,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All White 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251077640,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 3,
+          "label": "Sneaker Milão All White 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251085033,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Sneaker Milão All White 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251087156,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 6,
+          "label": "Sneaker Milão All White 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251164510,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251165666,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251168855,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251171036,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251173799,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251184000,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 10,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251189332,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 7,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251191521,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 12,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251193581,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251197601,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251374599,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251375456,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251377039,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 18,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251378088,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 18,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251381093,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 18,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251382619,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251384609,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251385512,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251407372,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 26,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251410311,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251411679,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251414162,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251416524,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251419010,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251421096,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251422507,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251424643,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251425882,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251427032,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251429260,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251429921,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251431129,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251442447,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251443175,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251444817,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251445736,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251448088,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251449437,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251450930,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251452130,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251456999,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251458602,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251594202,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 16,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251596999,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 21,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251600240,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251601362,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 28,
+          "de": 2,
+          "label": "Loafer Paris Fivela Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251710638,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251750799,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 34,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251751606,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251794367,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251794993,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Derby Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251797396,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 41,
+          "de": 0,
+          "label": "Derby Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251799000,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 41,
+          "label": "Derby Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251801199,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Derby Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251803040,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251803814,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251805712,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251807420,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Derby Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251809793,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Derby Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251812622,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Derby Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251813630,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251814527,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251819002,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251820286,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Derby Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251822407,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251823181,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Derby Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251836282,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Derby Moscow Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251837063,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Moscow Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251838110,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Derby Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251840494,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Moscow Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251841943,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251844704,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Derby Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251846791,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251848546,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251852663,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Moscow Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251854160,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Moscow Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251856304,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251856808,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251859021,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251859654,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251860812,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251863504,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251865188,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 2,
+          "label": "Derby Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251885837,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251888166,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 6,
+          "label": "Loafer Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251889877,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251892222,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Loafer Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251894253,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251895519,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251897390,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251898383,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 1,
+          "label": "Loafer Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251900150,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251901272,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251903367,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251904006,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251905511,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251905988,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251907878,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251909574,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251910545,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251911709,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251917281,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251919205,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251921375,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251922876,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251924695,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251926648,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251928030,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251929203,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251931550,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251932342,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251933735,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251934405,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785251936893,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785251938284,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785251939453,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785251940642,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785251994673,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785251995640,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785251997564,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785251998261,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785252000961,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785252001693,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252004553,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785252006359,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Dubai All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785252008220,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Dubai All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785252009519,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Dubai All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785252011357,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Dubai All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785252013894,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 14,
+          "de": 0,
+          "label": "Loafer Dubai All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785252015950,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Dubai All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252017162,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Dubai All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785252023430,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai Castor 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785252025333,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Dubai Castor 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785252026038,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Dubai Castor 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785252028324,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Loafer Dubai Castor 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785252029880,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 15,
+          "de": 0,
+          "label": "Loafer Dubai Castor 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785252031356,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 15,
+          "de": 0,
+          "label": "Loafer Dubai Castor 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785252034895,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Dubai Castor 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252036150,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Dubai Castor 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785252036781,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Dubai Castor 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785252066188,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785252068216,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785252070900,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785252072780,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785252075132,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785252077313,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252083412,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785252084182,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785252086151,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785252086597,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785252087781,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785252089287,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252090480,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785252091710,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785252093715,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 2,
+          "label": "Loafer Katar Gravata Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252123583,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1785252125526,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1785252127109,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785252127560,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785252128715,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785252130373,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252131474,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1785252132587,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1785252137571,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1785252138686,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1785252140047,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1785252141309,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 55,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252142450,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 55,
+          "label": "Loafer Katar Gravata Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1785252143685,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1787167871856,
+      "tipo": "metas",
+      "por": "Yuri",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 4,
+          "label": "Sneaker Milão All Black 43"
+        },
+        {
+          "para": 9,
+          "de": 6,
+          "label": "Sneaker Milão All Black 37"
+        },
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Sneaker Milão All White 37"
+        },
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Sneaker Milão All White 38"
+        },
+        {
+          "para": 21,
+          "de": 0,
+          "label": "Sneaker Milão All White 39"
+        },
+        {
+          "para": 21,
+          "de": 0,
+          "label": "Sneaker Milão All White 40"
+        },
+        {
+          "para": 21,
+          "de": 0,
+          "label": "Sneaker Milão All White 41"
+        },
+        {
+          "para": 18,
+          "de": 0,
+          "label": "Sneaker Milão All White 42"
+        },
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Sneaker Milão All White 43"
+        },
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Sneaker Milão All White 44"
+        },
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        },
+        {
+          "para": 21,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        },
+        {
+          "para": 21,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        },
+        {
+          "para": 21,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        },
+        {
+          "para": 18,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789061423030,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 12,
+          "label": "Sneaker Milão All White 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789061424319,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789061425552,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 16,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789061426626,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789061428340,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 13,
+          "label": "Sneaker Milão All White 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789061429082,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Sneaker Milão All White 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789061429701,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 8,
+          "label": "Sneaker Milão All White 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789061430418,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 9,
+          "label": "Sneaker Milão All White 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789061431135,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789061431975,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Sneaker Milão All White 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789061432886,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Sneaker Milão All White 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789061433891,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789061468022,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789061470797,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789061480930,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 21,
+          "de": 7,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789061484123,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 7,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789062209616,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789062214757,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Loafer Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789062215798,
+      "tipo": "estoque/produção",
+      "por": "Marcelo",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789062216916,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 5,
+          "label": "Loafer Moscow All Black 37"
+        },
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789062219451,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 22,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789062224236,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All White 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652518204,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 10,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789652521460,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 1,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789652523323,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 2,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652529193,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 3,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652531610,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 3,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652533620,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 8,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652541147,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 7,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652543111,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789652544388,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 7,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789652558019,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789652565385,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652569406,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652577987,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652583960,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789652663345,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789652671601,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Sneaker Milão All White 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789652672627,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 1,
+          "label": "Sneaker Milão All White 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789652677603,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652679729,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 16,
+          "de": 0,
+          "label": "Sneaker Milão All White 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652682368,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 14,
+          "de": 0,
+          "label": "Sneaker Milão All White 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652684538,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 15,
+          "de": 14,
+          "label": "Sneaker Milão All White 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652688411,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Sneaker Milão All White 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652690909,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Sneaker Milão All White 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789652692406,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All White 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789652696841,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All White 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789652700638,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Sneaker Milão All White 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789652702235,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Sneaker Milão All White 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652703939,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 15,
+          "de": 0,
+          "label": "Sneaker Milão All White 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652705325,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Sneaker Milão All White 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652706617,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Sneaker Milão All White 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652761983,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789652765406,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789652766333,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 15,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652769801,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 33,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652771622,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 31,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652773310,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 15,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652775111,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 41,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789652777933,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Paris Fivela Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789652830865,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789652836812,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789652838773,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 23,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652840563,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652844491,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652846794,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 15,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652848399,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789652857601,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Paris Fivela Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789652875329,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 15,
+          "label": "Loafer Paris Fivela Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652922789,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789652925941,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789652927050,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652928576,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Loafer Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652930176,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Loafer Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652932079,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652933795,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789652934490,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789652943064,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652947273,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652949437,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652952042,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652969425,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789652975433,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789652977114,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789652978696,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789652981392,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789652983230,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789652984580,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653013126,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Derby Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653014794,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Derby Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653016262,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Derby Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653017826,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653019069,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653020475,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653022864,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653328713,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Derby Moscow All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653332307,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653335047,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 17,
+          "de": 0,
+          "label": "Derby Moscow All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653336879,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 19,
+          "de": 0,
+          "label": "Derby Moscow All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653338543,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 23,
+          "de": 0,
+          "label": "Derby Moscow All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653339911,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653342326,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Derby Moscow All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653343522,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653383479,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Moscow Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653389028,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Derby Moscow Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653390600,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Derby Moscow Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653392306,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Derby Moscow Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653393707,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653395439,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653397076,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653397965,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Moscow Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653460678,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai Castor 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653463920,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Dubai Castor 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653465697,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Dubai Castor 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653467092,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai Castor 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653468557,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai Castor 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653470691,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai Castor 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653481367,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Dubai All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653485277,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Dubai All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653487390,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Dubai All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653488510,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653521718,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653524672,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653526343,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653530908,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653533714,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653536239,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653551434,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653553245,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653554503,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653556328,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653557677,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653561787,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653563167,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653568895,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653570055,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653571204,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653572260,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653573110,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653574139,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653609848,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Derby Lisboa Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653613963,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Derby Lisboa Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653615348,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Derby Lisboa Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653616790,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Derby Lisboa Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653618114,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Derby Lisboa Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653619095,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Derby Lisboa Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653620738,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Derby Lisboa Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653622752,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653630503,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653631498,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653632913,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653634298,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653635474,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653636465,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653637417,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653637895,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653652191,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Lisboa Preto 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653652674,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Loafer Lisboa Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653654011,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Loafer Lisboa Preto 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653655378,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Loafer Lisboa Preto 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653656467,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Loafer Lisboa Preto 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653657782,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Loafer Lisboa Preto 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653658826,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Lisboa Preto 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653660384,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Lisboa Preto 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653667665,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653669250,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653671066,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653673027,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653674577,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653677029,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653678205,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789653679438,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653686710,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653692218,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653694149,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653695253,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653695976,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653697993,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653701843,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Lisboa Mouro 44"
+        }
+      ]
+    },
+    {
+      "ts": 1789653712656,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789653714340,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 38"
+        }
+      ]
+    },
+    {
+      "ts": 1789653715116,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 39"
+        }
+      ]
+    },
+    {
+      "ts": 1789653715649,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 40"
+        }
+      ]
+    },
+    {
+      "ts": 1789653716768,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 41"
+        }
+      ]
+    },
+    {
+      "ts": 1789653717486,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789653718713,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 43"
+        }
+      ]
+    },
+    {
+      "ts": 1789663464668,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789663493248,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1789664738359,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1789667768905,
+      "tipo": "restauração do lançamento de 17/09 (sobrescrito por cache antigo)",
+      "por": "Lia (restauração autorizada pelo Gregory)",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 37"
+        },
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 38"
+        },
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 39"
+        },
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 40"
+        },
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 41"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 42"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 43"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Mouro 44"
+        },
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Derby Lisboa Preto 37"
+        },
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Derby Lisboa Preto 38"
+        },
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Derby Lisboa Preto 39"
+        },
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Derby Lisboa Preto 40"
+        },
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Derby Lisboa Preto 41"
+        },
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Derby Lisboa Preto 42"
+        },
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Derby Lisboa Preto 43"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Derby Lisboa Preto 44"
+        },
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Derby Moscow All Black 37"
+        },
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow All Black 38"
+        },
+        {
+          "para": 17,
+          "de": 0,
+          "label": "Derby Moscow All Black 39"
+        },
+        {
+          "para": 19,
+          "de": 0,
+          "label": "Derby Moscow All Black 40"
+        },
+        {
+          "para": 23,
+          "de": 0,
+          "label": "Derby Moscow All Black 41"
+        },
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow All Black 42"
+        },
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Derby Moscow All Black 43"
+        },
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow All Black 44"
+        },
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Derby Moscow Mouro 37"
+        },
+        {
+          "para": 10,
+          "de": 0,
+          "label": "Derby Moscow Mouro 38"
+        },
+        {
+          "para": 13,
+          "de": 0,
+          "label": "Derby Moscow Mouro 39"
+        },
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Derby Moscow Mouro 40"
+        },
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Derby Moscow Mouro 41"
+        },
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow Mouro 42"
+        },
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Derby Moscow Mouro 43"
+        },
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Derby Moscow Mouro 44"
+        },
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Dubai All Black 38"
+        },
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Dubai All Black 41"
+        },
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Dubai All Black 42"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai All Black 43"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai Castor 38"
+        },
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Dubai Castor 40"
+        },
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Loafer Dubai Castor 41"
+        },
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai Castor 42"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Dubai Castor 43"
+        },
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Dubai Castor 44"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 38"
+        },
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 39"
+        },
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 40"
+        },
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 42"
+        },
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 43"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Mouro 44"
+        },
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 37"
+        },
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Loafer Katar Gravata Preto 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086425024,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1790086427113,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086428945,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086430481,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086432294,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086439526,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 14,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086442283,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086444913,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086447361,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086451715,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1790086454183,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086455988,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086458643,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1790086501473,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1790086504905,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086506976,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086509839,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 6,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086511788,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086513731,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 8,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1790086515561,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086517691,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 1,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1790086520635,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086522803,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086525015,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086526752,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086528743,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1790086530669,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086532374,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1790086555957,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 1,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1790086556865,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086557698,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086558558,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086559325,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086560065,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 5,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1790086561021,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 7,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086562140,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 9,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1790086573074,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1790086575924,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1790086578283,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086579447,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086580592,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086581149,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086581681,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1790086582240,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086583503,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1790086586877,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1790086588480,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 23,
+          "de": 2,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1790086590676,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086591855,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086592747,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086593721,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086594553,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1790086595308,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086596571,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1790086604798,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1790086625754,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    },
+    {
+      "ts": 1790086628772,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 7,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086630345,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 11,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086632779,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 14,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086635195,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 12,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086638849,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 42"
+        }
+      ]
+    },
+    {
+      "ts": 1790086641768,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 5,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086645271,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 9,
+          "de": 0,
+          "label": "Sneaker Milão All Black 44"
+        }
+      ]
+    },
+    {
+      "ts": 1790086649838,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086653464,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086654852,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 4,
+          "de": 0,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086658193,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 3,
+          "de": 0,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086661972,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 2,
+          "de": 0,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790086784877,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All Black 38"
+        }
+      ]
+    },
+    {
+      "ts": 1790086785640,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Sneaker Milão All Black 39"
+        }
+      ]
+    },
+    {
+      "ts": 1790086786302,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 4,
+          "label": "Sneaker Milão All Black 40"
+        }
+      ]
+    },
+    {
+      "ts": 1790086787448,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 3,
+          "label": "Sneaker Milão All Black 41"
+        }
+      ]
+    },
+    {
+      "ts": 1790086788694,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 2,
+          "label": "Sneaker Milão All Black 43"
+        }
+      ]
+    },
+    {
+      "ts": 1790097545463,
+      "tipo": "estoque/produção",
+      "por": "Ana flora",
+      "mudancas": [
+        {
+          "para": 0,
+          "de": 6,
+          "label": "Sneaker Milão All Black 37"
+        }
+      ]
+    }
+  ],
+  "pedido": {},
+  "estoque": {},
+  "atualizadoEm": 1790097545462,
+  "meta": {
+    "loafer dubai|Castor|41": 18,
+    "loafer katar gravata|Preto|44": 6,
+    "derby moscow|Mouro|41": 12,
+    "sneaker milao|All Black|40": 21,
+    "derby moscow|Mouro|39": 15,
+    "loafer paris fivela|Mouro|39": 15,
+    "loafer dubai|Castor|44": 6,
+    "sneaker milao|All Black|43": 9,
+    "loafer paris fivela|Mouro|44": 6,
+    "loafer paris fivela|Mouro|41": 15,
+    "loafer katar gravata|Mouro|42": 9,
+    "loafer dubai|All Black|42": 15,
+    "loafer moscow|Mouro|41": 18,
+    "loafer moscow|All Black|40": 15,
+    "derby moscow|Mouro|44": 6,
+    "derby moscow|Mouro|40": 15,
+    "loafer paris fivela|Preto|41": 15,
+    "derby moscow|All Black|39": 15,
+    "loafer paris fivela|Preto|42": 12,
+    "loafer moscow|Mouro|42": 15,
+    "sneaker milao|All White|44": 6,
+    "derby moscow|All Black|38": 9,
+    "loafer paris fivela|Mouro|38": 9,
+    "loafer moscow|All Black|38": 9,
+    "loafer katar gravata|Mouro|38": 9,
+    "loafer paris fivela|Preto|38": 9,
+    "loafer paris fivela|Mouro|42": 12,
+    "sneaker milao|All White|42": 18,
+    "sneaker milao|All White|38": 12,
+    "loafer moscow|All Black|42": 15,
+    "loafer katar gravata|Mouro|44": 6,
+    "sneaker milao|All Black|41": 21,
+    "loafer dubai|All Black|40": 15,
+    "derby moscow|All Black|41": 12,
+    "loafer moscow|Mouro|43": 6,
+    "loafer moscow|Mouro|44": 6,
+    "loafer dubai|Castor|38": 9,
+    "derby moscow|All Black|37": 6,
+    "derby moscow|Mouro|37": 6,
+    "loafer dubai|All Black|39": 15,
+    "loafer dubai|All Black|44": 6,
+    "loafer katar gravata|Mouro|37": 6,
+    "derby moscow|All Black|43": 6,
+    "loafer dubai|All Black|43": 6,
+    "loafer dubai|Castor|42": 15,
+    "sneaker milao|All Black|39": 21,
+    "loafer dubai|All Black|37": 6,
+    "loafer katar gravata|Preto|39": 15,
+    "loafer moscow|All Black|37": 6,
+    "loafer paris fivela|Mouro|37": 6,
+    "loafer paris fivela|Preto|44": 6,
+    "loafer moscow|All Black|39": 15,
+    "sneaker milao|All White|41": 21,
+    "loafer katar gravata|Mouro|40": 15,
+    "loafer katar gravata|Mouro|43": 6,
+    "sneaker milao|All Black|38": 12,
+    "derby moscow|All Black|40": 15,
+    "derby moscow|All Black|44": 6,
+    "loafer moscow|All Black|44": 6,
+    "sneaker milao|All Black|37": 9,
+    "sneaker milao|All White|40": 21,
+    "loafer paris fivela|Preto|43": 6,
+    "loafer dubai|All Black|41": 18,
+    "loafer moscow|Mouro|37": 6,
+    "loafer dubai|Castor|40": 15,
+    "loafer katar gravata|Preto|43": 6,
+    "loafer moscow|Mouro|38": 9,
+    "loafer katar gravata|Preto|38": 9,
+    "loafer katar gravata|Preto|37": 6,
+    "sneaker milao|All White|43": 9,
+    "sneaker milao|All Black|42": 18,
+    "loafer dubai|Castor|43": 6,
+    "loafer paris fivela|Mouro|43": 6,
+    "derby moscow|Mouro|42": 9,
+    "loafer moscow|Mouro|39": 15,
+    "loafer moscow|Mouro|40": 15,
+    "loafer katar gravata|Preto|41": 12,
+    "sneaker milao|All White|39": 21,
+    "loafer paris fivela|Mouro|40": 15,
+    "derby moscow|Mouro|38": 9,
+    "sneaker milao|All White|37": 9,
+    "loafer paris fivela|Preto|39": 15,
+    "loafer paris fivela|Preto|37": 6,
+    "derby moscow|Mouro|43": 6,
+    "loafer moscow|All Black|43": 6,
+    "loafer katar gravata|Preto|42": 9,
+    "loafer katar gravata|Mouro|41": 12,
+    "loafer katar gravata|Mouro|39": 15,
+    "derby moscow|All Black|42": 9,
+    "loafer dubai|All Black|38": 9,
+    "loafer moscow|All Black|41": 18,
+    "loafer dubai|Castor|39": 15,
+    "sneaker milao|All Black|44": 6,
+    "loafer dubai|Castor|37": 6,
+    "loafer paris fivela|Preto|40": 15,
+    "loafer katar gravata|Preto|40": 15
+  },
+  "lorettoEm": 1790097545462
+}

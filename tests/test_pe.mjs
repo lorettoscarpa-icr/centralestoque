@@ -250,5 +250,24 @@ teste('delete explícito (foto removida por ação do usuário) some do push seg
   assert.equal(payloadQueSeriaEnviado.modeloX.Preto, 'url1', 'a outra cor do mesmo modelo não é afetada pelo delete');
 });
 
+console.log('gate de versão (incidente TCHWM 22/09/2026: aba velha zerou o estoque)');
+teste('versão local menor que appVerMin do servidor -> escrita bloqueada', () => {
+  assert.equal(PECore.versaoBloqueiaEscrita('e13', 'e12'), true);
+  assert.equal(PECore.versaoBloqueiaEscrita('e13', 'e9'), true, 'compara número, não string (e9 < e13 mesmo "e9">"e13" em string)');
+});
+teste('versão local igual ou maior que appVerMin do servidor -> passa', () => {
+  assert.equal(PECore.versaoBloqueiaEscrita('e13', 'e13'), false);
+  assert.equal(PECore.versaoBloqueiaEscrita('e13', 'e14'), false);
+});
+teste('doc sem appVerMin -> passa (compatibilidade com docs existentes)', () => {
+  assert.equal(PECore.versaoBloqueiaEscrita(undefined, 'e1'), false);
+  assert.equal(PECore.versaoBloqueiaEscrita('', 'e1'), false);
+});
+teste('parseAppVer extrai o número de "eNN"', () => {
+  assert.equal(PECore.parseAppVer('e13'), 13);
+  assert.equal(PECore.parseAppVer(''), 0);
+  assert.equal(PECore.parseAppVer(undefined), 0);
+});
+
 console.log('\n' + passou + ' passaram, ' + falhou + ' falharam');
 process.exit(falhou ? 1 : 0);

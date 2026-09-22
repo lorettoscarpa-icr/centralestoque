@@ -193,6 +193,23 @@
     return Object.assign({},local||{},remoto||{});
   }
 
+  /* app-ver é tipo "e12" — pega o número pra poder comparar versões. */
+  function parseAppVer(v){
+    var m=/(\d+)/.exec(String(v||''));
+    return m?parseInt(m[1],10):0;
+  }
+
+  /* GATE DE VERSÃO (incidente 22/09/2026): doc ganha appVerMin (versão mínima
+     que pode escrever nele). Uma aba com app-ver local MENOR que appVerMin do
+     servidor está rodando código velho o bastante pra repetir os bugs já
+     corrigidos — bloqueia a escrita em vez de deixar ela sobrescrever dado
+     bom com a lógica antiga. Doc sem appVerMin (ainda não gravado por uma
+     versão nova) deixa passar — compatibilidade com docs existentes. */
+  function versaoBloqueiaEscrita(appVerMin,versaoLocal){
+    if(!appVerMin) return false;
+    return parseAppVer(versaoLocal)<parseAppVer(appVerMin);
+  }
+
   var PECore={
     peDiffMapas:peDiffMapas,
     peTotaisOrdens:peTotaisOrdens,
@@ -207,7 +224,9 @@
     devePularRenderFabrica:devePularRenderFabrica,
     deveGravarNaInicializacao:deveGravarNaInicializacao,
     deveIgnorarSnapshotProprio:deveIgnorarSnapshotProprio,
-    mergePreferindoServidor:mergePreferindoServidor
+    mergePreferindoServidor:mergePreferindoServidor,
+    parseAppVer:parseAppVer,
+    versaoBloqueiaEscrita:versaoBloqueiaEscrita
   };
 
   if(typeof module!=='undefined'&&module.exports) module.exports=PECore;
