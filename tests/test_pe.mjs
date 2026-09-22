@@ -51,6 +51,54 @@ teste('aba em dia (_syncEm recente) pode apagar chave que sumiu da sua visão', 
   assert.equal(out.estoque.B, DEL);
 });
 
+teste('mesma chave editada por duas abas: última vence, e o historico registraria as duas (diffs não-vazios)', () => {
+  // aba 1 e aba 2 partem do mesmo estado (A:5), cada uma edita A pra um valor diferente
+  var servidor = { estoque: { A: 5 }, atualizadoEm: 1000 };
+  var base = { estoque: { A: 5 }, _syncEm: 1000 };
+  var out1 = PECore.montarGravacao({ estoque: { A: 8 } }, base, servidor, DEL);
+  assert.deepEqual(out1.estoque, { A: 8 });
+  var mud1 = PECore.peDiffMapas(servidor.estoque, { A: 8 });
+  assert.equal(mud1.length, 1, 'aba 1 gera entrada no historico');
+  // servidor agora está em A:8 (gravação da aba 1 já aplicada)
+  servidor = { estoque: { A: 8 }, atualizadoEm: 1001 };
+  var out2 = PECore.montarGravacao({ estoque: { A: 3 } }, base, servidor, DEL);
+  assert.deepEqual(out2.estoque, { A: 3 }, 'a última gravação (aba 2) vence — valor final é o dela');
+  var mud2 = PECore.peDiffMapas(servidor.estoque, { A: 3 });
+  assert.equal(mud2.length, 1, 'aba 2 também gera sua própria entrada — as duas edições ficam no historico');
+});
+
+console.log('replay de fila pendente após reconexão (_peFilaRebase / idempotência)');
+teste('reenviar a mesma operação (mesmo base/payload) depois que o servidor já aplicou não duplica o efeito', () => {
+  // simula: aba ficou offline, gravou {B:10} na fila; a rede caiu DEPOIS que o
+  // Firestore já tinha confirmado (ex.: resposta perdida) — o rebase reenvia o
+  // mesmo payload/base contra o estado atual do servidor (_peFilaRebase chama
+  // _peGravaDelta de novo com o MESMO base/payload guardado na fila).
+  var base = { estoque: { A: 5 }, _syncEm: 1000 };
+  var payload = { estoque: { A: 5, B: 10 } };
+  var servidorAntes = { estoque: { A: 5 }, atualizadoEm: 1000 };
+  var out1 = PECore.montarGravacao(payload, base, servidorAntes, DEL);
+  assert.deepEqual(out1.estoque, { B: 10 });
+  var servidorDepoisDoPrimeiro = { estoque: { A: 5, B: 10 }, atualizadoEm: 1001 }; // já aplicado
+  // replay: MESMO base/payload da operação enfileirada — o delta é sempre "valor
+  // final" (deltaCampo compara contra a BASE, não incrementa), então reenviar dá
+  // o MESMO delta de novo, não um delta cumulativo/dobrado.
+  var out2 = PECore.montarGravacao(payload, base, servidorDepoisDoPrimeiro, DEL);
+  assert.deepEqual(out2.estoque, { B: 10 }, 'replay manda o mesmo valor final de novo (idempotente por natureza: set, não soma)');
+  // aplicando os dois "sets" em sequência no servidor simulado, o resultado final
+  // continua 10 — não vira 20 (o que aconteceria se fosse um incremento)
+  var servidorFinal = Object.assign({}, servidorDepoisDoPrimeiro.estoque, out2.estoque);
+  assert.equal(servidorFinal.B, 10, 'replay não soma/duplica o valor — o segundo set é um no-op efetivo');
+});
+teste('replay não desfaz o que outra aba gravou numa chave diferente enquanto a operação estava na fila', () => {
+  var base = { estoque: { A: 5 }, _syncEm: 1000 };
+  var payload = { estoque: { A: 5, B: 10 } }; // operação enfileirada offline
+  // enquanto isso, outra aba (online) gravou C:7 — servidor evoluiu
+  var servidorComOutraEdicao = { estoque: { A: 5, C: 7 }, atualizadoEm: 2000 };
+  var out = PECore.montarGravacao(payload, base, servidorComOutraEdicao, DEL);
+  assert.deepEqual(out.estoque, { B: 10 }, 'replay só aplica o que esta operação realmente editou');
+  assert.equal(out.estoque.C, undefined, 'C (de outra aba) não é tocado pelo replay');
+});
+
 console.log('re-render durante digitação (devePularRenderFabrica)');
 teste('pula render com campo da grade focado', () => {
   assert.equal(PECore.devePularRenderFabrica(true, false), true);
