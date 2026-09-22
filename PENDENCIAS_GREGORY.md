@@ -81,6 +81,29 @@ aproximado.
 
 - [x] [gate-versao] BUG visto pelo Gregory 22/09 ~16h: loop "atualizar infinito" logo apos deploy — o botao ATUALIZAR recarrega mas o cache do GitHub Pages (max-age=600) devolve a versao antiga por ate 10min, e o overlay reaparece. RESOLVIDO nesta sessão (22/09, e16): `atualizar()` agora recarrega com `location.href=location.pathname+'?v='+Date.now()` (cache-buster), nunca `location.reload()` puro. O appVerMin=e16 só foi gravado no Firestore depois de confirmar via `curl` que o Pages já servia `app-ver` e16 — ver `CACA_FANTASMA_22SET.md`.
 
+# Pendências — sessão "voltar a projetar melhor" 22/09/2026 (noite)
+
+- [x] **Badge de saúde no painel da fábrica**: topo da tela agora mostra
+      versão do painel + pendências não confirmadas na fila
+      (`peFabHealthTxt`, `#fabHealth`). Ver `ARQUITETURA_SYNC.md`.
+- [x] **Documentação definitiva**: `ARQUITETURA_SYNC.md` criado — desenho
+      completo do funil único/delta/fila/gate de versão em português
+      simples, com o que foi decidido NÃO mudar e por quê.
+- [ ] **Render da grade da fábrica, célula a célula** (não implementado,
+      decisão registrada em `ARQUITETURA_SYNC.md`): hoje qualquer campo
+      focado/dirty pendente na tela bloqueia o redesenho da tela INTEIRA
+      (mais simples, já resolve o incidente de 18/09). Reconciliação
+      célula-a-célula no DOM seria mais granular (duas pessoas editando a
+      MESMA grade ao mesmo tempo sem esperar uma da outra), mas é reescrita
+      de risco médio/alto na função de render sem relato de caso real que
+      precise disso. Avisar se aparecer fábrica com 2+ pessoas na mesma
+      tela ao mesmo tempo — só aí vale reconsiderar.
+- [ ] **Fila de pendências ainda cobre só `ls_pe`** (estoque/produção/lotes).
+      `ls_pe_tokens`/`ls_rep_fotos`/`ls_rep_cfg` têm proteção própria
+      (servidor sempre ganha o merge) mas não fila/retry automático. Sem
+      indício de perda de dado por isso — se acontecer, estender o mesmo
+      padrão de fila pra essas coleções.
+
 # Pendências — escrita fantasma (CAÇA_FANTASMA) 22/09/2026
 
 - [x] **Causa raiz encontrada e corrigida** (e16): `montarGravacao` (pe-core.js)

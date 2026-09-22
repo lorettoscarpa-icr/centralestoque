@@ -1,7 +1,28 @@
 /* pe-core.js — lógica pura do módulo pronta-entrega (pe*), sem DOM/Firebase.
    Extraído do index.html pra poder ser testado com Node puro (tests/test_pe.mjs)
    e pra ter UM SÓ lugar com as regras de gravação por delta — o index.html
-   chama estas funções em vez de duplicar a lógica. */
+   chama estas funções em vez de duplicar a lógica.
+
+   ARQUITETURA (modelo "planilha", fechada 22/09/2026 — ver ARQUITETURA_SYNC.md
+   na raiz do repo pra versão completa em português simples):
+   1. Cada aba só manda o que ELA editou (deltaCampo), nunca o mapa inteiro —
+      Firestore nunca vê um estado que a aba não viu de verdade.
+   2. Toda gravação passa por UM funil (index.html: _peGravaDelta), que chama
+      montarGravacao aqui dentro de uma transação do Firestore (lê o atual,
+      decide o delta contra ele, grava). Não existe segundo caminho de escrita.
+   3. montarGravacao nunca manda `{}` pra um campo sem edição — omite a chave
+      (Firestore trata `{}` num merge como "substitua o campo inteiro" —
+      causa raiz do zeramento de 22/09, ver comentário na função abaixo).
+   4. Antes de tentar a rede, a operação {opId,path,base,payload} entra numa
+      fila em localStorage (index.html: _peFilaLer/_peFilaGravar) — só sai
+      quando o servidor confirma. Reenviar não duplica porque o payload é
+      sempre "valor final por chave", nunca um incremento.
+   5. localStorage NUNCA guarda estoque/produzindo/ordens — só a fila de
+      operações pendentes e preferências de UI. Quem decide valor é sempre
+      o servidor (onSnapshot), lido de volta pra _peEstoqueCache em memória.
+   6. Versão velha não escreve: appVerMin no doc + <meta name="app-ver"> local
+      (versaoBloqueiaEscrita/deveMostrarGateTotal) bloqueiam aba desatualizada
+      antes que ela repita um bug já corrigido. */
 (function(root){
   'use strict';
 
