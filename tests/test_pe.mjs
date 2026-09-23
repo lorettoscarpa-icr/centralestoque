@@ -389,5 +389,37 @@ teste('leitura do appVerMin FALHOU (offline/erro) -> nunca trava, mesmo com vers
   assert.equal(PECore.deveMostrarGateTotal('e14', 'e1', false), false);
 });
 
+console.log('reimpressão de etiquetas (pedido Gregory 23/09/2026: botão pra reimprimir lote/produzindo depois de lançado)');
+teste('gradeDoLotePorId acha o lote certo pelo id e devolve a grade dele', () => {
+  var lotes = [
+    { id: 'lp1', grade: { 'm1|Preto|38': 10, 'm1|Preto|39': 20 } },
+    { id: 'lp2', grade: { 'm2|Branco|40': 5 } }
+  ];
+  assert.deepEqual(PECore.gradeDoLotePorId(lotes, 'lp2'), { 'm2|Branco|40': 5 });
+});
+teste('gradeDoLotePorId funciona pra lote já aplicado (recebido/no estoque) — reimpressão pós-lançamento', () => {
+  var lotes = [{ id: 'lp1', grade: { 'm1|Preto|38': 10 }, aplicado: true, aplicadoEm: Date.now() }];
+  assert.deepEqual(PECore.gradeDoLotePorId(lotes, 'lp1'), { 'm1|Preto|38': 10 });
+});
+teste('gradeDoLotePorId devolve null se o lote não existe (index.html mostra o toast)', () => {
+  assert.equal(PECore.gradeDoLotePorId([{ id: 'lp1', grade: {} }], 'lp-inexistente'), null);
+  assert.equal(PECore.gradeDoLotePorId([], 'lp1'), null);
+  assert.equal(PECore.gradeDoLotePorId(undefined, 'lp1'), null);
+});
+teste('gradeDoLotePorId devolve cópia da grade — não é a mesma referência do lote', () => {
+  var lote = { id: 'lp1', grade: { 'm1|Preto|38': 10 } };
+  var g = PECore.gradeDoLotePorId([lote], 'lp1');
+  g['m1|Preto|38'] = 999;
+  assert.equal(lote.grade['m1|Preto|38'], 10, 'mexer na grade devolvida não pode mudar o lote original');
+});
+teste('gradeProduzindoAtual filtra só as chaves com qtd > 0 (produção digitada direto na grade, sem lote)', () => {
+  var produzindo = { 'm1|Preto|38': 5, 'm1|Preto|39': 0, 'm2|Branco|40': -3 };
+  assert.deepEqual(PECore.gradeProduzindoAtual(produzindo), { 'm1|Preto|38': 5 });
+});
+teste('gradeProduzindoAtual com mapa vazio/undefined devolve {} (botão "produzindo atual" some nesse caso)', () => {
+  assert.deepEqual(PECore.gradeProduzindoAtual({}), {});
+  assert.deepEqual(PECore.gradeProduzindoAtual(undefined), {});
+});
+
 console.log('\n' + passou + ' passaram, ' + falhou + ' falharam');
 process.exit(falhou ? 1 : 0);

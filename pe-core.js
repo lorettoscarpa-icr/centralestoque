@@ -200,6 +200,23 @@
     return {estoque:est,produzindo:prod,lotesProducao:lotes,totReceb:totReceb,faltaTot:faltaTot};
   }
 
+  /* Reimpressão de etiquetas (pedido Gregory 23/09/2026): acha um lote de
+     produção pelo id e devolve a grade dele pra imprimir de novo, mesmo já
+     aplicado (recebido/no estoque) — só a busca, sem mexer em produzindo/
+     estoque. null se o lote não existe (index.html decide o toast). */
+  function gradeDoLotePorId(lotes,loteId){
+    var l=(lotes||[]).find(function(x){return x&&x.id===loteId;});
+    return l?Object.assign({},l.grade||{}):null;
+  }
+
+  /* Grade pra reimprimir a partir do mapa "produzindo" direto (produção
+     digitada na grade sem passar por um lote) — só as chaves com qtd > 0. */
+  function gradeProduzindoAtual(produzindo){
+    var out={};
+    Object.keys(produzindo||{}).forEach(function(k){var q=parseInt(produzindo[k],10)||0;if(q>0)out[k]=q;});
+    return out;
+  }
+
   /* Guarda contra o modo fábrica perder edição em andamento (incidente 18/09/2026):
      nunca redesenha a grade (o que apaga o valor sendo digitado e o marcador
      "dirty" do que ainda não foi salvo) enquanto o usuário está com foco num campo
@@ -281,6 +298,8 @@
     aplicarProducao:aplicarProducao,
     aplicarLotePronto:aplicarLotePronto,
     aplicarRecebimento:aplicarRecebimento,
+    gradeDoLotePorId:gradeDoLotePorId,
+    gradeProduzindoAtual:gradeProduzindoAtual,
     devePularRenderFabrica:devePularRenderFabrica,
     deveGravarNaInicializacao:deveGravarNaInicializacao,
     deveIgnorarSnapshotProprio:deveIgnorarSnapshotProprio,
