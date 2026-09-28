@@ -4198,7 +4198,7 @@ function renderLogin(){
   box.innerHTML=usuarios.map(u=>'<button class="login-user" data-user="'+escapeHtml(u)+'">'+avaHtml(u,'lu-ava')+'<span class="lu-nome">'+escapeHtml(u)+'</span></button>').join('');
   box.querySelectorAll('.login-user').forEach(b=>b.addEventListener('click',function(){fazerLogin(b.dataset.user);}));
 }
-function atualizarUserUI(){if($('userNome'))$('userNome').textContent=userAtual||'Entrar';if($('userAva')){const f=userAtual&&FOTOS[userAtual];if(f){$('userAva').innerHTML='<img src="'+f+'" alt="">';$('userAva').classList.add('has-foto');}else{$('userAva').textContent=inicialDe(userAtual||'?');$('userAva').classList.remove('has-foto');}}}
+function atualizarUserUI(){if($('userNome'))$('userNome').textContent=userAtual||'Entrar';if($('userAva')){const f=userAtual&&FOTOS[userAtual];if(f){$('userAva').innerHTML='<img src="'+f+'" alt="">';$('userAva').classList.add('has-foto');}else{$('userAva').textContent=inicialDe(userAtual||'?');$('userAva').classList.remove('has-foto');}}try{if(window.ocAplicarAcesso)window.ocAplicarAcesso();}catch(e){}}
 window.fazerLogin=function(nome){
   userAtual=nome; try{localStorage.setItem('loretto_user',nome);}catch(e){}
   const ls=$('loginScreen'); if(ls)ls.classList.add('hide');
@@ -5190,7 +5190,7 @@ $('bulkApply')&&$('bulkApply').addEventListener('click',()=>{
 $('repoHistOpen')&&$('repoHistOpen').addEventListener('click',()=>{renderHist();$('histModal').classList.remove('hide');});
 $('histClose')&&$('histClose').addEventListener('click',()=>{$('histModal').classList.add('hide');});
 window.marcarRecebido=(id)=>{const p=repoHist.find(x=>x.id===id);if(p){p.status='recebido';p.recebidoEm=Date.now();salvaHist();afterHist();toast('Baixa dada - saiu do a caminho');}};
-window.excluirPedido=(id)=>{if(confirm('Excluir este pedido do histórico?')){repoHist=repoHist.filter(x=>x.id!==id);salvaHist();afterHist();}};
+window.excluirPedido=(id)=>{if(confirm('Excluir este pedido do histórico?')){if(window.ocAPI)try{window.ocAPI.cancelarReposicao(id);}catch(e){}repoHist=repoHist.filter(x=>x.id!==id);salvaHist();afterHist();}};
 function renderHist(){
   const lst=$('repRecebList')||$('histList');
   if(!lst)return;
@@ -5207,16 +5207,26 @@ window.repConfirmarPedido=(fid)=>{
   const F=repPedidoCache&&repPedidoCache[fid];
   if(!F||!F.mods||!Object.keys(F.mods).length){toast('Gere o pedido primeiro');return;}
   const fornNome=fid==='_sem'?'(sem fábrica)':repFornNome(fid);
+  const _valor=F.valor||0;
+  if(window.ocAPI){
+    var _s=window.ocAPI.saldo();
+    if(_valor>_s+0.005){
+      var _falta=_valor-_s;
+      alert('⛔ Sem saldo para esta reposição.\n\nDisponível este mês: '+window.ocAPI.fmt(_s)+'\nEste pedido: '+window.ocAPI.fmt(_valor)+'\nFaltam: '+window.ocAPI.fmt(_falta)+'\n\nReduza as quantidades do pedido até caber no saldo e confirme de novo.');
+      return;
+    }
+  }
   const itens=[];
   Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];Object.keys(M.cores).forEach(cor=>{const g={};Object.keys(M.cores[cor]).forEach(t=>g[t]=M.cores[cor][t]);itens.push({mk:mid,ck:cor,fk:fid,modelo:M.nome,cor:cor,grade:g,preco:M.custo||0});});});
   if(!itens.length){toast('Nada a confirmar');return;}
   var _rid='p'+Date.now();
-  repoHist.push({id:_rid,data:new Date().toISOString(),fk:fid,fornNome:fornNome,itens:itens,valor:F.valor||0,status:'pendente'});
+  repoHist.push({id:_rid,data:new Date().toISOString(),fk:fid,fornNome:fornNome,itens:itens,valor:_valor,status:'pendente'});
   salvaHist();
+  if(window.ocAPI)try{window.ocAPI.registrarReposicao(_rid,fornNome,_valor);}catch(e){}
   if(typeof peRefletirPedidoLoja==='function')peRefletirPedidoLoja(fid,itens,_rid);
   delete repPedidoCache[fid];
   repRenderPedido();
-  toast('Pedido de '+fornNome+' confirmado - vejá na aba Recebimento');
+  toast('Pedido de '+fornNome+' confirmado — '+(window.ocAPI?('descontou '+window.ocAPI.fmt(_valor)+' do saldo'):'veja na aba Recebimento'));
 };
 window.registrarEnviado=(fk)=>{
   _transito=transitoMap();const f=repoCfg[fk];const itens=[];let valor=0;
@@ -7686,12 +7696,22 @@ window.repSetPedidoQtd=function(fid,mid,cor,tam,val){const F=repPedidoCache&&rep
 // tirar do pedido ATUAL so (nao mexe no fixo: ao gerar de novo, volta)
 window.repRemoverCor=function(fid,mid,cor){const F=repPedidoCache&&repPedidoCache[fid];if(!F||!F.mods[mid])return;delete F.mods[mid].cores[cor];if(!Object.keys(F.mods[mid].cores).length)delete F.mods[mid];repRecalcForn(fid);if(!Object.keys(F.mods).length)delete repPedidoCache[fid];repRenderPedido();toast(cor+' saiu deste pedido');};
 window.repRemoverMod=function(fid,mid){const F=repPedidoCache&&repPedidoCache[fid];if(!F||!F.mods[mid])return;const nome=F.mods[mid].nome||'Modelo';delete F.mods[mid];repRecalcForn(fid);if(!Object.keys(F.mods).length)delete repPedidoCache[fid];repRenderPedido();toast(nome+' saiu deste pedido');};
+function repSaldoBannerHTML(){
+  if(!window.ocAPI)return '';
+  var s=window.ocAPI.saldo(), lab=window.ocAPI.mesLabel();
+  var est=s<0?'red':(s<=0.0001?'red':'green');
+  var cls=est==='red'?'rep-saldo-red':'rep-saldo-ok';
+  return '<div id="repSaldoBanner" class="rep-saldo '+cls+'"><span class="rep-saldo-l">Saldo disponível para reposição · '+escapeHtml(lab)+'</span><span class="rep-saldo-v">'+window.ocAPI.fmt(s)+'</span></div>';
+}
+window.repRefreshSaldo=function(){var el=document.getElementById('repSaldoBanner');if(el){var tmp=document.createElement('div');tmp.innerHTML=repSaldoBannerHTML();var nv=tmp.firstChild;if(nv)el.replaceWith(nv);}};
 function repRenderPedido(){
   const box=$('repPedido'); if(!box)return;
+  if(window.ocEnsure)try{window.ocEnsure();}catch(e){}
+  const _saldo=window.ocAPI?window.ocAPI.saldo():null;
   const porForn=repPedidoCache||{};
   const fids=Object.keys(porForn);
-  if(!fids.length){box.innerHTML='<div class="empty">Nada a pedir. Marque produtos como fixos, defina a grade e importe o estoque.</div>';return;}
-  let html='';
+  if(!fids.length){box.innerHTML=repSaldoBannerHTML()+'<div class="empty">Nada a pedir. Marque produtos como fixos, defina a grade e importe o estoque.</div>';return;}
+  let html=repSaldoBannerHTML();
   fids.forEach(fid=>{
     const F=porForn[fid];
     const fnome=fid==='_sem'?'Sem fábrica definida':((repForn[fid]&&repForn[fid].nome)||fid);
@@ -7710,7 +7730,7 @@ function repRenderPedido(){
       });
       html+=`</div>`;
     });
-    html+=`</div><div class="rep-ped-acts">
+    html+=`</div>${(_saldo!=null&&F.valor>_saldo+0.005)?`<div class="rep-ped-over">⚠ Este pedido (${repBRL(F.valor)}) passa do saldo disponível (${repBRL(_saldo)}). Faltam ${repBRL(F.valor-_saldo)} — reduza as quantidades até caber.</div>`:''}<div class="rep-ped-acts">
         <button class="btn btn-ouro btn-sm" onclick="repCopiar('${fid}')">Copiar p/ WhatsApp</button>
         ${fid!=='_sem'&&repForn[fid]&&repForn[fid].whatsapp?`<button class="btn btn-ghost btn-sm" onclick="repAbrirGrupo('${fid}')">Abrir grupo</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="repImprimir('${fid}')">Imprimir / PDF</button>
@@ -11579,6 +11599,13 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   .oc-histrow{font-size:var(--fs-sm);color:var(--areia);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);line-height:1.4}
   .oc-histrow b{color:var(--ouro-claro)} .oc-histrow .t{color:var(--texto-fraco);font-size:var(--fs-mini)}
   @media(max-width:720px){.oc-kpis{grid-template-columns:1fr 1fr}.oc-disp .dv{font-size:30px}}
+  .rep-saldo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-radius:var(--r-md);padding:12px 16px;margin-bottom:14px;border:1px solid var(--linha-forte)}
+  .rep-saldo-ok{background:linear-gradient(135deg,rgba(46,125,82,.20),rgba(0,0,0,.10))}
+  .rep-saldo-red{background:linear-gradient(135deg,rgba(192,57,43,.22),rgba(0,0,0,.10))}
+  .rep-saldo-l{font-size:var(--fs-mini);letter-spacing:1.5px;text-transform:uppercase;color:var(--areia);opacity:.85}
+  .rep-saldo-v{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;color:var(--areia)}
+  .rep-saldo-red .rep-saldo-v{color:var(--perigo)}
+  .rep-ped-over{background:rgba(192,57,43,.14);border:1px solid rgba(192,57,43,.4);color:#ffb59c;border-radius:var(--r-sm);padding:8px 11px;margin:8px 0;font-size:var(--fs-sm);font-weight:600;line-height:1.4}
 </style>
 <script>
 /* ================= ORÇAMENTO DE COMPRAS DO ESTOQUE =================
@@ -11626,6 +11653,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
         ocItens=itens;
         try{localStorage.setItem('loretto_orc_compras',JSON.stringify({cfg:ocCfg,itens:ocItens}));}catch(e){}
         render();
+        if(window.repRefreshSaldo)try{window.repRefreshSaldo();}catch(e){}
       },function(e){console.error('orc',e);});
       return true;
     }catch(e){console.error(e);return false;}
@@ -11799,7 +11827,8 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   function _mesShift(delta){var p=mesAtual().split('-');var d=new Date(parseInt(p[0],10),parseInt(p[1],10)-1+delta,1);_ocMes=mesKey(d);render();}
 
   window.ocRender=function(){
-    if(!_ocInit){_ocInit=true;loadLocal();if(!attach())render();}
+    if(!ehFinanceiro()){var h0=g('ocHost');if(h0)h0.innerHTML='<div class="oc-wrap"><div class="oc-sec"><h3>Acesso restrito</h3><p class="hint">A aba de Orçamento é do financeiro. Fale com o financeiro se precisar.</p></div></div>';return;}
+    ensure();
     if(!db())render(); // se já anexou, o onSnapshot renderiza; senão garante a tela
     if(!_ocMes)_ocMes=mesKey();
     var host=g('ocHost');if(host&&!host._ocBound){host._ocBound=true;host.addEventListener('click',function(e){
@@ -11814,5 +11843,37 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     });}
     render();
   };
+
+  // ---- acesso: só o financeiro vê a aba Orçamento ----
+  var FINANCEIRO=['gregory','larissa','avia'];
+  function ehFinanceiro(){var u=(typeof userAtual!=='undefined'&&userAtual||'').toString().trim().toLowerCase();return FINANCEIRO.indexOf(u)>=0;}
+  window.ocEhFinanceiro=ehFinanceiro;
+  window.ocAplicarAcesso=function(){var b=document.querySelector('.side-item[data-tab="orcamento"]');if(b)b.style.display=ehFinanceiro()?'':'none';};
+
+  // ---- garante que os dados carregam mesmo sem abrir a aba (p/ o saldo na Reposição) ----
+  function ensure(){ if(!_ocInit){_ocInit=true;loadLocal();attach();} else if(!_ocUnsub&&db()){attach();} }
+  window.ocEnsure=ensure;
+
+  // ---- API usada pela Reposição do Yuri ----
+  window.ocAPI={
+    mesAtual:function(){return mesKey();},
+    mesLabel:function(m){return mesLabel(m||mesKey());},
+    saldo:function(m){ensure();return saldo(m||mesKey());},
+    limite:function(m){ensure();return limite(m||mesKey());},
+    fmt:function(n){return BRL(n);},
+    temRepo:function(repoId){return ocItens.some(function(x){return x.repoId===repoId&&!x.cancelado;});},
+    registrarReposicao:function(repoId,fornNome,valor){
+      ensure(); if(!repoId||this.temRepo(repoId))return false;
+      addItem({tipo:'compra',mes:mesKey(),fornecedor:fornNome||'Reposição',descricao:'Reposição (pedido à fábrica)',valor:Number(valor)||0,status:'ativa',origem:'reposicao',repoId:repoId});
+      return true;
+    },
+    cancelarReposicao:function(repoId){
+      ensure(); var achou=false;
+      ocItens.filter(function(x){return x.repoId===repoId&&!x.cancelado;}).forEach(function(x){patchItem(x.id,{cancelado:true,canceladoEm:Date.now(),canceladoPor:user()},'cancelado');achou=true;});
+      return achou;
+    }
+  };
+  try{window.ocAplicarAcesso();}catch(e){}
 })();
+
 </script>
