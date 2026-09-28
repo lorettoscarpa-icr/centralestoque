@@ -5626,7 +5626,7 @@ window.peZerarMetas=function(fid,mid){
   _peGravaDelta(ref,{meta:cache.meta||{}},stamp).then(function(){if(_peEstoqueCache[fid])_peEstoqueCache[fid].meta=meta;toast('Metas zeradas — a fábrica para de produzir este modelo');peRender();}).catch(function(e){toast('Erro: '+((e&&e.message)||''));});
 };
 const PE_PADRAO=[{fid:'manutt',nome:'Manutt'},{fid:'tchwm',nome:'Tchwm Shoes'},{fid:'tarragona',nome:'Tarragona'},{fid:'urbana',nome:'Urbana Man'}];
-let peView='lista';var PE_CRIT_PCT=50;let peFornsOpen=false;let peFornEdit=null;
+let peView='lista';var PE_CRIT_PCT=50;let peFornsOpen=false;let peFornEdit=null;let _peDupGrupos=[];
 let peFornModelos=(function(){try{return JSON.parse(localStorage.getItem('loretto_pe_forn_modelos')||'{}')||{};}catch(e){return {};}})();
 let _peCadFid=null;
 let peEtqConfig=(function(){try{return JSON.parse(localStorage.getItem('loretto_pe_etq')||'{}')||{};}catch(e){return {};}})();
@@ -5797,17 +5797,66 @@ function peFornsHTML(){
       '<label class="rep-switch sm" title="Aparece na pronta-entrega"><input type="checkbox" '+(on?'checked':'')+(ff.off?' disabled':'')+' onchange="peFornPE(\''+k+'\',this.checked)"><span class="rep-slider"></span></label>'+
       '<button class="lnk-del" onclick="peFornDel(\''+k+'\')">remover</button></div>';
   }).join('');
+  _peDupGrupos=peFornDupGrupos();
+  var dupHTML=_peDupGrupos.map(function(grp,idx){
+    var best=grp.slice().sort(function(a,b){var ra=_peFornResumo(a),rb=_peFornResumo(b);return (rb.mod+rb.ped+rb.stk)-(ra.mod+ra.ped+ra.stk);})[0];
+    var opts=grp.map(function(k){var r=_peFornResumo(k);return '<option value="'+k+'"'+(k===best?' selected':'')+'>'+escapeHtml(repFornNome(k))+' — '+r.mod+' mod · '+r.ped+' ped · '+r.stk+' pares</option>';}).join('');
+    return '<div class="pe-dup"><div class="pe-dup-h">⚠ Fornecedor duplicado: <b>'+escapeHtml(repFornNome(best))+'</b> ('+grp.length+' entradas iguais)</div>'+
+      '<div class="pe-dup-b">Manter: <select id="dupSel'+idx+'">'+opts+'</select> <button class="btn btn-ouro sm" onclick="peUnificarGrupo('+idx+')">Unificar</button></div></div>';
+  }).join('');
+  var dupBox=dupHTML?('<div class="pe-dups"><div class="pe-dups-t">Duplicados encontrados — unifique para o sistema tratar como um só</div>'+dupHTML+'</div>'):'';
   return '<div class="pe-forns open"><div class="pe-forns-h" onclick="peFornsToggle()"><span class="pe-cfg-ic">&#127981;</span> Fábricas que usam a pronta-entrega <span class="pe-forns-ct">'+ativas+' ativa(s)</span><span class="pe-forns-car"><i class="chev up"></i></span></div>'+
-    '<div class="pe-forns-b"><p class="pe-forns-hint">Ligue só as fábricas que trabalham com o portal. As desligadas somem desta aba, mas continuam na Reposição.</p>'+rows+
+    '<div class="pe-forns-b">'+dupBox+'<p class="pe-forns-hint">Ligue só as fábricas que trabalham com o portal. As desligadas somem desta aba, mas continuam na Reposição.</p>'+rows+
     '<div class="pe-forns-add"><input type="text" id="peFornNome" placeholder="Nome da nova fábrica"><input type="text" id="peFornWa" placeholder="Link do grupo no WhatsApp (opcional)"><button class="btn btn-ouro sm" onclick="peFornAdd()">Adicionar fábrica</button></div></div></div>';
 }
 window.peFornsToggle=function(){peFornsOpen=!peFornsOpen;peRender();};
-window.peFornEditar=function(k){peFornEdit=k;peFornsOpen=true;peRender();};
+window.peUnificarGrupo=function(idx){var g=_peDupGrupos[idx];if(!g||!g.length)return;var sel=$('dupSel'+idx);var canon=(sel&&sel.value)||g[0];var dups=g.filter(function(x){return x!==canon;});peUnificarForn(canon,dups.join(','));};window.peFornEditar=function(k){peFornEdit=k;peFornsOpen=true;peRender();};
 window.peFornCancelarEdit=function(){peFornEdit=null;peRender();};
 window.peFornSalvarEdit=function(k){if(!repForn[k])return;var ap=($('pfeApelido')&&$('pfeApelido').value||'').trim();var nm=($('pfeNome')&&$('pfeNome').value||'').trim();var wa=($('pfeWa')&&$('pfeWa').value||'').trim();repForn[k].apelido=ap;if(nm)repForn[k].nome=nm;repForn[k].whatsapp=wa;peFornEdit=null;repSalvar();peRender();toast('Fábrica atualizada');};
 window.peFornPE=function(k,on){if(repForn[k]){repForn[k].pe=!!on;repSalvar();peRender();}};
 window.peFornDel=function(k){if(confirm('Remover esta fábrica da lista? Ela some da pronta-entrega. (Se você usa ela na Reposição, prefira só desligar o botão.)')){delete repForn[k];repSalvar();peRender();}};
 window.peFornAdd=function(){var n=($('peFornNome')&&$('peFornNome').value||'').trim();if(!n){toast('Digite o nome da fábrica');return;}var id='f'+Date.now().toString(36);repForn[id]={nome:n,whatsapp:($('peFornWa')&&$('peFornWa').value||'').trim(),off:false,pe:true};repSalvar();peFornsOpen=true;peRender();toast('Fábrica adicionada à pronta-entrega');};
+/* ---- Unificar fornecedores duplicados (ex.: Tchwm com 3 grafias) ---- */
+function _peMergeMapa(dst,src,soma){dst=dst||{};src=src||{};Object.keys(src).forEach(function(k){var q=parseInt(src[k],10)||0;if(!q)return;if(soma)dst[k]=(parseInt(dst[k],10)||0)+q;else if(dst[k]==null)dst[k]=src[k];});return dst;}
+function peFornDupGrupos(){
+  var by={};Object.keys(repForn||{}).forEach(function(k){var n=repNormCab(repForn[k].apelido||repForn[k].nome||k);if(!n)return;(by[n]=by[n]||[]).push(k);});
+  return Object.keys(by).map(function(n){return by[n];}).filter(function(g){return g.length>1;});
+}
+function _peFornResumo(fid){
+  var nMod=0;try{Object.keys(repCfg||{}).forEach(function(id){if(repCfg[id]&&repCfg[id].fornId===fid)nMod++;});}catch(e){}
+  var nPed=0;try{(repoHist||[]).forEach(function(p){if(p&&p.fk===fid)nPed++;});}catch(e){}
+  var stk=0;try{var c=_peEstoqueCache[fid];if(c){Object.keys(c.estoque||{}).forEach(function(k){stk+=parseInt(c.estoque[k],10)||0;});Object.keys(c.produzindo||{}).forEach(function(k){stk+=parseInt(c.produzindo[k],10)||0;});}}catch(e){}
+  return {mod:nMod,ped:nPed,stk:stk};
+}
+window.peUnificarForn=function(canon,dupsCsv){
+  var dups=String(dupsCsv||'').split(',').filter(function(d){return d&&d!==canon&&repForn[d];});
+  if(!repForn[canon]||!dups.length){toast('Nada para unificar');return;}
+  var nomeC=repFornNome(canon);
+  var tot={mod:0,ped:0,stk:0};dups.forEach(function(D){var r=_peFornResumo(D);tot.mod+=r.mod;tot.ped+=r.ped;tot.stk+=r.stk;});
+  if(!confirm('Unificar '+dups.length+' entrada(s) duplicada(s) em "'+nomeC+'"?\n\nVai passar para "'+nomeC+'":\n· '+tot.mod+' modelo(s)\n· '+tot.ped+' pedido(s) no histórico\n· '+tot.stk+' par(es) em estoque/produção\n· etiquetas e prazo de pagamento\n\nAs entradas duplicadas serão removidas. Não dá pra desfazer facilmente. Continuar?'))return;
+  dups.forEach(function(D){
+    try{Object.keys(repCfg||{}).forEach(function(id){if(repCfg[id]&&repCfg[id].fornId===D)repCfg[id].fornId=canon;});}catch(e){}
+    try{Object.keys(repFornReport||{}).forEach(function(id){if(repFornReport[id]===D)repFornReport[id]=canon;});}catch(e){}
+    try{(repoHist||[]).forEach(function(p){if(p&&p.fk===D){p.fk=canon;p.fornNome=nomeC;(p.itens||[]).forEach(function(it){if(it.fk===D)it.fk=canon;});}});}catch(e){}
+    try{if(peFornModelos[D]&&peFornModelos[D].length){peFornModelos[canon]=peFornModelos[canon]||[];peFornModelos[D].forEach(function(mid){if(peFornModelos[canon].indexOf(mid)<0)peFornModelos[canon].push(mid);});}delete peFornModelos[D];}catch(e){}
+    try{if(peEtqConfig[D]&&!peEtqConfig[canon])peEtqConfig[canon]=peEtqConfig[D];delete peEtqConfig[D];}catch(e){}
+    try{if(window.ocAPI&&window.ocAPI.moverPrazo)window.ocAPI.moverPrazo(D,canon);}catch(e){}
+    try{var cD=_peEstoqueCache[D];if(cD){var cC=_peEstoqueCache[canon]||{estoque:{},produzindo:{},meta:{},ordens:[],lotesProducao:[],historico:[]};
+      cC.estoque=_peMergeMapa(cC.estoque||{},cD.estoque,true);cC.produzindo=_peMergeMapa(cC.produzindo||{},cD.produzindo,true);cC.meta=_peMergeMapa(cC.meta||{},cD.meta,false);
+      cC.ordens=(cC.ordens||[]).concat(cD.ordens||[]);cC.lotesProducao=(cC.lotesProducao||[]).concat(cD.lotesProducao||[]);cC.historico=(cC.historico||[]).concat(cD.historico||[]);
+      _peEstoqueCache[canon]=cC;
+      if(_db){try{_db.collection('ls_pe').doc(peDocId(canon)).set({estoque:cC.estoque,produzindo:cC.produzindo,meta:cC.meta,ordens:cC.ordens,lotesProducao:cC.lotesProducao,atualizadoEm:Date.now(),lorettoEm:Date.now()},{merge:true});}catch(e){}
+        try{_db.collection('ls_pe').doc(peDocId(D)).set({estoque:{},produzindo:{},meta:{},ordens:[],lotesProducao:[]},{merge:true});}catch(e){}}
+      delete _peEstoqueCache[D];}
+    }catch(e){}
+    try{if(window.peFornOpOrdem)window.peFornOpOrdem(D,[]);}catch(e){}
+    delete repForn[D];
+  });
+  try{if(window.peFornOpOrdem)window.peFornOpOrdem(canon,peFornModelos[canon]||[]);}catch(e){}
+  repSalvar();peSalvarFornModelos();if(typeof peSalvarEtqConfig==='function')peSalvarEtqConfig();if(typeof salvaHist==='function')salvaHist();if(typeof salvaFornReport==='function')salvaFornReport();
+  peFornEdit=null;peRender();
+  toast('Unificado em '+nomeC);
+};
 function pePublicar(fid){
   if(!_db){toast('Conecte à internet para publicar');return;}
   const modelos=peModelosDaFabrica(fid);
@@ -11617,6 +11666,12 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   .rep-saldo-red .rep-saldo-v{color:var(--perigo)}
   .rep-ped-over{background:rgba(192,57,43,.14);border:1px solid rgba(192,57,43,.4);color:#ffb59c;border-radius:var(--r-sm);padding:8px 11px;margin:8px 0;font-size:var(--fs-sm);font-weight:600;line-height:1.4}
   .rep-ped-mes{background:rgba(220,189,96,.10);border:1px solid rgba(220,189,96,.3);color:var(--ouro-claro);border-radius:var(--r-sm);padding:7px 11px;margin:8px 0;font-size:var(--fs-sm);line-height:1.4}
+  .pe-dups{background:rgba(224,138,106,.10);border:1px solid rgba(224,138,106,.45);border-radius:var(--r-md);padding:12px 14px;margin-bottom:14px}
+  .pe-dups-t{font-weight:700;color:#ffb59c;font-size:var(--fs-base);margin-bottom:8px}
+  .pe-dup{padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
+  .pe-dup-h{font-size:var(--fs-sm);color:var(--areia);margin-bottom:6px}
+  .pe-dup-b{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:var(--fs-sm);color:var(--texto-fraco)}
+  .pe-dup-b select{background:var(--verde-escuro);border:1px solid var(--linha-forte);color:var(--areia);border-radius:6px;padding:6px 8px;font-family:'Barlow',sans-serif}
 </style>
 <script>
 /* ================= ORÇAMENTO DE COMPRAS DO ESTOQUE =================
@@ -11903,6 +11958,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     limite:function(m){ensure();return limite(m||mesKey());},
     fmt:function(n){return BRL(n);},
     prazoDe:function(fid){return prazoDe(fid);},
+    moverPrazo:function(from,to){ensure();if(ocCfg.prazos&&ocCfg.prazos[from]){if(!ocCfg.prazos[to])ocCfg.prazos[to]=ocCfg.prazos[from];saveLocal();var d=db();if(d)try{d.collection(COL).doc('_cfg').set({prazos:ocCfg.prazos},{merge:true});}catch(e){}}},
     // plano de um pedido: em que mês pesa e quanto há de saldo lá (para exibir e travar)
     plano:function(fid){
       ensure();var p=prazoDe(fid);
