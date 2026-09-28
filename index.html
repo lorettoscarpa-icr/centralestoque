@@ -2282,6 +2282,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
       <button class="side-item" data-tab="reposicao" data-title="Reposição"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11A8 8 0 0 0 6 6.3L3.5 8.5"/><path d="M3.5 4v4.5H8"/><path d="M4 13a8 8 0 0 0 14 4.7l2.5-2.2"/><path d="M20.5 20v-4.5H16"/></svg></span> Reposição</button>
       <button class="side-item" data-tab="pronta" data-title="Pronta-entrega (fábricas)"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9 5 4.6h14L20.5 9"/><path d="M4 9v9.4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M3.5 9a2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0"/><path d="M9.3 19.4V14.5h5.4v4.9"/></svg></span> Pronta-entrega</button>
       <button class="side-item" data-tab="financeiro" data-title="Financeiro"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 6.3v11.4"/><path d="M14.7 9c0-1.2-1.2-1.9-2.7-1.9s-2.7.7-2.7 2 1.2 1.7 2.7 1.7 2.7.6 2.7 1.9-1.2 2-2.7 2-2.7-.7-2.7-1.9"/></svg></span> Financeiro</button>
+      <button class="side-item" data-tab="orcamento" data-title="Orçamento de compras"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5h17v13h-17z"/><path d="M3.5 9.5h17"/><path d="M7 14h4"/><path d="M15.5 13.2l1.4 1.4 2.1-2.6"/></svg></span> Orçamento de compras</button>
       <button class="side-item" data-tab="modelos" data-title="Catálogo"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 16.5h15c1.6 0 3-.5 3-1.7 0-1-1.2-1.5-2.8-2l-4.4-1.4c-.6-.2-1.1-.5-1.6-1L9 7.8A2 2 0 0 0 7.5 7H3.5a1 1 0 0 0-1 1z"/><path d="M2.5 13.5c1.6 0 2.6.8 3.2 1.6"/><path d="M9 9.2l-1 1.4"/></svg></span> Catálogo</button>
       <button class="side-item" data-tab="avarias" data-title="Defeitos e pé trocado"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 4.4 2.6 17.8A1.6 1.6 0 0 0 4 20.2h16a1.6 1.6 0 0 0 1.4-2.4L13.7 4.4a1.6 1.6 0 0 0-2.8 0z"/><path d="M12 9.5v4.2"/><path d="M12 17h.01"/></svg></span> Defeitos</button>
       <button class="side-item" data-tab="suprimentos" data-title="Central de Suprimentos"><span class="si-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg></span> Suprimentos</button>
@@ -2683,6 +2684,7 @@ textarea.cons-field{min-height:80px;resize:vertical}
     </div>
   </div>
 
+  <div id="tab-orcamento" class="hide"><div id="ocHost"></div></div>
   <div id="tab-modelos" class="hide">
     <div class="twocol">
       <div class="panel">
@@ -5059,13 +5061,14 @@ document.querySelectorAll('.side-item').forEach(t=>t.addEventListener('click',()
   document.querySelectorAll('.side-item').forEach(x=>x.classList.remove('active'));
   t.classList.add('active');
   const tab=t.dataset.tab;
-  ['etiquetas','conferencia','entrada','reposicao','pronta','financeiro','modelos','avarias','suprimentos','consertos'].forEach(n=>{const el=$('tab-'+n);if(el)el.classList.toggle('hide',tab!==n);});
+  ['etiquetas','conferencia','entrada','reposicao','pronta','financeiro','orcamento','modelos','avarias','suprimentos','consertos'].forEach(n=>{const el=$('tab-'+n);if(el)el.classList.toggle('hide',tab!==n);});
   const tt=$('topbarTitle');if(tt)tt.textContent=t.dataset.title||t.textContent.trim();
   if(tab==='conferencia'&&window.confRender){confRender();}
   if(tab==='reposicao'){repRender();}
   if(tab==='consertos'&&window.renderConsertos){window.renderConsertos();}
   if(tab==='pronta'){peView='lista';peCarregarEstoques();}
   if(tab==='financeiro')renderFinanceiro();
+  if(tab==='orcamento'&&window.ocRender)window.ocRender();
   if(tab==='avarias')renderAvarias();
   if(tab==='suprimentos')renderSuprimentos();
   fecharMenu();const c=document.querySelector('.content');if(c)c.scrollTop=0;
@@ -11530,5 +11533,286 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
 })();
 
 </script>
-</body>
-</html>
+<style>
+  #tab-orcamento{padding:0}
+  .oc-wrap{max-width:1100px;margin:0 auto;padding:6px 2px 40px}
+  .oc-h{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .oc-h h2{font-family:'Playfair Display',serif;font-size:var(--fs-2xl,26px);color:var(--areia);margin:0}
+  .oc-h .oc-sub{font-size:var(--fs-sm);color:var(--ouro-claro);letter-spacing:.5px}
+  .oc-mes{display:flex;align-items:center;gap:8px}
+  .oc-mes input{background:var(--fundo-caixa);border:1px solid var(--linha-forte);color:var(--areia);padding:8px 12px;border-radius:var(--r-sm);font-family:'Barlow',sans-serif;font-size:var(--fs-md);color-scheme:dark}
+  .oc-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  .oc-kpi{background:var(--fundo-caixa);border:1px solid var(--linha);border-radius:var(--r-sm);padding:14px 16px;position:relative;overflow:hidden}
+  .oc-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ouro),transparent)}
+  .oc-kpi .l{font-size:var(--fs-mini);letter-spacing:1.5px;text-transform:uppercase;color:var(--texto-fraco);margin-bottom:8px}
+  .oc-kpi .v{font-family:'DM Mono',monospace;font-size:22px;font-weight:600;color:var(--areia);line-height:1}
+  .oc-kpi .v.gold{color:var(--ouro)} .oc-kpi .v.green{color:var(--ok)} .oc-kpi .v.red{color:var(--perigo)} .oc-kpi .v.warn{color:var(--alerta)}
+  .oc-bar{height:9px;border-radius:6px;background:rgba(255,255,255,.10);overflow:hidden;margin-top:10px}
+  .oc-bar i{display:block;height:100%;border-radius:6px;background:var(--ok);transition:width .3s}
+  .oc-bar.warn i{background:var(--alerta)} .oc-bar.red i{background:var(--perigo)}
+  .oc-disp{background:linear-gradient(135deg,rgba(46,125,82,.18),rgba(0,0,0,.10));border:1px solid var(--linha-forte);border-radius:var(--r-md);padding:20px 22px;margin-bottom:18px}
+  .oc-disp.warn{background:linear-gradient(135deg,rgba(212,133,10,.18),rgba(0,0,0,.10))}
+  .oc-disp.red{background:linear-gradient(135deg,rgba(192,57,43,.20),rgba(0,0,0,.10))}
+  .oc-disp .dl{font-size:var(--fs-mini);letter-spacing:2px;text-transform:uppercase;color:var(--texto-fraco)}
+  .oc-disp .dv{font-family:'DM Mono',monospace;font-size:38px;font-weight:700;color:var(--areia);line-height:1.05;margin:4px 0 2px}
+  .oc-disp .dv.green{color:var(--ok)} .oc-disp .dv.warn{color:var(--alerta)} .oc-disp .dv.red{color:var(--perigo)}
+  .oc-sec{background:var(--fundo-caixa);border:1px solid var(--linha);border-radius:var(--r-md);padding:16px 18px;margin-bottom:16px}
+  .oc-sec h3{font-family:'Playfair Display',serif;font-size:var(--fs-lg);color:var(--ouro-claro);margin:0 0 4px}
+  .oc-sec .hint{font-size:var(--fs-sm);color:var(--texto-fraco);margin:0 0 14px;line-height:1.45}
+  .oc-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+  .oc-fld{display:flex;flex-direction:column;gap:4px}
+  .oc-fld label{font-size:var(--fs-mini);letter-spacing:1px;text-transform:uppercase;color:var(--texto-fraco)}
+  .oc-fld input,.oc-fld select{background:var(--verde-escuro);border:1px solid var(--linha-forte);color:var(--areia);padding:9px 11px;border-radius:var(--r-sm);font-family:'Barlow',sans-serif;font-size:var(--fs-md);outline:none;color-scheme:dark}
+  .oc-fld input:focus,.oc-fld select:focus{border-color:var(--ouro)}
+  .oc-fld.g{flex:1;min-width:160px}
+  .oc-tbl{width:100%;border-collapse:collapse;margin-top:12px;font-size:var(--fs-sm)}
+  .oc-tbl th{text-align:left;font-size:var(--fs-mini);letter-spacing:1px;text-transform:uppercase;color:var(--texto-fraco);padding:6px 8px;border-bottom:1px solid var(--linha)}
+  .oc-tbl td{padding:8px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:middle}
+  .oc-tbl td.val{font-family:'DM Mono',monospace;text-align:right;white-space:nowrap}
+  .oc-tbl tr.canc td{opacity:.45;text-decoration:line-through}
+  .oc-chip{display:inline-block;padding:2px 9px;border-radius:var(--r-lg);font-size:var(--fs-micro);font-weight:700;letter-spacing:.5px}
+  .oc-chip.conf{background:rgba(46,125,82,.25);color:var(--ok)} .oc-chip.prev{background:rgba(212,133,10,.2);color:var(--alerta)} .oc-chip.exc{background:rgba(192,57,43,.2);color:var(--perigo)}
+  .oc-mini{background:transparent;border:1px solid var(--linha-forte);color:var(--ouro-claro);border-radius:var(--r-sm);padding:5px 10px;font-size:var(--fs-sm);cursor:pointer;font-family:'Barlow',sans-serif}
+  .oc-mini:hover{background:rgba(220,189,96,.10)}
+  .oc-mini.del{color:#e08a8a;border-color:rgba(224,138,106,.5)}
+  .oc-empty{color:var(--texto-fraco);font-size:var(--fs-sm);padding:10px 4px}
+  .oc-histrow{font-size:var(--fs-sm);color:var(--areia);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);line-height:1.4}
+  .oc-histrow b{color:var(--ouro-claro)} .oc-histrow .t{color:var(--texto-fraco);font-size:var(--fs-mini)}
+  @media(max-width:720px){.oc-kpis{grid-template-columns:1fr 1fr}.oc-disp .dv{font-size:30px}}
+</style>
+<script>
+/* ================= ORÇAMENTO DE COMPRAS DO ESTOQUE =================
+   Regra: total de compras do mês não pode passar de 50% do faturamento previsto.
+   Saldo = faturamento×50% − compromissos(financeiro) − compras(estoquista) + ajustes(direção).
+   Sincroniza por AÇÃO: cada compromisso/compra é um doc próprio (ls_orc_compras),
+   e o faturamento é gravado por campo do mês — sem regravar tudo (evita sobrescrita). */
+(function(){
+  var COL='ls_orc_compras';
+  var ocCfg={fatur:{},pct:0.5,alertaPct:0.2}, ocItens=[], _ocUnsub=null, _ocInit=false;
+  var _ocMes=null;
+  var g=function(id){return document.getElementById(id);};
+  function esc(s){return window.escapeHtml?window.escapeHtml(s):String(s==null?'':s);}
+  function db(){return (typeof _db!=='undefined'&&_db)?_db:null;}
+  function user(){return (typeof userAtual!=='undefined'&&userAtual)||'—';}
+  function toast(m){if(window.toast)window.toast(m);}
+  function money(s){if(typeof s==='number')return s;s=String(s==null?'':s).trim().replace(/[R$\s]/g,'');if(!s)return 0;if(s.indexOf(',')>=0)s=s.replace(/\./g,'').replace(',','.');var n=parseFloat(s);return isNaN(n)?0:n;}
+  function BRL(n){return 'R$ '+(Number(n)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function hoje(){return new Date();}
+  function mesKey(d){d=d||hoje();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);}
+  var MES_NOME=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  function mesLabel(m){var p=String(m||'').split('-');if(p.length<2)return m;var nm=MES_NOME[(parseInt(p[1],10)||1)-1]||'';return nm.charAt(0).toUpperCase()+nm.slice(1)+' '+p[0];}
+  function mesAtual(){return _ocMes||mesKey();}
+  function fmtDH(ts){var d=new Date(ts||Date.now());var p=function(n){return('0'+n).slice(-2);};return p(d.getDate())+'/'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes());}
+  function fmtVenc(s){if(!s)return '—';var p=String(s).split('-');return p.length===3?(p[2]+'/'+p[1]):s;}
+
+  // ---- cálculo ----
+  function limite(m){return (Number(ocCfg.fatur[m])||0)*(ocCfg.pct||0.5);}
+  function itensMes(m){return ocItens.filter(function(x){return x.mes===m&&!x.cancelado;});}
+  function somaTipo(m,tipo){return itensMes(m).filter(function(x){return x.tipo===tipo;}).reduce(function(s,x){return s+(Number(x.valor)||0);},0);}
+  function comprometido(m){return somaTipo(m,'compromisso')+somaTipo(m,'compra');}
+  function ajustes(m){return somaTipo(m,'ajuste');}
+  function saldo(m){return limite(m)-comprometido(m)+ajustes(m);}
+
+  // ---- persistência ----
+  function attach(){
+    var d=db(); if(!d)return false; if(_ocUnsub)return true;
+    try{
+      _ocUnsub=d.collection(COL).onSnapshot(function(snap){
+        var itens=[];
+        snap.docs.forEach(function(doc){
+          if(doc.id==='_cfg'){var c=doc.data()||{};ocCfg.fatur=c.fatur||{};ocCfg.pct=(typeof c.pct==='number')?c.pct:0.5;ocCfg.alertaPct=(typeof c.alertaPct==='number')?c.alertaPct:0.2;}
+          else itens.push(Object.assign({id:doc.id},doc.data()));
+        });
+        ocItens=itens;
+        try{localStorage.setItem('loretto_orc_compras',JSON.stringify({cfg:ocCfg,itens:ocItens}));}catch(e){}
+        render();
+      },function(e){console.error('orc',e);});
+      return true;
+    }catch(e){console.error(e);return false;}
+  }
+  function loadLocal(){try{var o=JSON.parse(localStorage.getItem('loretto_orc_compras')||'null');if(o){ocCfg=o.cfg||ocCfg;ocItens=o.itens||[];}}catch(e){}}
+  function saveLocal(){try{localStorage.setItem('loretto_orc_compras',JSON.stringify({cfg:ocCfg,itens:ocItens}));}catch(e){}}
+
+  function salvarFatur(m,val){
+    ocCfg.fatur[m]=val;saveLocal();
+    var d=db();if(d){var o={};o[m]=val;try{d.collection(COL).doc('_cfg').set({fatur:o,pct:ocCfg.pct,alertaPct:ocCfg.alertaPct},{merge:true});}catch(e){}}
+  }
+  function novoId(){return 'oc'+Date.now()+Math.floor(Math.random()*999);}
+  function addItem(obj){
+    obj.id=obj.id||novoId();obj.criadoEm=Date.now();obj.criadoPor=user();obj.cancelado=false;
+    obj.hist=[{ts:Date.now(),por:user(),acao:'criado',valor:obj.valor}];
+    var d=db();
+    if(d){try{d.collection(COL).doc(obj.id).set(obj);}catch(e){}}
+    else{ocItens.push(obj);saveLocal();render();}
+  }
+  function patchItem(id,patch,histAcao){
+    var it=ocItens.find(function(x){return x.id===id;});if(!it)return;
+    patch.atualizadoEm=Date.now();
+    var h=(it.hist||[]).slice();h.push({ts:Date.now(),por:user(),acao:histAcao||'alterado',de:it.valor,para:(patch.valor!=null?patch.valor:it.valor)});
+    patch.hist=h;
+    var d=db();
+    if(d){try{d.collection(COL).doc(id).update(patch);}catch(e){}}
+    else{Object.assign(it,patch);saveLocal();render();}
+  }
+
+  // ---- ações (delegado) ----
+  window.ocSalvarFatur=function(){var m=mesAtual();var v=money(g('ocFatur').value);salvarFatur(m,v);toast('Faturamento de '+mesLabel(m)+' salvo');render();};
+  function lerForm(pref){
+    return {forn:(g(pref+'Forn')&&g(pref+'Forn').value||'').trim(),desc:(g(pref+'Desc')&&g(pref+'Desc').value||'').trim(),valor:money(g(pref+'Valor')&&g(pref+'Valor').value),venc:(g(pref+'Venc')&&g(pref+'Venc').value)||'',status:(g(pref+'Status')&&g(pref+'Status').value)||''};
+  }
+  window.ocAddCompromisso=function(){
+    var m=mesAtual();var f=lerForm('ocC');
+    if(!f.forn){toast('Informe o fornecedor');return;}
+    if(f.valor<=0){toast('Informe um valor válido');return;}
+    addItem({tipo:'compromisso',mes:m,fornecedor:f.forn,descricao:f.desc,valor:f.valor,venc:f.venc,status:f.status||'previsto'});
+    ['ocCForn','ocCDesc','ocCValor','ocCVenc'].forEach(function(id){if(g(id))g(id).value='';});
+    toast('Compromisso cadastrado');
+  };
+  window.ocAddCompra=function(){
+    var m=mesAtual();
+    var forn=(g('ocPForn')&&g('ocPForn').value||'').trim();
+    var desc=(g('ocPDesc')&&g('ocPDesc').value||'').trim();
+    var val=money(g('ocPValor')&&g('ocPValor').value);
+    if(!forn){toast('Informe o fornecedor');return;}
+    if(val<=0){toast('Informe um valor válido');return;}
+    var s=saldo(m), lim=limite(m);
+    if(lim<=0){toast('Cadastre primeiro o faturamento previsto do mês');return;}
+    if(val>s){
+      var exc=val-s;
+      if(!confirm('⛔ Compra acima do orçamento de '+mesLabel(m)+'.\n\nDisponível: '+BRL(s)+'\nSolicitado: '+BRL(val)+'\nExcedente: '+BRL(exc)+'\n\nEsta compra NÃO está autorizada automaticamente.\nRegistrar mesmo assim, como EXCEÇÃO aprovada pela direção?'))return;
+      addItem({tipo:'compra',mes:m,fornecedor:forn,descricao:desc,valor:val,status:'excecao'});
+      toast('Compra registrada como exceção (acima do limite)');
+    }else{
+      addItem({tipo:'compra',mes:m,fornecedor:forn,descricao:desc,valor:val,status:'ativa'});
+      var novoSaldo=s-val;
+      if(novoSaldo<lim*(ocCfg.alertaPct||0.2))toast('⚠ Atenção: saldo baixo — '+BRL(novoSaldo)+' restante');
+      else toast('Compra registrada');
+    }
+    ['ocPForn','ocPDesc','ocPValor'].forEach(function(id){if(g(id))g(id).value='';});
+  };
+  window.ocAddAjuste=function(){
+    var m=mesAtual();var motivo=(g('ocAMotivo')&&g('ocAMotivo').value||'').trim();var val=money(g('ocAValor')&&g('ocAValor').value);
+    if(val===0){toast('Informe um valor (use - para reduzir)');return;}
+    if(!confirm('Ajuste de orçamento (direção) para '+mesLabel(m)+': '+BRL(val)+'\nMotivo: '+(motivo||'—')+'\n\nConfirmar?'))return;
+    addItem({tipo:'ajuste',mes:m,fornecedor:'(ajuste direção)',descricao:motivo,valor:val,status:'ajuste'});
+    ['ocAMotivo','ocAValor'].forEach(function(id){if(g(id))g(id).value='';});
+    toast('Ajuste lançado');
+  };
+
+  function onClick(e){
+    var b=e.target.closest&&e.target.closest('[data-oc]');if(!b)return;
+    var act=b.getAttribute('data-oc'),id=b.getAttribute('data-id');
+    if(act==='cancel'){var it=ocItens.find(function(x){return x.id===id;});if(!it)return;if(!confirm('Cancelar "'+(it.fornecedor||'')+' '+BRL(it.valor)+'"?\nO valor volta para o orçamento disponível.'))return;patchItem(id,{cancelado:true,canceladoEm:Date.now(),canceladoPor:user()},'cancelado');toast('Cancelado — valor devolvido ao orçamento');}
+    else if(act==='reativar'){patchItem(id,{cancelado:false},'reativado');toast('Reativado');}
+    else if(act==='del'){if(!confirm('Excluir de vez este lançamento? (não fica no histórico do saldo)'))return;var d=db();if(d){try{d.collection(COL).doc(id).delete();}catch(e2){}}else{ocItens=ocItens.filter(function(x){return x.id!==id;});saveLocal();render();}toast('Excluído');}
+    else if(act==='status'){var it2=ocItens.find(function(x){return x.id===id;});if(!it2)return;patchItem(id,{status:it2.status==='confirmado'?'previsto':'confirmado'},'status');}
+  }
+
+  // ---- render ----
+  function render(){
+    var host=g('ocHost');if(!host)return;
+    var m=mesAtual();
+    var fat=Number(ocCfg.fatur[m])||0, lim=limite(m), comp=comprometido(m), somaComp=somaTipo(m,'compromisso'), somaCompra=somaTipo(m,'compra'), aj=ajustes(m), s=saldo(m);
+    var pct=lim>0?Math.min(999,(comp-aj)/lim*100):0;
+    var estado=s<0?'red':(lim>0&&s<lim*(ocCfg.alertaPct||0.2)?'warn':'green');
+    var barCls=estado==='red'?'red':(estado==='warn'?'warn':'');
+
+    var kpis='<div class="oc-kpis">'+
+      '<div class="oc-kpi"><div class="l">Faturamento previsto</div><div class="v">'+BRL(fat)+'</div></div>'+
+      '<div class="oc-kpi"><div class="l">Limite de compras (50%)</div><div class="v gold">'+BRL(lim)+'</div></div>'+
+      '<div class="oc-kpi"><div class="l">Comprometido</div><div class="v">'+BRL(comp)+'</div></div>'+
+      '<div class="oc-kpi"><div class="l">Compromissos financeiro</div><div class="v">'+BRL(somaComp)+'</div></div>'+
+      '<div class="oc-kpi"><div class="l">Compras novas</div><div class="v">'+BRL(somaCompra)+'</div></div>'+
+      '<div class="oc-kpi"><div class="l">% do limite utilizado</div><div class="v '+(pct>=100?'red':(pct>=80?'warn':'gold'))+'">'+pct.toFixed(1).replace('.',',')+'%</div><div class="oc-bar '+barCls+'"><i style="width:'+Math.min(100,pct)+'%"></i></div></div>'+
+      (aj?'<div class="oc-kpi"><div class="l">Ajustes da direção</div><div class="v '+(aj<0?'red':'green')+'">'+BRL(aj)+'</div></div>':'')+
+    '</div>';
+
+    var disp='<div class="oc-disp '+estado+'"><div class="dl">Disponível para novas compras — '+esc(mesLabel(m))+'</div><div class="dv '+estado+'">'+BRL(s)+'</div>'+
+      '<div class="dl" style="margin-top:6px">Limite '+BRL(lim)+' · comprometido '+BRL(comp)+(aj?(' · ajustes '+BRL(aj)):'')+'</div></div>';
+
+    // compras do estoquista
+    var compras=itensMes(m).filter(function(x){return x.tipo==='compra';}).sort(function(a,b){return b.criadoEm-a.criadoEm;});
+    var comprasCanc=ocItens.filter(function(x){return x.mes===m&&x.tipo==='compra'&&x.cancelado;});
+    var comprasRows=compras.concat(comprasCanc).map(function(x){
+      return '<tr class="'+(x.cancelado?'canc':'')+'"><td>'+esc(x.fornecedor)+(x.status==='excecao'?' <span class="oc-chip exc">exceção</span>':'')+'</td><td>'+esc(x.descricao||'')+'</td><td class="val">'+BRL(x.valor)+'</td><td>'+esc(x.criadoPor||'')+'</td><td style="text-align:right;white-space:nowrap">'+(x.cancelado?'<button class="oc-mini" data-oc="reativar" data-id="'+x.id+'">reativar</button>':'<button class="oc-mini del" data-oc="cancel" data-id="'+x.id+'">cancelar</button>')+'</td></tr>';
+    }).join('');
+    var estoquista='<div class="oc-sec"><h3>Registrar nova compra</h3><p class="hint">O valor é descontado do saldo disponível. Se passar do limite, o sistema bloqueia e pede aprovação da direção.</p>'+
+      '<div class="oc-form">'+
+        '<div class="oc-fld g"><label>Fornecedor / coleção</label><input id="ocPForn" placeholder="Ex.: Urbana"></div>'+
+        '<div class="oc-fld g"><label>Descrição</label><input id="ocPDesc" placeholder="opcional"></div>'+
+        '<div class="oc-fld"><label>Valor</label><input id="ocPValor" inputmode="decimal" placeholder="0,00"></div>'+
+        '<button class="btn btn-ouro" data-oc="addcompra">Registrar compra</button>'+
+      '</div>'+
+      (comprasRows?('<table class="oc-tbl"><thead><tr><th>Fornecedor</th><th>Descrição</th><th>Valor</th><th>Por</th><th></th></tr></thead><tbody>'+comprasRows+'</tbody></table>'):'<div class="oc-empty">Nenhuma compra registrada neste mês.</div>')+
+    '</div>';
+
+    // compromissos financeiro
+    var comps=itensMes(m).filter(function(x){return x.tipo==='compromisso';}).sort(function(a,b){return (a.venc||'').localeCompare(b.venc||'');});
+    var compsCanc=ocItens.filter(function(x){return x.mes===m&&x.tipo==='compromisso'&&x.cancelado;});
+    var compsRows=comps.concat(compsCanc).map(function(x){
+      var chip=x.status==='confirmado'?'<span class="oc-chip conf">confirmado</span>':'<span class="oc-chip prev">previsto</span>';
+      return '<tr class="'+(x.cancelado?'canc':'')+'"><td>'+esc(x.fornecedor)+'</td><td>'+esc(x.descricao||'')+'</td><td>'+fmtVenc(x.venc)+'</td><td class="val">'+BRL(x.valor)+'</td><td>'+chip+'</td><td style="text-align:right;white-space:nowrap">'+(x.cancelado?'<button class="oc-mini" data-oc="reativar" data-id="'+x.id+'">reativar</button>':('<button class="oc-mini" data-oc="status" data-id="'+x.id+'">alternar</button> <button class="oc-mini del" data-oc="cancel" data-id="'+x.id+'">cancelar</button>'))+'</td></tr>';
+    }).join('');
+    var financeiro='<div class="oc-sec"><h3>Financeiro — faturamento e compromissos</h3><p class="hint">Informe o faturamento previsto do mês e cadastre os compromissos de compra (fornecedores) que pesam neste mês.</p>'+
+      '<div class="oc-form" style="margin-bottom:12px">'+
+        '<div class="oc-fld g"><label>Faturamento previsto — '+esc(mesLabel(m))+'</label><input id="ocFatur" inputmode="decimal" placeholder="0,00" value="'+(fat?fat.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'')+'"></div>'+
+        '<button class="btn" data-oc="savefatur">Salvar faturamento</button>'+
+      '</div>'+
+      '<div class="oc-form">'+
+        '<div class="oc-fld g"><label>Fornecedor</label><input id="ocCForn" placeholder="Ex.: Marsara"></div>'+
+        '<div class="oc-fld g"><label>Descrição</label><input id="ocCDesc" placeholder="opcional"></div>'+
+        '<div class="oc-fld"><label>Valor</label><input id="ocCValor" inputmode="decimal" placeholder="0,00"></div>'+
+        '<div class="oc-fld"><label>Vencimento</label><input id="ocCVenc" type="date"></div>'+
+        '<div class="oc-fld"><label>Status</label><select id="ocCStatus"><option value="previsto">Previsto</option><option value="confirmado">Confirmado</option></select></div>'+
+        '<button class="btn btn-ouro" data-oc="addcomp">Adicionar</button>'+
+      '</div>'+
+      (compsRows?('<table class="oc-tbl"><thead><tr><th>Fornecedor</th><th>Descrição</th><th>Venc.</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>'+compsRows+'</tbody></table>'):'<div class="oc-empty">Nenhum compromisso cadastrado neste mês.</div>')+
+    '</div>';
+
+    // ajustes direção
+    var ajuste='<details class="oc-sec"><summary style="cursor:pointer;color:var(--ouro-claro);font-weight:600">Ajuste de orçamento (direção)</summary><p class="hint" style="margin-top:12px">Uso excepcional: soma ou reduz o orçamento do mês (ex.: transferir saldo de outro mês). Fica registrado no histórico.</p>'+
+      '<div class="oc-form"><div class="oc-fld g"><label>Motivo</label><input id="ocAMotivo" placeholder="Ex.: transferência de setembro"></div><div class="oc-fld"><label>Valor (+/-)</label><input id="ocAValor" inputmode="decimal" placeholder="0,00"></div><button class="btn" data-oc="addajuste">Lançar ajuste</button></div></details>';
+
+    // histórico do mês
+    var eventos=[];
+    ocItens.filter(function(x){return x.mes===m;}).forEach(function(x){(x.hist||[]).forEach(function(h){eventos.push({ts:h.ts,por:h.por,txt:_histTxt(x,h)});});});
+    eventos.sort(function(a,b){return b.ts-a.ts;});
+    var hist='<div class="oc-sec"><h3>Histórico do mês</h3>'+(eventos.length?eventos.slice(0,40).map(function(ev){return '<div class="oc-histrow"><span class="t">'+fmtDH(ev.ts)+' · '+esc(ev.por||'?')+'</span><br>'+ev.txt+'</div>';}).join(''):'<div class="oc-empty">Sem movimentações ainda.</div>')+'</div>';
+
+    host.innerHTML='<div class="oc-wrap">'+
+      '<div class="oc-h"><div><h2>Orçamento de compras</h2><div class="oc-sub">Trava automática · máximo 50% do faturamento previsto</div></div>'+
+      '<div class="oc-mes"><button class="oc-mini" data-oc="mesant">‹</button><input type="month" id="ocMesInput" value="'+m+'"><button class="oc-mini" data-oc="mesprox">›</button></div></div>'+
+      kpis+disp+estoquista+financeiro+ajuste+hist+'</div>';
+
+    var mi=g('ocMesInput');if(mi)mi.onchange=function(){_ocMes=mi.value||mesKey();render();};
+  }
+  function _histTxt(x,h){
+    var tlabel=x.tipo==='compra'?'Compra':(x.tipo==='ajuste'?'Ajuste':'Compromisso');
+    var alvo=esc(x.fornecedor||'')+(x.descricao?(' — '+esc(x.descricao)):'');
+    if(h.acao==='criado')return '<b>'+tlabel+' criado</b>: '+alvo+' · '+BRL(h.valor);
+    if(h.acao==='cancelado')return '<b>'+tlabel+' cancelado</b>: '+alvo+' · '+BRL(x.valor)+' (devolvido ao orçamento)';
+    if(h.acao==='reativado')return '<b>'+tlabel+' reativado</b>: '+alvo;
+    if(h.acao==='status')return '<b>'+tlabel+' — status alterado</b>: '+alvo;
+    return '<b>'+tlabel+' alterado</b>: '+alvo+(h.de!=h.para?(' · '+BRL(h.de)+' → '+BRL(h.para)):'');
+  }
+
+  function _mesShift(delta){var p=mesAtual().split('-');var d=new Date(parseInt(p[0],10),parseInt(p[1],10)-1+delta,1);_ocMes=mesKey(d);render();}
+
+  window.ocRender=function(){
+    if(!_ocInit){_ocInit=true;loadLocal();if(!attach())render();}
+    if(!db())render(); // se já anexou, o onSnapshot renderiza; senão garante a tela
+    if(!_ocMes)_ocMes=mesKey();
+    var host=g('ocHost');if(host&&!host._ocBound){host._ocBound=true;host.addEventListener('click',function(e){
+      var b=e.target.closest&&e.target.closest('[data-oc]');if(!b)return;var a=b.getAttribute('data-oc');
+      if(a==='savefatur')return window.ocSalvarFatur();
+      if(a==='addcomp')return window.ocAddCompromisso();
+      if(a==='addcompra')return window.ocAddCompra();
+      if(a==='addajuste')return window.ocAddAjuste();
+      if(a==='mesant')return _mesShift(-1);
+      if(a==='mesprox')return _mesShift(1);
+      onClick(e);
+    });}
+    render();
+  };
+})();
+</script>
