@@ -5189,7 +5189,7 @@ $('bulkApply')&&$('bulkApply').addEventListener('click',()=>{
 // ---- histórico ----
 $('repoHistOpen')&&$('repoHistOpen').addEventListener('click',()=>{renderHist();$('histModal').classList.remove('hide');});
 $('histClose')&&$('histClose').addEventListener('click',()=>{$('histModal').classList.add('hide');});
-window.marcarRecebido=(id)=>{const p=repoHist.find(x=>x.id===id);if(p){p.status='recebido';p.recebidoEm=Date.now();salvaHist();afterHist();toast('Baixa dada - saiu do a caminho');}};
+window.marcarRecebido=(id)=>{const p=repoHist.find(x=>x.id===id);if(p){p.status='recebido';p.recebidoEm=Date.now();salvaHist();if(window.ocAPI)try{window.ocAPI.ativarChegada(id,p.recebidoEm);}catch(e){}afterHist();toast('Baixa dada - saiu do a caminho');}};
 window.excluirPedido=(id)=>{if(confirm('Excluir este pedido do histórico?')){if(window.ocAPI)try{window.ocAPI.cancelarReposicao(id);}catch(e){}repoHist=repoHist.filter(x=>x.id!==id);salvaHist();afterHist();}};
 function renderHist(){
   const lst=$('repRecebList')||$('histList');
@@ -5208,13 +5208,11 @@ window.repConfirmarPedido=(fid)=>{
   if(!F||!F.mods||!Object.keys(F.mods).length){toast('Gere o pedido primeiro');return;}
   const fornNome=fid==='_sem'?'(sem fábrica)':repFornNome(fid);
   const _valor=F.valor||0;
-  if(window.ocAPI){
-    var _s=window.ocAPI.saldo();
-    if(_valor>_s+0.005){
-      var _falta=_valor-_s;
-      alert('⛔ Sem saldo para esta reposição.\n\nDisponível este mês: '+window.ocAPI.fmt(_s)+'\nEste pedido: '+window.ocAPI.fmt(_valor)+'\nFaltam: '+window.ocAPI.fmt(_falta)+'\n\nReduza as quantidades do pedido até caber no saldo e confirme de novo.');
-      return;
-    }
+  var _plano=window.ocAPI?window.ocAPI.plano(fid):null;
+  if(_plano&&_plano.trava&&_valor>_plano.saldo+0.005){
+    var _falta=_valor-_plano.saldo;
+    alert('⛔ Sem saldo no orçamento de '+_plano.mesLabel+'.\n\nEste pedido vence em '+_plano.mesLabel+' (pagamento D+'+_plano.dias+' do pedido).\n\nDisponível nesse mês: '+window.ocAPI.fmt(_plano.saldo)+'\nEste pedido: '+window.ocAPI.fmt(_valor)+'\nFaltam: '+window.ocAPI.fmt(_falta)+'\n\nReduza as quantidades do pedido até caber e confirme de novo.');
+    return;
   }
   const itens=[];
   Object.keys(F.mods).forEach(mid=>{const M=F.mods[mid];Object.keys(M.cores).forEach(cor=>{const g={};Object.keys(M.cores[cor]).forEach(t=>g[t]=M.cores[cor][t]);itens.push({mk:mid,ck:cor,fk:fid,modelo:M.nome,cor:cor,grade:g,preco:M.custo||0});});});
@@ -5222,11 +5220,15 @@ window.repConfirmarPedido=(fid)=>{
   var _rid='p'+Date.now();
   repoHist.push({id:_rid,data:new Date().toISOString(),fk:fid,fornNome:fornNome,itens:itens,valor:_valor,status:'pendente'});
   salvaHist();
-  if(window.ocAPI)try{window.ocAPI.registrarReposicao(_rid,fornNome,_valor);}catch(e){}
+  if(window.ocAPI)try{window.ocAPI.registrarReposicao(_rid,fornNome,_valor,fid);}catch(e){}
   if(typeof peRefletirPedidoLoja==='function')peRefletirPedidoLoja(fid,itens,_rid);
   delete repPedidoCache[fid];
   repRenderPedido();
-  toast('Pedido de '+fornNome+' confirmado — '+(window.ocAPI?('descontou '+window.ocAPI.fmt(_valor)+' do saldo'):'veja na aba Recebimento'));
+  var _msg;
+  if(_plano&&_plano.base==='chegada')_msg='Pedido de '+fornNome+' confirmado — vai pesar no orçamento só quando a mercadoria chegar (D+'+_plano.dias+' da chegada)';
+  else if(_plano&&_plano.trava)_msg='Pedido de '+fornNome+' confirmado — '+window.ocAPI.fmt(_valor)+' no orçamento de '+_plano.mesLabel;
+  else _msg='Pedido de '+fornNome+' confirmado';
+  toast(_msg);
 };
 window.registrarEnviado=(fk)=>{
   _transito=transitoMap();const f=repoCfg[fk];const itens=[];let valor=0;
@@ -6965,6 +6967,7 @@ function finalizarReceb(gerar){const p=repoHist.find(x=>x.id===recebId);if(!p)re
   p.itens.forEach((it,i)=>{it.fabrica=fab[i];it.chegou=che[i];});
   let div=false;p.itens.forEach(it=>{const ts=new Set([...Object.keys(it.fabrica||{}),...Object.keys(it.chegou||{})]);ts.forEach(t=>{if(((it.fabrica&&it.fabrica[t])||0)!==((it.chegou&&it.chegou[t])||0))div=true;});});
   p.divergente=div;p.status='recebido';p.recebidoEm=Date.now();salvaHist();
+  if(window.ocAPI)try{window.ocAPI.ativarChegada(p.id,p.recebidoEm);}catch(e){}
   let n=0;
   if(gerar){p.itens.forEach(it=>{const mc=acharModeloCor(it.modelo,it.cor);if(!mc)return;Object.keys(it.chegou).forEach(t=>{addItem(mc.modId,mc.ci,t,it.chegou[t]);n++;});});renderFila();renderLista();}
   $('recebModal').classList.add('hide');afterHist();
@@ -7730,7 +7733,14 @@ function repRenderPedido(){
       });
       html+=`</div>`;
     });
-    html+=`</div>${(_saldo!=null&&F.valor>_saldo+0.005)?`<div class="rep-ped-over">⚠ Este pedido (${repBRL(F.valor)}) passa do saldo disponível (${repBRL(_saldo)}). Faltam ${repBRL(F.valor-_saldo)} — reduza as quantidades até caber.</div>`:''}<div class="rep-ped-acts">
+    var _pl=window.ocAPI?window.ocAPI.plano(fid):null;
+    var _plInfo='';
+    if(_pl&&_pl.base==='chegada'){_plInfo=`<div class="rep-ped-mes">Pesa no orçamento só quando a mercadoria chegar (pagamento D+${_pl.dias} da chegada) — não desconta agora.</div>`;}
+    else if(_pl&&_pl.trava){
+      if(F.valor>_pl.saldo+0.005)_plInfo=`<div class="rep-ped-over">⚠ Vence em ${escapeHtml(_pl.mesLabel)} (D+${_pl.dias} do pedido). Este pedido (${repBRL(F.valor)}) passa do saldo desse mês (${repBRL(_pl.saldo)}). Faltam ${repBRL(F.valor-_pl.saldo)} — reduza as quantidades.</div>`;
+      else _plInfo=`<div class="rep-ped-mes">Pesa no orçamento de <b>${escapeHtml(_pl.mesLabel)}</b> (D+${_pl.dias} do pedido) · saldo desse mês ${repBRL(_pl.saldo)}.</div>`;
+    }
+    html+=`</div>${_plInfo}<div class="rep-ped-acts">
         <button class="btn btn-ouro btn-sm" onclick="repCopiar('${fid}')">Copiar p/ WhatsApp</button>
         ${fid!=='_sem'&&repForn[fid]&&repForn[fid].whatsapp?`<button class="btn btn-ghost btn-sm" onclick="repAbrirGrupo('${fid}')">Abrir grupo</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="repImprimir('${fid}')">Imprimir / PDF</button>
@@ -11606,6 +11616,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
   .rep-saldo-v{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;color:var(--areia)}
   .rep-saldo-red .rep-saldo-v{color:var(--perigo)}
   .rep-ped-over{background:rgba(192,57,43,.14);border:1px solid rgba(192,57,43,.4);color:#ffb59c;border-radius:var(--r-sm);padding:8px 11px;margin:8px 0;font-size:var(--fs-sm);font-weight:600;line-height:1.4}
+  .rep-ped-mes{background:rgba(220,189,96,.10);border:1px solid rgba(220,189,96,.3);color:var(--ouro-claro);border-radius:var(--r-sm);padding:7px 11px;margin:8px 0;font-size:var(--fs-sm);line-height:1.4}
 </style>
 <script>
 /* ================= ORÇAMENTO DE COMPRAS DO ESTOQUE =================
@@ -11615,7 +11626,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
    e o faturamento é gravado por campo do mês — sem regravar tudo (evita sobrescrita). */
 (function(){
   var COL='ls_orc_compras';
-  var ocCfg={fatur:{},pct:0.5,alertaPct:0.2}, ocItens=[], _ocUnsub=null, _ocInit=false;
+  var ocCfg={fatur:{},pct:0.5,alertaPct:0.2,prazos:{}}, ocItens=[], _ocUnsub=null, _ocInit=false;
   var _ocMes=null;
   var g=function(id){return document.getElementById(id);};
   function esc(s){return window.escapeHtml?window.escapeHtml(s):String(s==null?'':s);}
@@ -11634,11 +11645,23 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
 
   // ---- cálculo ----
   function limite(m){return (Number(ocCfg.fatur[m])||0)*(ocCfg.pct||0.5);}
-  function itensMes(m){return ocItens.filter(function(x){return x.mes===m&&!x.cancelado;});}
+  function itensMes(m){return ocItens.filter(function(x){return x.mes===m&&!x.cancelado&&!x.aguardaChegada;});}
   function somaTipo(m,tipo){return itensMes(m).filter(function(x){return x.tipo===tipo;}).reduce(function(s,x){return s+(Number(x.valor)||0);},0);}
   function comprometido(m){return somaTipo(m,'compromisso')+somaTipo(m,'compra');}
   function ajustes(m){return somaTipo(m,'ajuste');}
   function saldo(m){return limite(m)-comprometido(m)+ajustes(m);}
+  // ---- prazos de pagamento por fornecedor (compra × pagamento) ----
+  function nomeForn(fid){try{return (typeof repForn!=='undefined'&&repForn&&repForn[fid]&&repForn[fid].nome)||fid;}catch(e){return fid;}}
+  function normNome(s){return String(s||'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+  function prazoDe(fid){
+    var p=(ocCfg.prazos||{})[fid];
+    if(p&&typeof p.dias==='number')return {dias:p.dias,base:(p.base==='chegada'?'chegada':'pedido')};
+    var nm=normNome(nomeForn(fid));
+    if(nm.indexOf('tchwm')>=0)return {dias:15,base:'chegada'};
+    if(nm.indexOf('manutt')>=0)return {dias:30,base:'pedido'};
+    return {dias:30,base:'pedido'};
+  }
+  function mesVenc(fid,ref){var p=prazoDe(fid);var d=new Date(ref||Date.now());d.setDate(d.getDate()+p.dias);return mesKey(d);}
 
   // ---- persistência ----
   function attach(){
@@ -11647,7 +11670,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
       _ocUnsub=d.collection(COL).onSnapshot(function(snap){
         var itens=[];
         snap.docs.forEach(function(doc){
-          if(doc.id==='_cfg'){var c=doc.data()||{};ocCfg.fatur=c.fatur||{};ocCfg.pct=(typeof c.pct==='number')?c.pct:0.5;ocCfg.alertaPct=(typeof c.alertaPct==='number')?c.alertaPct:0.2;}
+          if(doc.id==='_cfg'){var c=doc.data()||{};ocCfg.fatur=c.fatur||{};ocCfg.pct=(typeof c.pct==='number')?c.pct:0.5;ocCfg.alertaPct=(typeof c.alertaPct==='number')?c.alertaPct:0.2;ocCfg.prazos=c.prazos||{};}
           else itens.push(Object.assign({id:doc.id},doc.data()));
         });
         ocItens=itens;
@@ -11685,6 +11708,13 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
 
   // ---- ações (delegado) ----
   window.ocSalvarFatur=function(){var m=mesAtual();var v=money(g('ocFatur').value);salvarFatur(m,v);toast('Faturamento de '+mesLabel(m)+' salvo');render();};
+  window.ocSalvarPrazos=function(){
+    var pr=ocCfg.prazos||{};
+    document.querySelectorAll('.oc-praz-d').forEach(function(i){var fid=i.getAttribute('data-fid');var dias=parseInt(i.value,10);if(isNaN(dias)||dias<0)dias=30;var b=document.querySelector('.oc-praz-b[data-fid="'+fid+'"]');var base=(b&&b.value==='chegada')?'chegada':'pedido';pr[fid]={dias:dias,base:base};});
+    ocCfg.prazos=pr;saveLocal();
+    var d=db();if(d)try{d.collection(COL).doc('_cfg').set({prazos:pr},{merge:true});}catch(e){}
+    toast('Prazos de pagamento salvos');render();
+  };
   function lerForm(pref){
     return {forn:(g(pref+'Forn')&&g(pref+'Forn').value||'').trim(),desc:(g(pref+'Desc')&&g(pref+'Desc').value||'').trim(),valor:money(g(pref+'Valor')&&g(pref+'Valor').value),venc:(g(pref+'Venc')&&g(pref+'Venc').value)||'',status:(g(pref+'Status')&&g(pref+'Status').value)||''};
   }
@@ -11718,8 +11748,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     }
     ['ocPForn','ocPDesc','ocPValor'].forEach(function(id){if(g(id))g(id).value='';});
   };
-  window.ocAddAjuste=function(){
-    var m=mesAtual();var motivo=(g('ocAMotivo')&&g('ocAMotivo').value||'').trim();var val=money(g('ocAValor')&&g('ocAValor').value);
+  window.ocAddAjuste=function(){    var m=mesAtual();var motivo=(g('ocAMotivo')&&g('ocAMotivo').value||'').trim();var val=money(g('ocAValor')&&g('ocAValor').value);
     if(val===0){toast('Informe um valor (use - para reduzir)');return;}
     if(!confirm('Ajuste de orçamento (direção) para '+mesLabel(m)+': '+BRL(val)+'\nMotivo: '+(motivo||'—')+'\n\nConfirmar?'))return;
     addItem({tipo:'ajuste',mes:m,fornecedor:'(ajuste direção)',descricao:motivo,valor:val,status:'ajuste'});
@@ -11797,6 +11826,17 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
       (compsRows?('<table class="oc-tbl"><thead><tr><th>Fornecedor</th><th>Descrição</th><th>Venc.</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>'+compsRows+'</tbody></table>'):'<div class="oc-empty">Nenhum compromisso cadastrado neste mês.</div>')+
     '</div>';
 
+    // prazos de pagamento por fornecedor
+    var _forns=[];try{if(typeof repForn!=='undefined'&&repForn){Object.keys(repForn).forEach(function(fid){if(repForn[fid]&&!repForn[fid].off)_forns.push({fid:fid,nome:repForn[fid].nome||fid});});}}catch(e){}
+    _forns.sort(function(a,b){return String(a.nome).localeCompare(String(b.nome));});
+    var _inpS='background:var(--verde-escuro);border:1px solid var(--linha-forte);color:var(--areia);border-radius:6px;padding:5px 7px';
+    var prazosRows=_forns.map(function(f){var p=prazoDe(f.fid);
+      return '<tr><td>'+esc(f.nome)+'</td><td style="text-align:right"><input class="oc-praz-d" data-fid="'+esc(f.fid)+'" type="number" min="0" style="width:66px;'+_inpS+'" value="'+p.dias+'"> dias</td><td><select class="oc-praz-b" data-fid="'+esc(f.fid)+'" style="'+_inpS+'"><option value="pedido"'+(p.base==='pedido'?' selected':'')+'>do pedido</option><option value="chegada"'+(p.base==='chegada'?' selected':'')+'>da chegada</option></select></td></tr>';
+    }).join('');
+    var prazos='<details class="oc-sec"><summary style="cursor:pointer;color:var(--ouro-claro);font-weight:600">Prazos de pagamento por fornecedor</summary><p class="hint" style="margin-top:12px">Define em que mês a reposição de cada fornecedor pesa: <b>do pedido</b> = conta a partir do dia do pedido; <b>da chegada</b> = só pesa quando a mercadoria chega (ex.: Manutt 30 do pedido, Tchwm 15 da chegada). Padrão: 30 dias do pedido.</p>'+
+      (prazosRows?('<table class="oc-tbl"><thead><tr><th>Fornecedor</th><th style="text-align:right">Prazo</th><th>A partir de</th></tr></thead><tbody>'+prazosRows+'</tbody></table><div style="margin-top:12px"><button class="btn btn-ouro" data-oc="saveprazos">Salvar prazos</button></div>'):'<div class="oc-empty">Nenhum fornecedor cadastrado na Reposição ainda.</div>')+
+      '</details>';
+
     // ajustes direção
     var ajuste='<details class="oc-sec"><summary style="cursor:pointer;color:var(--ouro-claro);font-weight:600">Ajuste de orçamento (direção)</summary><p class="hint" style="margin-top:12px">Uso excepcional: soma ou reduz o orçamento do mês (ex.: transferir saldo de outro mês). Fica registrado no histórico.</p>'+
       '<div class="oc-form"><div class="oc-fld g"><label>Motivo</label><input id="ocAMotivo" placeholder="Ex.: transferência de setembro"></div><div class="oc-fld"><label>Valor (+/-)</label><input id="ocAValor" inputmode="decimal" placeholder="0,00"></div><button class="btn" data-oc="addajuste">Lançar ajuste</button></div></details>';
@@ -11810,7 +11850,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     host.innerHTML='<div class="oc-wrap">'+
       '<div class="oc-h"><div><h2>Orçamento de compras</h2><div class="oc-sub">Trava automática · máximo 50% do faturamento previsto</div></div>'+
       '<div class="oc-mes"><button class="oc-mini" data-oc="mesant">‹</button><input type="month" id="ocMesInput" value="'+m+'"><button class="oc-mini" data-oc="mesprox">›</button></div></div>'+
-      kpis+disp+estoquista+financeiro+ajuste+hist+'</div>';
+      kpis+disp+estoquista+financeiro+prazos+ajuste+hist+'</div>';
 
     var mi=g('ocMesInput');if(mi)mi.onchange=function(){_ocMes=mi.value||mesKey();render();};
   }
@@ -11834,6 +11874,7 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     var host=g('ocHost');if(host&&!host._ocBound){host._ocBound=true;host.addEventListener('click',function(e){
       var b=e.target.closest&&e.target.closest('[data-oc]');if(!b)return;var a=b.getAttribute('data-oc');
       if(a==='savefatur')return window.ocSalvarFatur();
+      if(a==='saveprazos')return window.ocSalvarPrazos();
       if(a==='addcomp')return window.ocAddCompromisso();
       if(a==='addcompra')return window.ocAddCompra();
       if(a==='addajuste')return window.ocAddAjuste();
@@ -11861,11 +11902,31 @@ if($('fecLimpar'))$('fecLimpar').addEventListener('click',function(){_fecFab=[];
     saldo:function(m){ensure();return saldo(m||mesKey());},
     limite:function(m){ensure();return limite(m||mesKey());},
     fmt:function(n){return BRL(n);},
+    prazoDe:function(fid){return prazoDe(fid);},
+    // plano de um pedido: em que mês pesa e quanto há de saldo lá (para exibir e travar)
+    plano:function(fid){
+      ensure();var p=prazoDe(fid);
+      if(p.base==='chegada')return {base:'chegada',dias:p.dias,trava:false,mes:null,mesLabel:null,saldo:null};
+      var m=mesVenc(fid,Date.now());
+      return {base:'pedido',dias:p.dias,trava:true,mes:m,mesLabel:mesLabel(m),saldo:saldo(m)};
+    },
     temRepo:function(repoId){return ocItens.some(function(x){return x.repoId===repoId&&!x.cancelado;});},
-    registrarReposicao:function(repoId,fornNome,valor){
+    registrarReposicao:function(repoId,fornNome,valor,fid){
       ensure(); if(!repoId||this.temRepo(repoId))return false;
-      addItem({tipo:'compra',mes:mesKey(),fornecedor:fornNome||'Reposição',descricao:'Reposição (pedido à fábrica)',valor:Number(valor)||0,status:'ativa',origem:'reposicao',repoId:repoId});
+      var p=prazoDe(fid),now=Date.now();
+      var chegada=(p.base==='chegada');
+      var mes=mesVenc(fid,now); // p/ 'chegada' é só uma estimativa até chegar
+      addItem({tipo:'compra',mes:mes,fornecedor:fornNome||'Reposição',fid:fid||'',descricao:'Reposição (pedido à fábrica)',valor:Number(valor)||0,status:'ativa',origem:'reposicao',repoId:repoId,base:p.base,prazoDias:p.dias,aguardaChegada:chegada,dataPedido:now});
       return true;
+    },
+    // quando a mercadoria chega: fornecedores 'da chegada' passam a pesar no mês de (chegada + dias)
+    ativarChegada:function(repoId,arrivalTs){
+      ensure();var achou=false;
+      ocItens.filter(function(x){return x.repoId===repoId&&x.aguardaChegada&&!x.cancelado;}).forEach(function(x){
+        var m=mesVenc(x.fid,arrivalTs||Date.now());
+        patchItem(x.id,{aguardaChegada:false,mes:m,chegouEm:(arrivalTs||Date.now())},'chegada');achou=true;
+      });
+      return achou;
     },
     cancelarReposicao:function(repoId){
       ensure(); var achou=false;
