@@ -95,26 +95,34 @@
      Por isso: nunca incluir no objeto final um campo cujo delta ficou vazio —
      omitir a chave inteira faz o merge do Firestore simplesmente não tocar
      nela, que é o comportamento certo pra "nada mudou". */
-  function montarGravacao(payload,base,atual,DEL){
+  function montarGravacao(payload,base,atual,DEL,isentoGuardRail){
     payload=payload||{};base=base||{};atual=atual||{};
     var baseSync=base._syncEm||0;
     var podeDel=!baseSync||((atual.atualizadoEm||0)<=baseSync+2000);
     var out={};
     Object.keys(payload).forEach(function(campo){
+      if(campo==='_isentoGuardRail') return; // sinalizador interno, nunca vai pro Firestore
       if(campo==='estoque'||campo==='produzindo'||campo==='meta'){
         var d=deltaCampo(base[campo],payload[campo],podeDel?DEL:null);
         if(!Object.keys(d).length) return; // nada mudou nesse campo — não manda a chave (ver GHOST BUG acima)
         /* GUARD-RAIL (pedido Gregory 22/09/2026): mesmo com o fix acima, se
            algum caminho futuro gerar um delete em massa de um mapa, aborta em
            vez de deixar passar — isso teria parado os zeramentos de hoje
-           mesmo sem saber a causa exata. */
-        var baseCampo=base[campo]||{};
-        var baseNaoZero=Object.keys(baseCampo).filter(function(k){return (parseInt(baseCampo[k],10)||0)!==0;});
-        var dels=Object.keys(d).filter(function(k){return d[k]===DEL;}).length;
-        if(baseNaoZero.length>=5 && dels>baseNaoZero.length*0.3){
-          var err=new Error('Gravação bloqueada: apagaria '+dels+' de '+baseNaoZero.length+' chaves de "'+campo+'" de uma vez — parece bug, não edição real.');
-          err.code='delecao-suspeita';
-          throw err;
+           mesmo sem saber a causa exata.
+           ISENÇÃO (achado 02/10/2026): recebimento de lote (peReceberTudo/
+           peReceberLote) passa isentoGuardRail=true porque o delta dele já é
+           limitado aos itens do próprio lote — nunca é edição solta, então
+           não é o padrão de bug que esta trava foi desenhada pra pegar.
+           Ajuste manual de estoque/produzindo/meta continua protegido. */
+        if(!isentoGuardRail){
+          var baseCampo=base[campo]||{};
+          var baseNaoZero=Object.keys(baseCampo).filter(function(k){return (parseInt(baseCampo[k],10)||0)!==0;});
+          var dels=Object.keys(d).filter(function(k){return d[k]===DEL;}).length;
+          if(baseNaoZero.length>=5 && dels>baseNaoZero.length*0.3){
+            var err=new Error('Gravação bloqueada: apagaria '+dels+' de '+baseNaoZero.length+' chaves de "'+campo+'" de uma vez — parece bug, não edição real.');
+            err.code='delecao-suspeita';
+            throw err;
+          }
         }
         out[campo]=d;
       } else out[campo]=payload[campo];

@@ -155,6 +155,43 @@ teste('mapa pequeno (menos de 5 chaves não-zero) não aciona o guard-rail mesmo
   var out = PECore.montarGravacao({ produzindo: {} }, base, servidor, DEL);
   assert.deepEqual(out.produzindo, { a: DEL, b: DEL });
 });
+console.log('isenção do guard-rail para recebimento de lote (achado 02/10/2026, caso real Manutt)');
+teste('recebimento de lote grande SEM isenção ainda bloqueia (prova que o bug existia)', () => {
+  // caso real: Manutt, 64 células em produzindo, lote de 296 pares cobre todas.
+  var prod = {}; for (var i = 0; i < 64; i++) prod['k' + i] = 1 + i;
+  var servidor = { produzindo: prod, atualizadoEm: 1000 };
+  var base = { produzindo: prod, _syncEm: 1000 };
+  // recebimento esvazia o mapa inteiro (equivalente a receber o lote completo)
+  assert.throws(() => PECore.montarGravacao({ produzindo: {} }, base, servidor, DEL), function(e) {
+    return e.code === 'delecao-suspeita';
+  });
+});
+teste('recebimento de lote grande COM isentoGuardRail=true passa normalmente (fix 02/10/2026)', () => {
+  var prod = {}; for (var i = 0; i < 64; i++) prod['k' + i] = 1 + i;
+  var servidor = { produzindo: prod, atualizadoEm: 1000 };
+  var base = { produzindo: prod, _syncEm: 1000 };
+  var out = PECore.montarGravacao({ produzindo: {} }, base, servidor, DEL, true);
+  assert.equal(Object.keys(out.produzindo).length, 64);
+  Object.keys(out.produzindo).forEach(k => assert.equal(out.produzindo[k], DEL));
+});
+teste('_isentoGuardRail nunca vaza como campo real pro Firestore', () => {
+  var servidor = { produzindo: { a: 1 }, atualizadoEm: 1000 };
+  var base = { produzindo: { a: 1 }, _syncEm: 1000 };
+  var out = PECore.montarGravacao({ produzindo: { a: 2 }, _isentoGuardRail: true, lorettoEm: 5 }, base, servidor, DEL, true);
+  assert.equal('_isentoGuardRail' in out, false);
+  assert.equal(out.lorettoEm, 5);
+});
+teste('ajuste MANUAL de estoque/produzindo (sem isentoGuardRail) continua protegido mesmo depois do fix', () => {
+  // garante que a isenção é exclusiva de quem passa o 5º parâmetro — não virou
+  // brecha geral.
+  var prodReal = {}; for (var i = 0; i < 10; i++) prodReal['k' + i] = 10 + i;
+  var servidor = { produzindo: prodReal, atualizadoEm: 1000 };
+  var base = { produzindo: prodReal, _syncEm: 1000 };
+  var payload = { produzindo: { k0: 10, k1: 11, k2: 12 } }; // 70% apagado, SEM isenção
+  assert.throws(() => PECore.montarGravacao(payload, base, servidor, DEL), function(e) {
+    return e.code === 'delecao-suspeita';
+  });
+});
 
 console.log('re-render durante digitação (devePularRenderFabrica)');
 teste('pula render com campo da grade focado', () => {
